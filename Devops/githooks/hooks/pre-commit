@@ -1,0 +1,9 @@
+#!/bin/sh
+echo "Hello shell"
+git update-index --assume-unchanged Devops/config.bat
+
+for file in $(git diff --staged --name-only | grep -i -E '\.(cpp|h|cs)$'); do
+    echo ${file}
+    clang-format -i ${file}
+    git add ${file}
+done
