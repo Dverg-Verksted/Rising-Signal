@@ -9,7 +9,8 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
-				"Engine"
+				"Engine",
+				"ALSV4_CPP"
 			]
 		}
 	],
@@ -333,6 +334,10 @@
 				"Win64",
 				"Linux"
 			]
+		},
+		{
+			"Name": "ElectronicNodes",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [
