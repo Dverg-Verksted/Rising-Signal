@@ -1,0 +1,32 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "3.2",
+	"FriendlyName": "Electronic Nodes",
+	"Description": "Improve the wire style of blueprints and materials editors.",
+	"Category": "Editor",
+	"CreatedBy": "Hugo Attal",
+	"CreatedByURL": "https://twitter.com/HugoAttal",
+	"DocsURL": "https://github.com/TheHerobrine/ElectronicNodes",
+	"CanContainContent": false,
+	"Installed": true,
+	"Modules": [
+		{
+			"Name": "ElectronicNodes",
+			"Type": "Editor",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32",
+				"Mac",
+				"Linux"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "ControlRig",
+			"Enabled": true
+		}
+	]
+}
