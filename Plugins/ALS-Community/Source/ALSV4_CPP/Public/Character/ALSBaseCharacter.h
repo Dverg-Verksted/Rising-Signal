@@ -530,6 +530,7 @@ protected:
 
 	float PreviousAimYaw = 0.0f;
 
+	UPROPERTY()
 	UALSCharacterAnimInstance* MainAnimInstance = nullptr;
 
 	/** Last time the 'first' crouch/roll button is pressed */

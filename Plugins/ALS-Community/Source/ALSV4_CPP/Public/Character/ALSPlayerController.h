@@ -21,5 +21,6 @@ public:
 
 private:
 	/** Main character reference */
+	UPROPERTY()
 	AALSBaseCharacter* PossessedCharacter = nullptr;
 };
