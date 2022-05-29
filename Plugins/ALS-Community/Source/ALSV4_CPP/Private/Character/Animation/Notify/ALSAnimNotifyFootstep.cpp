@@ -1,6 +1,8 @@
 // Copyright (C) 2020, Doga Can Yanikoglu
 
+
 #include "Character/Animation/Notify/ALSAnimNotifyFootstep.h"
+
 
 #include "Components/AudioComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -17,8 +19,10 @@ void UALSAnimNotifyFootstep::Notify(USkeletalMeshComponent* MeshComp, UAnimSeque
 
 	if (Sound)
 	{
-		UAudioComponent* SpawnedAudio = UGameplayStatics::SpawnSoundAttached(Sound, MeshComp, AttachPointName, FVector::ZeroVector,
-			FRotator::ZeroRotator, EAttachLocation::Type::KeepRelativeOffset, true, FinalVolMult, PitchMultiplier);
+		UAudioComponent* SpawnedAudio = UGameplayStatics::SpawnSoundAttached(Sound, MeshComp, AttachPointName,
+		                                                                     FVector::ZeroVector, FRotator::ZeroRotator,
+		                                                                     EAttachLocation::Type::KeepRelativeOffset,
+		                                                                     true, FinalVolMult, PitchMultiplier);
 		if (SpawnedAudio)
 		{
 			SpawnedAudio->SetIntParameter(FName(TEXT("FootstepType")), static_cast<int32>(FootstepType));
