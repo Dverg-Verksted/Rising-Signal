@@ -1,7 +1,7 @@
 // It is owned by the company Dverg Verksted.
 
-
 #include "Game/HUD/GameHUD.h"
+#include "Player/RSGamePLayer.h"
 
 void AGameHUD::DrawHUD()
 {
@@ -20,4 +20,7 @@ void AGameHUD::DrawHUD()
 void AGameHUD::BeginPlay()
 {
 	Super::BeginPlay();
+
+	this->GamePlayer = Cast<ARSGamePLayer>(GetOwningPlayerController()->GetPawn());
+	check(this->GamePlayer);
 }
