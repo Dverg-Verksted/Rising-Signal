@@ -16,7 +16,7 @@ class ALSV4_CPP_API AALSCharacter : public AALSBaseCharacter
 
 public:
 	AALSCharacter();
-
+	
 	/** Implement on BP to update held objects */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "HeldObject")
 	void UpdateHeldObject();
@@ -25,8 +25,8 @@ public:
 	void ClearHeldObject();
 
 	UFUNCTION(BlueprintCallable, Category = "HeldObject")
-	void AttachToHand(
-		UStaticMesh* NewStaticMesh, USkeletalMesh* NewSkeletalMesh, class UClass* NewAnimClass, bool bLeftHand, FVector Offset);
+	void AttachToHand(UStaticMesh* NewStaticMesh, USkeletalMesh* NewSkeletalMesh,
+	                  class UClass* NewAnimClass, bool bLeftHand, FVector Offset);
 
 	virtual void RagdollStart() override;
 
@@ -45,7 +45,8 @@ protected:
 
 	virtual void OnOverlayStateChanged(EALSOverlayState PreviousState) override;
 
-	virtual void MantleStart(float MantleHeight, const FALSComponentAndTransform& MantleLedgeWS, EALSMantleType MantleType) override;
+	virtual void MantleStart(
+		float MantleHeight, const FALSComponentAndTransform& MantleLedgeWS, EALSMantleType MantleType) override;
 
 	virtual void MantleEnd() override;
 

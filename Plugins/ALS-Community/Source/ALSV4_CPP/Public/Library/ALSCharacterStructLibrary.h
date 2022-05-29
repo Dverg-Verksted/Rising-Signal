@@ -178,10 +178,14 @@ struct FALSMovementSettings
 	{
 		switch (Gait)
 		{
-			case EALSGait::Running: return RunSpeed;
-			case EALSGait::Sprinting: return SprintSpeed;
-			case EALSGait::Walking: return WalkSpeed;
-			default: return RunSpeed;
+		case EALSGait::Running:
+			return RunSpeed;
+		case EALSGait::Sprinting:
+			return SprintSpeed;
+		case EALSGait::Walking:
+			return WalkSpeed;
+		default:
+			return RunSpeed;
 		}
 	}
 };

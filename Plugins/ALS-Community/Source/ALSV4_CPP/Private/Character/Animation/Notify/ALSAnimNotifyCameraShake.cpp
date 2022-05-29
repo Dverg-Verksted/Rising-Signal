@@ -1,6 +1,8 @@
 // Copyright (C) 2020, Doga Can Yanikoglu
 
+
 #include "Character/Animation/Notify/ALSAnimNotifyCameraShake.h"
+
 
 void UALSAnimNotifyCameraShake::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
