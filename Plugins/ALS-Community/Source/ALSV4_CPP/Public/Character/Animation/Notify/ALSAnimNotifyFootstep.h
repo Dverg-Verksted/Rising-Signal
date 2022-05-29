@@ -35,8 +35,7 @@ public:
 	float VolumeMultiplier = 1.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimNotify)
-	float PitchMultiplier = 1.0f;
-	;
+	float PitchMultiplier = 1.0f;;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimNotify)
 	bool bOverrideMaskCurve = false;

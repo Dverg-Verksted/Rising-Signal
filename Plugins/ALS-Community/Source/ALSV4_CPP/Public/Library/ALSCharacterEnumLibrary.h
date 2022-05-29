@@ -19,6 +19,7 @@ static FORCEINLINE FString GetEnumerationToString(const Enumeration InValue)
 	return StaticEnum<Enumeration>()->GetNameStringByValue(static_cast<int64>(InValue));
 }
 
+
 UENUM(BlueprintType)
 enum class EALSGait : uint8
 {
@@ -137,4 +138,12 @@ enum class EALSMovementDirection : uint8
 	Right,
 	Left,
 	Backward
+};
+
+UENUM(BlueprintType)
+enum class ELogVerb : uint8
+{
+	Display,
+	Warning,
+	Error
 };

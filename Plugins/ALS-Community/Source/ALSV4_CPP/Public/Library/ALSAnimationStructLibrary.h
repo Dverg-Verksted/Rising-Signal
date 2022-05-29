@@ -6,7 +6,9 @@
 #include "Runtime/Engine/Classes/Animation/AnimSequenceBase.h"
 #include "ALSCharacterEnumLibrary.h"
 
+
 #include "ALSAnimationStructLibrary.generated.h"
+
 
 USTRUCT(BlueprintType)
 struct FALSDynamicMontageParams
@@ -146,6 +148,7 @@ struct FALSAnimCharacterInformation
 	EALSOverlayState OverlayState = EALSOverlayState::Default;
 };
 
+
 USTRUCT(BlueprintType)
 struct FALSAnimGraphGrounded
 {
@@ -164,7 +167,7 @@ struct FALSAnimGraphGrounded
 	FVector RelativeAccelerationAmount;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
-	bool bShouldMove = false;  // Should be false initially
+	bool bShouldMove = false; // Should be false initially
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 	bool bRotateL = false;

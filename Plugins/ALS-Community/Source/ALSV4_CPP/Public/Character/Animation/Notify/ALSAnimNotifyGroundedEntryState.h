@@ -9,7 +9,7 @@
 #include "ALSAnimNotifyGroundedEntryState.generated.h"
 
 /**
- *
+ * 
  */
 UCLASS()
 class ALSV4_CPP_API UALSAnimNotifyGroundedEntryState : public UAnimNotify
