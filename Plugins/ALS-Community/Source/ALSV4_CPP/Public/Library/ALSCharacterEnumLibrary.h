@@ -139,3 +139,11 @@ enum class EALSMovementDirection : uint8
 	Left,
 	Backward
 };
+
+UENUM(BlueprintType)
+enum class ELogVerb : uint8
+{
+	Display,
+	Warning,
+	Error
+};
