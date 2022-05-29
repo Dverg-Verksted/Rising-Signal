@@ -1,6 +1,8 @@
 // Copyright (C) 2020, Doga Can Yanikoglu
 
+
 #include "Character/Animation/Notify/ALSAnimNotifyCameraShake.h"
+
 
 void UALSAnimNotifyCameraShake::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
@@ -10,7 +12,7 @@ void UALSAnimNotifyCameraShake::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 		APlayerController* OwnerController = Cast<APlayerController>(OwnerPawn->GetController());
 		if (OwnerController)
 		{
-			OwnerController->ClientStartCameraShake(ShakeClass, Scale);
+			OwnerController->ClientPlayCameraShake(ShakeClass, Scale);
 		}
 	}
 }

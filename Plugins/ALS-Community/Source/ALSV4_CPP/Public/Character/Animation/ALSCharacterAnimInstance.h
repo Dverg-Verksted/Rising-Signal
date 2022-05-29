@@ -42,13 +42,22 @@ public:
 	void OnPivot();
 
 	UFUNCTION(BlueprintCallable, Category = "Grounded")
-	void SetGroundedEntryState(EALSGroundedEntryState GroundedEntryState) { Grounded.GroundedEntryState = GroundedEntryState; }
+	void SetGroundedEntryState(EALSGroundedEntryState GroundedEntryState)
+	{
+		Grounded.GroundedEntryState = GroundedEntryState;
+	}
 
 	UFUNCTION(BlueprintCallable, Category = "Grounded")
-	void SetOverlayOverrideState(int32 OverlayOverrideState) { LayerBlendingValues.OverlayOverrideState = OverlayOverrideState; }
+	void SetOverlayOverrideState(int32 OverlayOverrideState)
+	{
+		LayerBlendingValues.OverlayOverrideState = OverlayOverrideState;
+	}
 
 	UFUNCTION(BlueprintCallable, Category = "Grounded")
-	void SetTrackedHipsDirection(EALSHipsDirection HipsDirection) { Grounded.TrackedHipsDirection = HipsDirection; }
+	void SetTrackedHipsDirection(EALSHipsDirection HipsDirection)
+	{
+		Grounded.TrackedHipsDirection = HipsDirection;
+	}
 
 	/** Enable Movement Animations if IsMoving and HasMovementInput, or if the Speed is greater than 150. */
 	UFUNCTION(BlueprintCallable, Category = "Grounded")
@@ -75,7 +84,10 @@ public:
 	bool CanDynamicTransition();
 
 	/** Return mutable reference of character information to edit them easily inside character class */
-	FALSAnimCharacterInformation& GetCharacterInformationMutable() { return CharacterInformation; }
+	FALSAnimCharacterInformation& GetCharacterInformationMutable()
+	{
+		return CharacterInformation;
+	}
 
 private:
 	void PlayDynamicTransitionDelay();
@@ -102,8 +114,8 @@ private:
 
 	/** Foot IK */
 
-	void SetFootLocking(float DeltaSeconds, FName EnableFootIKCurve, FName FootLockCurve, FName IKFootBone, float& CurFootLockAlpha,
-		FVector& CurFootLockLoc, FRotator& CurFootLockRot);
+	void SetFootLocking(float DeltaSeconds, FName EnableFootIKCurve, FName FootLockCurve, FName IKFootBone,
+	                    float& CurFootLockAlpha, FVector& CurFootLockLoc, FRotator& CurFootLockRot);
 
 	void SetFootLockOffsets(float DeltaSeconds, FVector& LocalLoc, FRotator& LocalRot);
 
@@ -111,8 +123,8 @@ private:
 
 	void ResetIKOffsets(float DeltaSeconds);
 
-	void SetFootOffsets(float DeltaSeconds, FName EnableFootIKCurve, FName IKFootBone, FName RootBone, FVector& CurLocationTarget,
-		FVector& CurLocationOffset, FRotator& CurRotationOffset);
+	void SetFootOffsets(float DeltaSeconds, FName EnableFootIKCurve, FName IKFootBone, FName RootBone,
+	                    FVector& CurLocationTarget, FVector& CurLocationOffset, FRotator& CurRotationOffset);
 
 	/** Grounded */
 
@@ -147,7 +159,7 @@ private:
 	EALSMovementDirection CalculateMovementDirection();
 
 	EALSMovementDirection CalculateQuadrant(EALSMovementDirection Current, float FRThreshold, float FLThreshold, float BRThreshold,
-		float BLThreshold, float Buffer, float Angle);
+	                                       float BLThreshold, float Buffer, float Angle);
 
 	/** Util */
 
@@ -171,8 +183,8 @@ protected:
 	FALSAnimGraphInAir InAir;
 
 	/** Anim Graph - Aiming Values */
-	UPROPERTY(
-		VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Anim Graph - Aiming Values", Meta = (ShowOnlyInnerProperties))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Anim Graph - Aiming Values", Meta = (
+		ShowOnlyInnerProperties))
 	FALSAnimGraphAimingValues AimingValues;
 
 	/** Anim Graph - Ragdoll */
@@ -180,8 +192,8 @@ protected:
 	float FlailRate = 0.0f;
 
 	/** Anim Graph - Layer Blending */
-	UPROPERTY(
-		VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Anim Graph - Layer Blending", Meta = (ShowOnlyInnerProperties))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Anim Graph - Layer Blending", Meta = (
+		ShowOnlyInnerProperties))
 	FALSAnimGraphLayerBlending LayerBlendingValues;
 
 	/** Anim Graph - Foot IK */

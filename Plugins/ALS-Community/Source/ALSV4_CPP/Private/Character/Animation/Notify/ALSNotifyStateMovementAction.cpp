@@ -1,5 +1,6 @@
 // Copyright (C) 2020, Doga Can Yanikoglu
 
+
 #include "Character/Animation/Notify/ALSNotifyStateMovementAction.h"
 
 #include "Character/ALSBaseCharacter.h"

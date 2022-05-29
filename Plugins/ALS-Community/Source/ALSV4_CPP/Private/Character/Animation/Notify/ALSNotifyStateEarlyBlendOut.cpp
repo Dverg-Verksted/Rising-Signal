@@ -1,10 +1,12 @@
 // Copyright (C) 2020, Doga Can Yanikoglu
 
+
 #include "Character/Animation/Notify/ALSNotifyStateEarlyBlendOut.h"
 
 #include "Character/ALSBaseCharacter.h"
 
-void UALSNotifyStateEarlyBlendOut::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime)
+void UALSNotifyStateEarlyBlendOut::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
+                                             float FrameDeltaTime)
 {
 	if (!MeshComp || !MeshComp->GetAnimInstance())
 	{
