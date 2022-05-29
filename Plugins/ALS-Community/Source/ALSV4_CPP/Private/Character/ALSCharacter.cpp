@@ -1,5 +1,6 @@
 // Copyright (C) 2020, Doga Can Yanikoglu
 
+
 #include "Character/ALSCharacter.h"
 
 AALSCharacter::AALSCharacter()
@@ -21,8 +22,8 @@ void AALSCharacter::ClearHeldObject()
 	SkeletalMesh->SetAnimInstanceClass(nullptr);
 }
 
-void AALSCharacter::AttachToHand(
-	UStaticMesh* NewStaticMesh, USkeletalMesh* NewSkeletalMesh, UClass* NewAnimClass, bool bLeftHand, FVector Offset)
+void AALSCharacter::AttachToHand(UStaticMesh* NewStaticMesh, USkeletalMesh* NewSkeletalMesh, UClass* NewAnimClass,
+                                bool bLeftHand, FVector Offset)
 {
 	ClearHeldObject();
 
@@ -49,7 +50,8 @@ void AALSCharacter::AttachToHand(
 		AttachBone = TEXT("VB RHS_ik_hand_gun");
 	}
 
-	HeldObjectRoot->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, AttachBone);
+	HeldObjectRoot->AttachToComponent(GetMesh(),
+	                                  FAttachmentTransformRules::SnapToTargetNotIncludingScale, AttachBone);
 	HeldObjectRoot->SetRelativeLocation(Offset);
 }
 
@@ -83,8 +85,9 @@ ECollisionChannel AALSCharacter::GetThirdPersonTraceParams(FVector& TraceOrigin,
 
 FTransform AALSCharacter::GetThirdPersonPivotTarget()
 {
-	return FTransform(GetActorRotation(), (GetMesh()->GetSocketLocation(TEXT("Head")) + GetMesh()->GetSocketLocation(TEXT("Root"))) / 2.0f,
-		FVector::OneVector);
+	return FTransform(GetActorRotation(),
+	                  (GetMesh()->GetSocketLocation(TEXT("Head")) + GetMesh()->GetSocketLocation(TEXT("Root"))) / 2.0f,
+	                  FVector::OneVector);
 }
 
 FVector AALSCharacter::GetFirstPersonCameraTarget()
@@ -109,7 +112,8 @@ void AALSCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AALSCharacter::MantleStart(float MantleHeight, const FALSComponentAndTransform& MantleLedgeWS, EALSMantleType MantleType)
+void AALSCharacter::MantleStart(float MantleHeight, const FALSComponentAndTransform& MantleLedgeWS,
+                               EALSMantleType MantleType)
 {
 	Super::MantleStart(MantleHeight, MantleLedgeWS, MantleType);
 	if (MantleType != EALSMantleType::LowMantle)
