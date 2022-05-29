@@ -6,6 +6,7 @@
 #include "Game/HUD/DebugHUD.h"
 #include "GameHUD.generated.h"
 
+class ARSGamePLayer;
 /**
  * @class Base game play HUD
  */
@@ -20,5 +21,9 @@ protected:
 
 	/** Overridable native event for when play begins for this actor. */
 	virtual void BeginPlay() override;
-	
+
+private:
+	// Current pointer on Character
+	UPROPERTY()
+	ARSGamePLayer* GamePlayer;
 };
