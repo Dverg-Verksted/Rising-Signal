@@ -1,12 +1,7 @@
 // It is owned by the company Dverg Verksted.
 
 
-#include "ActorsComponents/RSCharacterHealthComponent.h"
-
-float URSCharacterHealthComponent::GetCurrentStamina()
-{
-	return Stamina;
-}
+#include "RisingSignal/AbilitySystem/ActorsComponents/RSCharacterHealthComponent.h"
 
 void URSCharacterHealthComponent::ChangeStaminaValue(float ChangeValue)
 {

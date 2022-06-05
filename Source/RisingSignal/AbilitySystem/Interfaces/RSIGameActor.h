@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "RisingSignal/Effects/RSStateEffects.h"
+#include "RisingSignal/AbilitySystem/Effects/RSStateEffects.h"
 #include "RSIGameActor.generated.h"
 
 // This class does not need to be modified.

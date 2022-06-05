@@ -36,18 +36,17 @@ public:
 	URSHealthComponent();
 
 	// Delegate
-	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Health")
+	UPROPERTY(BlueprintAssignable)
 	FOnHealthChange OnHealthChange;
 
 	// Delegate
-	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Health")
+	UPROPERTY(BlueprintAssignable)
 	FOnDead OnDead;
 
 	// The value witch contain coefficient damage.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Здоровье",
 	meta = (DisplayName="Коэффициент урона", AllowPrivateAccess = "true",
-		ToolTip = "Коэффициент получаймого урона",
-		EditConditionHides))
+		ToolTip = "Коэффициент получаймого урона"))
 	float CoefficientDamage = 1.0f;
 
 protected:
@@ -57,15 +56,13 @@ protected:
 	// The value witch contain default health.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Здоровье",
 	meta = (DisplayName="Здоровье по умолчанию", AllowPrivateAccess = "true",
-		ToolTip = "Количество здоровья по умолчанию",
-		EditConditionHides))
+		ToolTip = "Количество здоровья по умолчанию"))
 	float Health = 100.0f;
 
 	// The value witch contain max health.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Здоровье",
 	meta = (DisplayName="Максимальное здоровье", AllowPrivateAccess = "true",
-		ToolTip = "Максимально допустимое количество здоровья",
-		EditConditionHides))
+		ToolTip = "Максимально допустимое количество здоровья"))
 	float MaxHealthValue = 100.0f;
 
 public:
@@ -78,7 +75,7 @@ public:
   * @note BlueprintCallable function.
   */
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	float GetCurrentHealth();
+	float GetCurrentHealth() {return Health;}
 
 /**
   * Setter function for set health value.
@@ -86,7 +83,7 @@ public:
   * @note BlueprintCallable function.
   */
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	void SetCurrentHealth(float NewHealth);
+	void SetCurrentHealth(float NewHealth) {Health = NewHealth;}
 
 /**
   * Function broadcast FOnHealthChange and checking limit values.

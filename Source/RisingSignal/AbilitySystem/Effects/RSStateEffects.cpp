@@ -1,7 +1,7 @@
 ﻿#include "RSStateEffects.h"
 
-#include "RisingSignal/ActorsComponents/RSHealthComponent.h"
-#include "RisingSignal/Interfaces/RSIGameActor.h"
+#include "RisingSignal/AbilitySystem/ActorsComponents/RSHealthComponent.h"
+#include "RisingSignal/AbilitySystem/Interfaces/RSIGameActor.h"
 #include "Kismet/GameplayStatics.h"
 
 bool URSStateEffects::InitObject(AActor* Actor, FName NameBoneHit)

@@ -33,16 +33,6 @@ void URSHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	// ...
 }
 
-float URSHealthComponent::GetCurrentHealth()
-{
-	return Health;
-}
-
-void URSHealthComponent::SetCurrentHealth(float NewHealth)
-{
-	Health = NewHealth;
-}
-
 void URSHealthComponent::ChangeHealthValue(float ChangeValue)
 {
 	ChangeValue = ChangeValue * CoefficientDamage;

@@ -1,4 +1,4 @@
-﻿#include "RSIGameActor.h"
+﻿ #include "RSIGameActor.h"
 
 
 // Add default functionality here for any IRSIGameActor functions that are not pure virtual.

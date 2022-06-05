@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ActorsComponents/RSHealthComponent.h"
+#include "RisingSignal/AbilitySystem/ActorsComponents/RSHealthComponent.h"
 #include "RSCharacterHealthComponent.generated.h"
 
 /**
@@ -20,7 +20,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStaminaChange, float, Stamina, f
 * @param StaminaCoolDownRecoverTime The value witch contain time when stamina will recovering.
 * @note Parent [RSHealthComponent] -> this [RSCharacterHealthComponent]
 */
-UCLASS()
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class RISINGSIGNAL_API URSCharacterHealthComponent : public URSHealthComponent
 {
 	GENERATED_BODY()
@@ -29,20 +29,18 @@ protected:
 	// The value witch contain default stamina.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Выносливость",
 		meta = (DisplayName="Выносливость по умолчанию", AllowPrivateAccess = "true",
-			ToolTip = "Параметр времени по истечению которого выносливость начнет восстанавливаться",
-			EditConditionHides))
+			ToolTip = "Параметр времени по истечению которого выносливость начнет восстанавливаться"))
 	float Stamina = 100.0f;
 
 	// The value witch contain max stamina.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Здоровье",
 	meta = (DisplayName="Максимальное выносливасть", AllowPrivateAccess = "true",
-		ToolTip = "Максимально допустимое количество выносливости",
-		EditConditionHides))
+		ToolTip = "Максимально допустимое количество выносливости"))
 	float MaxStaminaValue = 100.0f;
 
 public:
 	// Delegate
-	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Выносливасть")
+	UPROPERTY(BlueprintAssignable)
 	FOnStaminaChange OnStaminaChange;
 
 	// The pointer timer handle for stamina cool down.
@@ -53,29 +51,26 @@ public:
 	// The value witch contain time when stamina will recovering.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Выносливасть",
 		meta = (DisplayName="Время востоновления выносливоси", AllowPrivateAccess = "true",
-			ToolTip = "Параметр времени по истечению которого выносливость начнет восстанавливаться",
-			EditConditionHides))
+			ToolTip = "Параметр времени по истечению которого выносливость начнет восстанавливаться"))
 	float StaminaCoolDownRecoverTime = 5.0f;
 
 	// The value witch contain value incrementing stamina.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Выносливасть",
 		meta = (DisplayName="Значение востовновления", AllowPrivateAccess = "true",
-			ToolTip = "Параметр указывает на какое значение будет увеличиваться в промежуток времени выносливость",
-			EditConditionHides))
+			ToolTip = "Параметр указывает на какое значение будет увеличиваться в промежуток времени выносливость"))
 	float StaminaRecoverValue = 1.0f;
 
 	// The value contains the time when stamina will recover by rate.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Выносливасть",
 		meta = (DisplayName="Скорость восстановления", AllowPrivateAccess = "true",
-			ToolTip = "Параметр указывает на скрость востоновления",
-			EditConditionHides))
+			ToolTip = "Параметр указывает на скрость востоновления"))
 	float StaminaRecoverRate = 0.1f;
 
 /**
 * Getter function for current stamina.
 * @return Current stamina.
 */
-	float GetCurrentStamina();
+	float GetCurrentStamina() {return Stamina;}
 /**
 * Function broadcast FOnStaminaChange and checking limit values and time recover rate.
 * @param ChangeValue the new value of increment stamina.
