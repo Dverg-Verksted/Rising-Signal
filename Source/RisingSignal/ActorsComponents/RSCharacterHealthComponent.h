@@ -7,21 +7,19 @@
 #include "RSCharacterHealthComponent.generated.h"
 
 /**
-  * Delegate method for broadcast to UMG when Stamina change.
-  * @param Stamina The value which means a character get tired.
-  * @note Broadcast when stamina changes.
-  */
+* Delegate method for broadcast to UMG when Stamina change.
+* @param Stamina The value which means a character get tired.
+* @note Broadcast when stamina changes.
+*/
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStaminaChange, float, Stamina, float, IncrementValue);
 
 /**
-  * Actor component for Health and Stamina system.Inherit class. Can be attached to any Actors witch needed stamina.
-  * @param Stamina The value witch contain time when stamina will recovering.
-  * @param MaxStaminaValue The value witch contain value incrementing stamina.
-  * @param StaminaCoolDownRecoverTime The value witch contain time when stamina will recovering.
-  * @param StaminaRecoverValue The value witch contain value incrementing stamina.
-  * @param StaminaRecoverRate The value contains the time when stamina will recover by rate.
-  * @note Parent [RSHealthComponent] -> this [RSCharacterHealthComponent]
-  */
+* Actor component for Health and Stamina system.Inherit class. Can be attached to any Actors witch needed stamina.
+* @param Stamina The value witch contain time when stamina will recovering.
+* @param MaxStaminaValue The value witch contain value incrementing stamina.
+* @param StaminaCoolDownRecoverTime The value witch contain time when stamina will recovering.
+* @note Parent [RSHealthComponent] -> this [RSCharacterHealthComponent]
+*/
 UCLASS()
 class RISINGSIGNAL_API URSCharacterHealthComponent : public URSHealthComponent
 {
@@ -74,28 +72,28 @@ public:
 	float StaminaRecoverRate = 0.1f;
 
 /**
-  * Getter function for current stamina.
-  * @return Current stamina.
-  */
+* Getter function for current stamina.
+* @return Current stamina.
+*/
 	float GetCurrentStamina();
 /**
-  * Function broadcast FOnStaminaChange and checking limit values and time recover rate.
-  * @param ChangeValue the new value of increment stamina.
-  */
+* Function broadcast FOnStaminaChange and checking limit values and time recover rate.
+* @param ChangeValue the new value of increment stamina.
+*/
 	void ChangeStaminaValue(float ChangeValue);
 /**
-  * Function cool down the stamina when time ends.
-  */
+* Function cool down the stamina when time ends.
+*/
 	void CoolDownStaminaEnd();
 /**
-  * Function recovery the stamina over time.
-  */
+* Function recovery the stamina over time.
+*/
 	void RecoveryStamina();
 
 /**
-  * Function witch get the stamina value
-  * @note BlueprintCallable function.
-  */
+* Function witch get the stamina value
+* @note BlueprintCallable function.
+*/
 	UFUNCTION(BlueprintCallable)
 	float GetStaminaValue();
 };
