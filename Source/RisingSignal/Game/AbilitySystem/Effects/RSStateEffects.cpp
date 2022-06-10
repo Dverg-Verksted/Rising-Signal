@@ -8,10 +8,10 @@ bool URSStateEffects::InitObject(AActor* Actor, FName NameBoneHit)
 {
 	EffectOwnerActor = Actor;
 
-	IRSIGameActor* myInterface = Cast<IRSIGameActor>(EffectOwnerActor);
-	if (myInterface)
+	IRSIGameActor* Interface = Cast<IRSIGameActor>(EffectOwnerActor);
+	if (Interface)
 	{
-		myInterface->AddEffect(this);
+		Interface->AddEffect(this);
 	}
 
 	return true;
@@ -19,10 +19,10 @@ bool URSStateEffects::InitObject(AActor* Actor, FName NameBoneHit)
 
 void URSStateEffects::DestroyObject()
 {
-	IRSIGameActor* myInterface = Cast<IRSIGameActor>(EffectOwnerActor);
-	if (myInterface)
+	IRSIGameActor* Interface = Cast<IRSIGameActor>(EffectOwnerActor);
+	if (Interface)
 	{
-		myInterface->RemoveEffect(this);
+		Interface->RemoveEffect(this);
 	}
 
 	EffectOwnerActor = nullptr;
@@ -48,10 +48,10 @@ void URSStateEffectExecuteOnce::ExecuteOnce()
 {
 	if (EffectOwnerActor)
 	{
-		URSHealthComponent* MyHealthComponent = Cast<URSHealthComponent>(EffectOwnerActor->GetComponentByClass(URSHealthComponent::StaticClass()));
-		if (MyHealthComponent)
+		URSHealthComponent* HealthComponent = Cast<URSHealthComponent>(EffectOwnerActor->GetComponentByClass(URSHealthComponent::StaticClass()));
+		if (HealthComponent)
 		{
-			MyHealthComponent->ChangeHealthValue(Power);
+			HealthComponent->ChangeHealthValue(Power);
 		}
 	}
 
@@ -70,11 +70,11 @@ bool URSStateEffectExecuteTime::InitObject(AActor* Actor, FName NameBoneHit)
 		FName NameBoneToAttached = NameBoneHit;
 		FVector Loc = FVector(0);
 
-		USceneComponent* MyMesh = Cast<USceneComponent>(EffectOwnerActor->GetComponentByClass(USkeletalMeshComponent::StaticClass()));
-		if (MyMesh)
+		USceneComponent* MeshImpactEffect = Cast<USceneComponent>(EffectOwnerActor->GetComponentByClass(USkeletalMeshComponent::StaticClass()));
+		if (MeshImpactEffect)
 		{
 			ParticleEmitter = UGameplayStatics::SpawnEmitterAttached(ParticleEffect,
-				MyMesh, NameBoneToAttached, Loc, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
+				MeshImpactEffect, NameBoneToAttached, Loc, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
 		}
 		else
 		{
@@ -97,10 +97,10 @@ void URSStateEffectExecuteTime::Execute()
 {
 	if (EffectOwnerActor)
 	{
-		URSHealthComponent* MyHealthComponent = Cast<URSHealthComponent>(EffectOwnerActor->GetComponentByClass(URSHealthComponent::StaticClass()));
-		if (MyHealthComponent)
+		URSHealthComponent* HealthComponent = Cast<URSHealthComponent>(EffectOwnerActor->GetComponentByClass(URSHealthComponent::StaticClass()));
+		if (HealthComponent)
 		{
-			MyHealthComponent->ChangeHealthValue(Power);
+			HealthComponent->ChangeHealthValue(Power);
 		}
 	}
 }

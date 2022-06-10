@@ -9,18 +9,18 @@ void UMyBlueprintFunctionLibrary::AddEffectBySurfaceType(AActor* TakeEffectActor
 {
 	if (SurfaceType != EPhysicalSurface::SurfaceType_Default && TakeEffectActor && AddEffectClass)
 	{
-		URSStateEffects* myEffect = Cast<URSStateEffects>(AddEffectClass->GetDefaultObject());
-		if (myEffect)
+		URSStateEffects* Effect = Cast<URSStateEffects>(AddEffectClass->GetDefaultObject());
+		if (Effect)
 		{
 			bool bIsHavePossibleSurface = false;
 			int8 i = 0;
-			while (i < myEffect->PossibleInteractSurface.Num() && !bIsHavePossibleSurface)
+			while (i < Effect->PossibleInteractSurface.Num() && !bIsHavePossibleSurface)
 			{
-				if (myEffect->PossibleInteractSurface[i] == SurfaceType)
+				if (Effect->PossibleInteractSurface[i] == SurfaceType)
 				{			
 					bIsHavePossibleSurface = true;
 					bool bIsCanAddEffect = false;
-					if (!myEffect->bIsStackable)
+					if (!Effect->bIsStackable)
 					{
 						int8 j = 0;
 						TArray<URSStateEffects*> CurrentEffects;
