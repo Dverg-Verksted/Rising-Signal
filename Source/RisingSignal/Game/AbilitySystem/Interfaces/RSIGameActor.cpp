@@ -28,5 +28,5 @@ FVector IRSIGameActor::GetEffectLocation(URSStateEffects* Effect)
 
 FString IRSIGameActor::GetAttachComponent(URSStateEffects* Effect)
 {
-	return Effect->MyActor->GetRootComponent()->GetName();
+	return Effect->EffectOwnerActor->GetRootComponent()->GetName();
 }

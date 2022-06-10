@@ -35,17 +35,17 @@ void URSHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 void URSHealthComponent::ChangeHealthValue(float ChangeValue)
 {
-	ChangeValue = ChangeValue * CoefficientDamage;
-	Health += ChangeValue;
-	OnHealthChange.Broadcast(Health, ChangeValue);
+	ChangeValue = ChangeValue * HealthStruct.CoefficientDamage;
+	HealthStruct.Health += ChangeValue;
+	OnHealthChange.Broadcast(HealthStruct.Health, ChangeValue);
 
-	if (Health > MaxHealthValue)
+	if (HealthStruct.Health > HealthStruct.MaxHealthValue)
 	{
-		Health = MaxHealthValue;
+		HealthStruct.Health = HealthStruct.MaxHealthValue;
 	}
 	else
 	{
-		if (Health < 0.0f)
+		if (HealthStruct.Health < 0.0f)
 		{
 			OnDead.Broadcast();
 		}

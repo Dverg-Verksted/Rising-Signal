@@ -1,14 +1,14 @@
 ﻿#include "RSStateEffects.h"
 
-#include "RisingSignal/AbilitySystem/ActorsComponents/RSHealthComponent.h"
-#include "RisingSignal/AbilitySystem/Interfaces/RSIGameActor.h"
+#include "RisingSignal/Game/AbilitySystem/ActorsComponents/RSHealthComponent.h"
+#include "RisingSignal/Game/AbilitySystem/Interfaces/RSIGameActor.h"
 #include "Kismet/GameplayStatics.h"
 
 bool URSStateEffects::InitObject(AActor* Actor, FName NameBoneHit)
 {
-	MyActor = Actor;
+	EffectOwnerActor = Actor;
 
-	IRSIGameActor* myInterface = Cast<IRSIGameActor>(MyActor);
+	IRSIGameActor* myInterface = Cast<IRSIGameActor>(EffectOwnerActor);
 	if (myInterface)
 	{
 		myInterface->AddEffect(this);
@@ -19,13 +19,13 @@ bool URSStateEffects::InitObject(AActor* Actor, FName NameBoneHit)
 
 void URSStateEffects::DestroyObject()
 {
-	IRSIGameActor* myInterface = Cast<IRSIGameActor>(MyActor);
+	IRSIGameActor* myInterface = Cast<IRSIGameActor>(EffectOwnerActor);
 	if (myInterface)
 	{
 		myInterface->RemoveEffect(this);
 	}
 
-	MyActor = nullptr;
+	EffectOwnerActor = nullptr;
 	if (this && this->IsValidLowLevel())
 	{
 		this->ConditionalBeginDestroy();
@@ -46,9 +46,9 @@ void URSStateEffectExecuteOnce::DestroyObject()
 
 void URSStateEffectExecuteOnce::ExecuteOnce()
 {
-	if (MyActor)
+	if (EffectOwnerActor)
 	{
-		URSHealthComponent* MyHealthComponent = Cast<URSHealthComponent>(MyActor->GetComponentByClass(URSHealthComponent::StaticClass()));
+		URSHealthComponent* MyHealthComponent = Cast<URSHealthComponent>(EffectOwnerActor->GetComponentByClass(URSHealthComponent::StaticClass()));
 		if (MyHealthComponent)
 		{
 			MyHealthComponent->ChangeHealthValue(Power);
@@ -70,7 +70,7 @@ bool URSStateEffectExecuteTime::InitObject(AActor* Actor, FName NameBoneHit)
 		FName NameBoneToAttached = NameBoneHit;
 		FVector Loc = FVector(0);
 
-		USceneComponent* MyMesh = Cast<USceneComponent>(MyActor->GetComponentByClass(USkeletalMeshComponent::StaticClass()));
+		USceneComponent* MyMesh = Cast<USceneComponent>(EffectOwnerActor->GetComponentByClass(USkeletalMeshComponent::StaticClass()));
 		if (MyMesh)
 		{
 			ParticleEmitter = UGameplayStatics::SpawnEmitterAttached(ParticleEffect,
@@ -79,7 +79,7 @@ bool URSStateEffectExecuteTime::InitObject(AActor* Actor, FName NameBoneHit)
 		else
 		{
 			ParticleEmitter = UGameplayStatics::SpawnEmitterAttached(ParticleEffect,
-				MyActor->GetRootComponent(), NameBoneToAttached, Loc,
+				EffectOwnerActor->GetRootComponent(), NameBoneToAttached, Loc,
 				FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
 		}
 	}
@@ -95,9 +95,9 @@ void URSStateEffectExecuteTime::DestroyObject()
 
 void URSStateEffectExecuteTime::Execute()
 {
-	if (MyActor)
+	if (EffectOwnerActor)
 	{
-		URSHealthComponent* MyHealthComponent = Cast<URSHealthComponent>(MyActor->GetComponentByClass(URSHealthComponent::StaticClass()));
+		URSHealthComponent* MyHealthComponent = Cast<URSHealthComponent>(EffectOwnerActor->GetComponentByClass(URSHealthComponent::StaticClass()));
 		if (MyHealthComponent)
 		{
 			MyHealthComponent->ChangeHealthValue(Power);
