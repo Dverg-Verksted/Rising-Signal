@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Game/Inventory/RSInventoryItems.h"
+#include "Engine/DataTable.h"
 #include "RSInventoryComponent.generated.h"
 
 UENUM()
@@ -14,31 +15,45 @@ enum EInventoryEvent
 	Divide,
 	Motion,
 	Use,
-	Warning
+	Warning,
+	Changed
 };
 
 USTRUCT(BlueprintType)
-struct FInventoryItem
+struct FInventoryItem: public FTableRowBase
 {
 	GENERATED_BODY()
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
 	int32 Count = 0;
 
-	int32 SlotIndex=-1;
-	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
+	int32 SlotIndex = -1;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
 	int32 ItemID = -1;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
 	UTexture2D* ImageItem;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
-	bool bCanCraft= false;
+	bool bCanCraft = false;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
 	bool bCanUse = false;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
 	int32 MaxCount = 50;
+
+	FInventoryItem()
+		: ImageItem(nullptr)
+	{
+	}
+
+	FInventoryItem(int i)
+		: ImageItem(nullptr)
+	{
+		SlotIndex = i;
+	}
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryEvent, EInventoryEvent, IventoryEvent, FInventoryItem, RemovedItem);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryEvent, EInventoryEvent, IventoryEvent, FInventoryItem, FirstItem);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class RISINGSIGNAL_API URSInventoryComponent : public UActorComponent
@@ -61,6 +76,18 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Инвентарь")
 	int32 MaxCountItem = 40;
 
+	UFUNCTION(BlueprintPure, Category = "Инвентарь")
+	static FString ToString(FInventoryItem item)
+	{
+		FString ret = "";
+		ret.Append("itemId=");
+		ret.Append(FString::FromInt(item.ItemID));
+		ret.Append("  Slot=");
+		ret.Append(FString::FromInt(item.SlotIndex));
+		ret.Append("  Count=");
+		ret.Append(FString::FromInt(item.Count));
+		return ret;
+	}
 
 protected:
 	// Called when the game starts
@@ -73,8 +100,8 @@ private:
 	bool SwapItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
 	bool MotionItem(FInventoryItem FirstInventorySlot);
 	bool CombineItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot, int32& RemainingCount);
-	FInventoryItem UseItem(const FInventoryItem& FirstInventorySlot);
-	void ChangeItem(int32 Index, const FInventoryItem& Item,int32 ChangedCount);
+	bool UseItem(const FInventoryItem& FirstInventorySlot);
+	void ChangeItem(int32 Index, const FInventoryItem& Item, int32 ChangedCount);
 	void InsertItem(const FInventoryItem& Item);
 
 	UPROPERTY()
