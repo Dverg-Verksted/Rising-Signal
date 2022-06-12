@@ -11,6 +11,7 @@
 #include "Curves/CurveFloat.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Library/ALSFunctionLibrary.h"
 
 AALSBaseCharacter::AALSBaseCharacter()
 {
@@ -164,6 +165,8 @@ void AALSBaseCharacter::Tick(float DeltaTime)
 
 void AALSBaseCharacter::RagdollStart()
 {
+	LOG_ALS(ELogVerb::Display, "Ragdoll Start");
+
 	// Step 1: Clear the Character Movement Mode and set teh Movement State to Ragdoll
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	SetMovementState(EALSMovementState::Ragdoll);
@@ -180,6 +183,8 @@ void AALSBaseCharacter::RagdollStart()
 
 void AALSBaseCharacter::RagdollEnd()
 {
+	LOG_ALS(ELogVerb::Display, "Ragdoll End");
+
 	if (!MainAnimInstance)
 	{
 		return;
@@ -212,6 +217,8 @@ void AALSBaseCharacter::SetMovementState(const EALSMovementState NewState)
 {
 	if (MovementState != NewState)
 	{
+		LOG_ALS(ELogVerb::Display, FString("New ALS movement state: " + UEnum::GetValueAsString(NewState)));
+
 		PrevMovementState = MovementState;
 		MovementState = NewState;
 		FALSAnimCharacterInformation& AnimData = MainAnimInstance->GetCharacterInformationMutable();
@@ -219,16 +226,26 @@ void AALSBaseCharacter::SetMovementState(const EALSMovementState NewState)
 		AnimData.MovementState = MovementState;
 		OnMovementStateChanged(PrevMovementState);
 	}
+	else
+	{
+		LOG_ALS(ELogVerb::Warning, FString("Current movement == New State : " + UEnum::GetValueAsString(NewState)));
+	}
 }
 
 void AALSBaseCharacter::SetMovementAction(const EALSMovementAction NewAction)
 {
 	if (MovementAction != NewAction)
 	{
+		LOG_ALS(ELogVerb::Display, FString("New ALS movement Action: " + UEnum::GetValueAsString(NewAction)));
+
 		EALSMovementAction Prev = MovementAction;
 		MovementAction = NewAction;
 		MainAnimInstance->GetCharacterInformationMutable().MovementAction = MovementAction;
 		OnMovementActionChanged(Prev);
+	}
+	else
+	{
+		LOG_ALS(ELogVerb::Warning, FString("Current movement action == New Action : " + UEnum::GetValueAsString(NewAction)));
 	}
 }
 
@@ -236,10 +253,16 @@ void AALSBaseCharacter::SetStance(const EALSStance NewStance)
 {
 	if (Stance != NewStance)
 	{
+		LOG_ALS(ELogVerb::Display, FString("New ALS Stance: " + UEnum::GetValueAsString(NewStance)));
+
 		EALSStance Prev = Stance;
 		Stance = NewStance;
 		MainAnimInstance->GetCharacterInformationMutable().Stance = Stance;
 		OnStanceChanged(Prev);
+	}
+	else
+	{
+		LOG_ALS(ELogVerb::Warning, FString("Current Stance == New Stance : " + UEnum::GetValueAsString(NewStance)));
 	}
 }
 
@@ -247,10 +270,16 @@ void AALSBaseCharacter::SetRotationMode(const EALSRotationMode NewRotationMode)
 {
 	if (RotationMode != NewRotationMode)
 	{
+		LOG_ALS(ELogVerb::Display, FString("New ALS Rotation mode: " + UEnum::GetValueAsString(NewRotationMode)));
+
 		EALSRotationMode Prev = RotationMode;
 		RotationMode = NewRotationMode;
 		MainAnimInstance->GetCharacterInformationMutable().RotationMode = RotationMode;
 		OnRotationModeChanged(Prev);
+	}
+	else
+	{
+		LOG_ALS(ELogVerb::Warning, FString("Current Rotation mode == New Rotation mode : " + UEnum::GetValueAsString(RotationMode)));
 	}
 }
 

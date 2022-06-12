@@ -47,6 +47,8 @@ protected:
 	 */
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual void BeginPlay() override;
+
 	// Spring arm component
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	USpringArmComponent* SpringArm = nullptr;

@@ -2,7 +2,9 @@
 
 #include "Player/RSGamePLayer.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 ARSGamePLayer::ARSGamePLayer()
 {
@@ -17,4 +19,9 @@ ARSGamePLayer::ARSGamePLayer()
 void ARSGamePLayer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+}
+
+void ARSGamePLayer::BeginPlay()
+{
+	Super::BeginPlay();
 }
