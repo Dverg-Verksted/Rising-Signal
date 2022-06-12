@@ -48,7 +48,8 @@ void URSStateEffectExecuteOnce::ExecuteOnce()
 {
 	if (EffectOwnerActor)
 	{
-		URSHealthComponent* HealthComponent = Cast<URSHealthComponent>(EffectOwnerActor->GetComponentByClass(URSHealthComponent::StaticClass()));
+		URSHealthComponent* HealthComponent =
+			Cast<URSHealthComponent>(EffectOwnerActor->GetComponentByClass(URSHealthComponent::StaticClass()));
 		if (HealthComponent)
 		{
 			HealthComponent->ChangeHealthValue(Power);
@@ -70,17 +71,17 @@ bool URSStateEffectExecuteTime::InitObject(AActor* Actor, FName NameBoneHit)
 		FName NameBoneToAttached = NameBoneHit;
 		FVector Loc = FVector(0);
 
-		USceneComponent* MeshImpactEffect = Cast<USceneComponent>(EffectOwnerActor->GetComponentByClass(USkeletalMeshComponent::StaticClass()));
+		USceneComponent* MeshImpactEffect =
+			Cast<USceneComponent>(EffectOwnerActor->GetComponentByClass(USkeletalMeshComponent::StaticClass()));
 		if (MeshImpactEffect)
 		{
-			ParticleEmitter = UGameplayStatics::SpawnEmitterAttached(ParticleEffect,
-				MeshImpactEffect, NameBoneToAttached, Loc, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
+			ParticleEmitter = UGameplayStatics::SpawnEmitterAttached(
+				ParticleEffect, MeshImpactEffect, NameBoneToAttached, Loc, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
 		}
 		else
 		{
-			ParticleEmitter = UGameplayStatics::SpawnEmitterAttached(ParticleEffect,
-				EffectOwnerActor->GetRootComponent(), NameBoneToAttached, Loc,
-				FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
+			ParticleEmitter = UGameplayStatics::SpawnEmitterAttached(ParticleEffect, EffectOwnerActor->GetRootComponent(),
+				NameBoneToAttached, Loc, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
 		}
 	}
 	return true;
@@ -97,7 +98,8 @@ void URSStateEffectExecuteTime::Execute()
 {
 	if (EffectOwnerActor)
 	{
-		URSHealthComponent* HealthComponent = Cast<URSHealthComponent>(EffectOwnerActor->GetComponentByClass(URSHealthComponent::StaticClass()));
+		URSHealthComponent* HealthComponent =
+			Cast<URSHealthComponent>(EffectOwnerActor->GetComponentByClass(URSHealthComponent::StaticClass()));
 		if (HealthComponent)
 		{
 			HealthComponent->ChangeHealthValue(Power);

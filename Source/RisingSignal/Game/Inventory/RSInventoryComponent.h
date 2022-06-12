@@ -20,44 +20,37 @@ enum EInventoryEvent
 };
 
 USTRUCT(BlueprintType)
-struct FInventoryItem: public FTableRowBase
+struct FInventoryItem : public FTableRowBase
 {
 	GENERATED_BODY()
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
 	int32 Count = 0;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
 	int32 SlotIndex = -1;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
 	int32 ItemID = -1;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
 	UTexture2D* ImageItem;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
 	bool bCanCraft = false;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
-	bool bStack= true;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
+	bool bStack = true;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
 	bool bCanUse = false;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
 	int32 MaxCount = 50;
 
-	FInventoryItem()
-		: ImageItem(nullptr)
-	{
-	}
+	FInventoryItem() : ImageItem(nullptr) {}
 
-	FInventoryItem(int i)
-		: ImageItem(nullptr)
-	{
-		SlotIndex = i;
-	}
+	FInventoryItem(int i) : ImageItem(nullptr) { SlotIndex = i; }
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryEvent, EInventoryEvent, IventoryEvent, FInventoryItem, FirstItem);
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class RISINGSIGNAL_API URSInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()

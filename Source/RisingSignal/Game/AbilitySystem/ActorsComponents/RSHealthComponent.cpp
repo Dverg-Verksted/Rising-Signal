@@ -1,8 +1,6 @@
 // It is owned by the company Dverg Verksted.
 
-
 #include "RSHealthComponent.h"
-
 
 // Sets default values for this component's properties
 URSHealthComponent::URSHealthComponent()
@@ -14,16 +12,13 @@ URSHealthComponent::URSHealthComponent()
 	// ...
 }
 
-
 // Called when the game starts
 void URSHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
 	// ...
-	
 }
-
 
 // Called every frame
 void URSHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -51,4 +46,3 @@ void URSHealthComponent::ChangeHealthValue(float ChangeValue)
 		}
 	}
 }
-

@@ -1,5 +1,4 @@
-﻿ #include "RSIGameActor.h"
-
+﻿#include "RSIGameActor.h"
 
 // Add default functionality here for any IRSIGameActor functions that are not pure virtual.
 EPhysicalSurface IRSIGameActor::GetSurfaceType()
@@ -13,13 +12,9 @@ TArray<URSStateEffects*> IRSIGameActor::GetAllCurrentEffects()
 	return Effect;
 }
 
-void IRSIGameActor::RemoveEffect(URSStateEffects* RemoveEffect)
-{
-}
+void IRSIGameActor::RemoveEffect(URSStateEffects* RemoveEffect) {}
 
-void IRSIGameActor::AddEffect(URSStateEffects* newEffect)
-{
-}
+void IRSIGameActor::AddEffect(URSStateEffects* newEffect) {}
 
 FVector IRSIGameActor::GetEffectLocation(URSStateEffects* Effect)
 {

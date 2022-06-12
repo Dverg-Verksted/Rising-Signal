@@ -1,11 +1,10 @@
 // It is owned by the company Dverg Verksted.
 
-
 #include "Game/AbilitySystem/Effects/EffectFunctionLibrary.h"
 #include "Game/AbilitySystem/Interfaces/RSIGameActor.h"
 
-void UMyBlueprintFunctionLibrary::AddEffectBySurfaceType(AActor* TakeEffectActor, TSubclassOf<URSStateEffects> AddEffectClass,
-	EPhysicalSurface SurfaceType, FName NameBoneHit)
+void UMyBlueprintFunctionLibrary::AddEffectBySurfaceType(
+	AActor* TakeEffectActor, TSubclassOf<URSStateEffects> AddEffectClass, EPhysicalSurface SurfaceType, FName NameBoneHit)
 {
 	if (SurfaceType != EPhysicalSurface::SurfaceType_Default && TakeEffectActor && AddEffectClass)
 	{
@@ -17,7 +16,7 @@ void UMyBlueprintFunctionLibrary::AddEffectBySurfaceType(AActor* TakeEffectActor
 			while (i < Effect->PossibleInteractSurface.Num() && !bIsHavePossibleSurface)
 			{
 				if (Effect->PossibleInteractSurface[i] == SurfaceType)
-				{			
+				{
 					bIsHavePossibleSurface = true;
 					bool bIsCanAddEffect = false;
 					if (!Effect->bIsStackable)
@@ -45,7 +44,6 @@ void UMyBlueprintFunctionLibrary::AddEffectBySurfaceType(AActor* TakeEffectActor
 						{
 							bIsCanAddEffect = true;
 						}
-						
 					}
 					else
 					{
@@ -54,7 +52,7 @@ void UMyBlueprintFunctionLibrary::AddEffectBySurfaceType(AActor* TakeEffectActor
 
 					if (bIsCanAddEffect)
 					{
-						
+
 						URSStateEffects* NewEffect = NewObject<URSStateEffects>(TakeEffectActor, AddEffectClass);
 						if (NewEffect)
 						{

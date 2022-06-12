@@ -23,14 +23,14 @@ class RISINGSIGNAL_API IRSIGameActor
 public:
 	/**
 	 * It returns the surface type of the actor.
-	 * 
+	 *
 	 * @return The surface type of the actor.
 	 */
 	virtual EPhysicalSurface GetSurfaceType();
 
 	/**
 	 * It returns an array of all the current effects on the actor.
-	 * 
+	 *
 	 * @return An array of pointers to the class IRSStateEffects.
 	 */
 	virtual TArray<URSStateEffects*> GetAllCurrentEffects();

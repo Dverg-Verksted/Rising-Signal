@@ -25,9 +25,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterAbility, FCharacterAbili
  * @param StaminaCoolDownRecoverTime The value witch contain time when stamina will recovering.
  * @note Parent [RSHealthComponent] -> this [RSCharacterHealthComponent]
  */
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent),
-	HideCategories=("Variable", "Tags", "ComponentTick",
-		"ComponentReplication", "Activation", "Cooking", "AssetUserData", "Collision"))
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent),
+	HideCategories = ("Variable", "Tags", "ComponentTick", "ComponentReplication", "Activation", "Cooking", "AssetUserData", "Collision"))
 class RISINGSIGNAL_API URSCharacterHealthComponent : public URSHealthComponent
 {
 	GENERATED_BODY()
@@ -35,8 +34,8 @@ class RISINGSIGNAL_API URSCharacterHealthComponent : public URSHealthComponent
 protected:
 	/*Struct contain all values witch use in the ability system.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Способность",
-		meta = (DisplayName="Настройки выносливости", AllowPrivateAccess = "true",
-		ToolTip = "В этой структуре все параметры выносливости"))
+		meta = (DisplayName = "Настройки выносливости", AllowPrivateAccess = "true",
+			ToolTip = "В этой структуре все параметры выносливости"))
 	FCharacterAbilityStruct CharacterAbilityStruct;
 
 public:
@@ -57,15 +56,15 @@ public:
 	 * Getter function for current stamina.
 	 * @return Current stamina.
 	 */
-	float GetCurrentStamina() {return CharacterAbilityStruct.Stamina;}
+	float GetCurrentStamina() { return CharacterAbilityStruct.Stamina; }
 	/**
 	 * Function broadcast FOnStaminaChange and checking limit values and time recover rate.
 	 * @param ChangeValue the new value of increment stamina.
 	 */
 	void ChangeStaminaValue(float ChangeValue);
 	/**
-	* Function cool down the stamina when time ends.
-	*/
+	 * Function cool down the stamina when time ends.
+	 */
 	void CoolDownStaminaEnd();
 	/**
 	 * Function recovery the stamina over time.
@@ -74,7 +73,7 @@ public:
 
 	/**
 	 * The override function is called when the character's health value changes with new broadcast of dilagate.
-	 * 
+	 *
 	 * @param ChangeValue The amount of health to change by.
 	 */
 	virtual void ChangeHealthValue(float ChangeValue) override;
@@ -85,5 +84,5 @@ public:
 	 * @note BlueprintCallable function.
 	 */
 	UFUNCTION(BlueprintCallable)
-	float GetStaminaValue() {return CharacterAbilityStruct.Stamina;}
+	float GetStaminaValue() { return CharacterAbilityStruct.Stamina; }
 };

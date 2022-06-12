@@ -1,6 +1,5 @@
 // It is owned by the company Dverg Verksted.
 
-
 #include "Game/Inventory/RSInventoryComponent.h"
 
 // Sets default values for this component's properties
@@ -20,14 +19,11 @@ URSInventoryComponent::URSInventoryComponent()
 		}
 	}
 
-	
-
 	// ...
 }
 
-
-bool URSInventoryComponent::ActionItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot,
-	EInventoryEvent InventoryEvent)
+bool URSInventoryComponent::ActionItem(
+	const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot, EInventoryEvent InventoryEvent)
 {
 	switch (InventoryEvent)
 	{
@@ -87,7 +83,7 @@ FInventoryItem URSInventoryComponent::RemoveItem(const FInventoryItem& FirstInve
 	if (CountRemove == -1)
 	{
 		ChangeItem(IndexItem, FInventoryItem(), 0);
-		//ToDo spawn
+		// ToDo spawn
 	}
 	else
 	{
@@ -98,7 +94,7 @@ FInventoryItem URSInventoryComponent::RemoveItem(const FInventoryItem& FirstInve
 		}
 		else
 		{
-			ChangeItem(IndexItem, FirstInventorySlot, FirstInventorySlot.Count-CountRemove);
+			ChangeItem(IndexItem, FirstInventorySlot, FirstInventorySlot.Count - CountRemove);
 			Item.Count = CountRemove;
 		}
 	}
@@ -111,8 +107,8 @@ bool URSInventoryComponent::MotionItem(FInventoryItem FirstInventorySlot)
 	int32 RemainingCount = 0;
 	for (int32 i = 0; i < MaxCountItem; i++)
 	{
-		if ((FirstInventorySlot.bStack)&&(FirstInventorySlot.ItemID == InventoryBox[i].ItemID) && (InventoryBox[i].Count != InventoryBox[i].MaxCount) && (
-			    FirstInventorySlot.SlotIndex == -1))
+		if ((FirstInventorySlot.bStack) && (FirstInventorySlot.ItemID == InventoryBox[i].ItemID) &&
+			(InventoryBox[i].Count != InventoryBox[i].MaxCount) && (FirstInventorySlot.SlotIndex == -1))
 		{
 			CombineItem(FirstInventorySlot, InventoryBox[i], RemainingCount);
 			FirstInventorySlot.Count = RemainingCount;
@@ -135,7 +131,7 @@ bool URSInventoryComponent::MotionItem(FInventoryItem FirstInventorySlot)
 	}
 	else if (bCombined && (RemainingCount == 0))
 	{
-		//OnInventoryEvent.Broadcast(Motion, FirstInventorySlot);
+		// OnInventoryEvent.Broadcast(Motion, FirstInventorySlot);
 		return true;
 	}
 	else if (!bCombined && (RemainingCount == 0))
@@ -143,7 +139,7 @@ bool URSInventoryComponent::MotionItem(FInventoryItem FirstInventorySlot)
 		InsertItem(FirstInventorySlot);
 		// if (FirstInventorySlot.Count != 0)
 		// {
-			// OnInventoryEvent.Broadcast(Remove, FirstInventorySlot);
+		// OnInventoryEvent.Broadcast(Remove, FirstInventorySlot);
 		// }
 		// OnInventoryEvent.Broadcast(Motion, FirstInventorySlot);
 		return true;
@@ -151,12 +147,12 @@ bool URSInventoryComponent::MotionItem(FInventoryItem FirstInventorySlot)
 	return false;
 }
 
-bool URSInventoryComponent::CombineItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot,
-	int32& RemainingCount)
+bool URSInventoryComponent::CombineItem(
+	const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot, int32& RemainingCount)
 {
 	int32 FirstIndexItem = FirstInventorySlot.SlotIndex;
 	int32 SecondIndexItem = SecondInventorySlot.SlotIndex;
-	if (FirstInventorySlot.bStack&&(FirstInventorySlot.ItemID == SecondInventorySlot.ItemID))
+	if (FirstInventorySlot.bStack && (FirstInventorySlot.ItemID == SecondInventorySlot.ItemID))
 	{
 		if ((FirstInventorySlot.Count + SecondInventorySlot.Count) > FirstInventorySlot.MaxCount)
 		{
@@ -183,24 +179,23 @@ bool URSInventoryComponent::UseItem(const FInventoryItem& FirstInventorySlot)
 {
 	if (FirstInventorySlot.bCanUse)
 	{
-		auto Item=RemoveItem(FirstInventorySlot, 1);
+		auto Item = RemoveItem(FirstInventorySlot, 1);
 		OnInventoryEvent.Broadcast(Use, Item);
 		return true;
 	}
 	return false;
 }
 
-
 void URSInventoryComponent::InsertItem(const FInventoryItem& Item)
 {
-	int CurrentCountItem=Item.Count;
+	int CurrentCountItem = Item.Count;
 	for (int32 i = 0; i < MaxCountItem; i++)
 	{
 		if (InventoryBox[i].ItemID == -1)
 		{
 			if (CurrentCountItem > Item.MaxCount)
 			{
-				CurrentCountItem-=Item.MaxCount;
+				CurrentCountItem -= Item.MaxCount;
 				ChangeItem(i, Item, Item.MaxCount);
 			}
 			else
@@ -242,25 +237,24 @@ void URSInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//ToDo Load Inventory
+	// ToDo Load Inventory
 }
 
 void URSInventoryComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	//ToDo Save Inventory
+	// ToDo Save Inventory
 }
-
 
 bool URSInventoryComponent::DivideItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot)
 {
-	//ToDo
+	// ToDo
 	return true;
 }
 
 bool URSInventoryComponent::SwapItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot)
 {
-	//ToDo
+	// ToDo
 	ChangeItem(SecondInventorySlot.SlotIndex, FirstInventorySlot, FirstInventorySlot.Count);
 	ChangeItem(FirstInventorySlot.SlotIndex, SecondInventorySlot, SecondInventorySlot.Count);
 	return true;

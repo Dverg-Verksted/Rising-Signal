@@ -12,7 +12,7 @@ void URSCharacterHealthComponent::ChangeStaminaValue(float ChangeValue)
 	}
 	else
 	{
-		if(CharacterAbilityStruct.Stamina < 0.0f)
+		if (CharacterAbilityStruct.Stamina < 0.0f)
 		{
 			CharacterAbilityStruct.Stamina = 0.0f;
 		}
@@ -20,8 +20,8 @@ void URSCharacterHealthComponent::ChangeStaminaValue(float ChangeValue)
 
 	if (GetWorld())
 	{
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_StaminaCoolDown, this,
-			&URSCharacterHealthComponent::RecoveryStamina, CharacterAbilityStruct.StaminaCoolDownRecoverTime, false);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_StaminaCoolDown, this, &URSCharacterHealthComponent::RecoveryStamina,
+			CharacterAbilityStruct.StaminaCoolDownRecoverTime, false);
 
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandle_StaminaRecoverRateTimer);
 	}
@@ -31,8 +31,8 @@ void URSCharacterHealthComponent::CoolDownStaminaEnd()
 {
 	if (GetWorld())
 	{
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_StaminaRecoverRateTimer, this,
-			&URSCharacterHealthComponent::RecoveryStamina, CharacterAbilityStruct.StaminaRecoverRate, true);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_StaminaRecoverRateTimer, this, &URSCharacterHealthComponent::RecoveryStamina,
+			CharacterAbilityStruct.StaminaRecoverRate, true);
 	}
 }
 

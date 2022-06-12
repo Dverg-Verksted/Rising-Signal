@@ -23,9 +23,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDead);
  * @param MaxHealthValue The value witch contain max health.
  * @param CoefficientDamage The value witch contain coefficient damage.
  */
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent),
-HideCategories=("Variable", "Tags", "ComponentTick",
-"ComponentReplication", "Activation", "Cooking", "AssetUserData", "Collision"))
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent),
+	HideCategories = ("Variable", "Tags", "ComponentTick", "ComponentReplication", "Activation", "Cooking", "AssetUserData", "Collision"))
 class RISINGSIGNAL_API URSHealthComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -44,8 +43,7 @@ public:
 
 	/*Struct contain all values witch use in the health.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Здоровье",
-	meta = (DisplayName="Настройки здоровья", AllowPrivateAccess = "true",
-	ToolTip = "В этой структуре все параметры здоровья"))
+		meta = (DisplayName = "Настройки здоровья", AllowPrivateAccess = "true", ToolTip = "В этой структуре все параметры здоровья"))
 	FHealthStruct HealthStruct;
 
 protected:
@@ -62,7 +60,7 @@ public:
 	 * @note BlueprintCallable function.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	float GetCurrentHealth() {return HealthStruct.Health;}
+	float GetCurrentHealth() { return HealthStruct.Health; }
 
 	/**
 	 * Setter function for set health value.
@@ -70,7 +68,7 @@ public:
 	 * @note BlueprintCallable function.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	void SetCurrentHealth(float NewHealth) {HealthStruct.Health = NewHealth;}
+	void SetCurrentHealth(float NewHealth) { HealthStruct.Health = NewHealth; }
 
 	/**
 	 * Function broadcast FOnHealthChange and checking limit values.
