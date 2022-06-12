@@ -9,8 +9,6 @@
 #include "Engine/DataTable.h"
 #include "GameFramework/Character.h"
 #include "Kismet/KismetSystemLibrary.h"
-
-
 #include "ALSBaseCharacter.generated.h"
 
 class UTimelineComponent;
@@ -294,17 +292,17 @@ protected:
 
 	virtual void MantleStart(float MantleHeight, const FALSComponentAndTransform& MantleLedgeWS, EALSMantleType MantleType);
 
-	virtual bool MantleCheck(const FALSMantleTraceSettings& TraceSettings,
-	                         EDrawDebugTrace::Type DebugType = EDrawDebugTrace::Type::ForOneFrame);
+	virtual bool MantleCheck(
+		const FALSMantleTraceSettings& TraceSettings, EDrawDebugTrace::Type DebugType = EDrawDebugTrace::Type::ForOneFrame);
 
 	UFUNCTION()
 	virtual void MantleUpdate(float BlendIn);
-	
+
 	UFUNCTION()
 	virtual void MantleEnd();
 
-	bool CapsuleHasRoomCheck(UCapsuleComponent* Capsule, FVector TargetLocation,
-	                         float HeightOffset, float RadiusOffset, EDrawDebugTrace::Type DebugType);
+	bool CapsuleHasRoomCheck(
+		UCapsuleComponent* Capsule, FVector TargetLocation, float HeightOffset, float RadiusOffset, EDrawDebugTrace::Type DebugType);
 
 	/** Utils */
 
