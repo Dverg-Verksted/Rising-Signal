@@ -37,6 +37,8 @@ struct FInventoryItem: public FTableRowBase
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
 	bool bCanCraft = false;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
+	bool bStack= true;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
 	bool bCanUse = false;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь")
 	int32 MaxCount = 50;

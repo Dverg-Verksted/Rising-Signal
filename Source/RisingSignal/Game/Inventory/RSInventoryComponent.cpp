@@ -111,7 +111,7 @@ bool URSInventoryComponent::MotionItem(FInventoryItem FirstInventorySlot)
 	int32 RemainingCount = 0;
 	for (int32 i = 0; i < MaxCountItem; i++)
 	{
-		if ((FirstInventorySlot.ItemID == InventoryBox[i].ItemID) && (InventoryBox[i].Count != InventoryBox[i].MaxCount) && (
+		if ((FirstInventorySlot.bStack)&&(FirstInventorySlot.ItemID == InventoryBox[i].ItemID) && (InventoryBox[i].Count != InventoryBox[i].MaxCount) && (
 			    FirstInventorySlot.SlotIndex == -1))
 		{
 			CombineItem(FirstInventorySlot, InventoryBox[i], RemainingCount);
@@ -156,7 +156,7 @@ bool URSInventoryComponent::CombineItem(const FInventoryItem& FirstInventorySlot
 {
 	int32 FirstIndexItem = FirstInventorySlot.SlotIndex;
 	int32 SecondIndexItem = SecondInventorySlot.SlotIndex;
-	if (FirstInventorySlot.ItemID == SecondInventorySlot.ItemID)
+	if (FirstInventorySlot.bStack&&(FirstInventorySlot.ItemID == SecondInventorySlot.ItemID))
 	{
 		if ((FirstInventorySlot.Count + SecondInventorySlot.Count) > FirstInventorySlot.MaxCount)
 		{
