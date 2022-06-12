@@ -28,8 +28,12 @@ protected:
 	virtual void BeginPlay() override;
 
 #if WITH_EDITOR
-	//
+
+	/**
+	 * @protected Called whenever a variable changes
+	 **/
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+
 #endif
 
 private:
