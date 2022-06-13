@@ -10,6 +10,8 @@ AInteractItemActor::AInteractItemActor()
 	PrimaryActorTick.bStartWithTickEnabled = false;
 	PrimaryActorTick.bAllowTickOnDedicatedServer = false;
 	PrimaryActorTick.bTickEvenWhenPaused = false;
+
+	this->Mesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("Mesh component"));
 }
 
 // Called when the game starts or when spawned
@@ -17,3 +19,19 @@ void AInteractItemActor::BeginPlay()
 {
 	Super::BeginPlay();
 }
+
+#if UE_EDITOR
+
+void AInteractItemActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	
+	
+	if (PropertyChangedEvent.Property && PropertyChangedEvent.Property->GetName() == TEXT("InteractItem"))
+	{
+		
+	}
+}
+
+#endif
