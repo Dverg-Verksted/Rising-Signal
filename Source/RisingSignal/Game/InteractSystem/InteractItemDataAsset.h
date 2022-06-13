@@ -14,7 +14,7 @@ enum class ETypeItem : uint8
 };
 
 /**
- * @class
+ * @class Data set for the items
  */
 UCLASS()
 class RISINGSIGNAL_API UInteractItemDataAsset : public UDataAsset
