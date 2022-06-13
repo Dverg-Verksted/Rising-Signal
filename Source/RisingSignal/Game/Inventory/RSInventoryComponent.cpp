@@ -1,12 +1,8 @@
-// It is owned by the company Dverg Verksted.
 
 #include "Game/Inventory/RSInventoryComponent.h"
 
-// Sets default values for this component's properties
 URSInventoryComponent::URSInventoryComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
 	if (InventoryBox.Num() != MaxCountItem)
@@ -18,8 +14,6 @@ URSInventoryComponent::URSInventoryComponent()
 			InventoryBox.Add(FInventoryItem(i));
 		}
 	}
-
-	// ...
 }
 
 bool URSInventoryComponent::ActionItem(
@@ -29,7 +23,7 @@ bool URSInventoryComponent::ActionItem(
 	{
 		case Motion:
 		{
-			if (SecondInventorySlot.ItemID == -1)
+			if ((SecondInventorySlot.ItemID == -1)&&(SecondInventorySlot.SlotIndex==-1))
 			{
 				MotionItem(FirstInventorySlot);
 			}
@@ -74,10 +68,8 @@ FInventoryItem URSInventoryComponent::RemoveItem(const FInventoryItem& FirstInve
 	int32 IndexItem = FirstInventorySlot.SlotIndex;
 	if (IndexItem == -1)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("элемент не найден для удаления, id= : %d!"), FirstInventorySlot.ItemID);
 		return FInventoryItem();
 	}
-	UE_LOG(LogTemp, Warning, TEXT("элемент найден для удаления, id= : %d! количество = %d"), FirstInventorySlot.ItemID, CountRemove);
 	FInventoryItem Item = FirstInventorySlot;
 
 	if (CountRemove == -1)
@@ -131,17 +123,11 @@ bool URSInventoryComponent::MotionItem(FInventoryItem FirstInventorySlot)
 	}
 	else if (bCombined && (RemainingCount == 0))
 	{
-		// OnInventoryEvent.Broadcast(Motion, FirstInventorySlot);
 		return true;
 	}
 	else if (!bCombined && (RemainingCount == 0))
 	{
 		InsertItem(FirstInventorySlot);
-		// if (FirstInventorySlot.Count != 0)
-		// {
-		// OnInventoryEvent.Broadcast(Remove, FirstInventorySlot);
-		// }
-		// OnInventoryEvent.Broadcast(Motion, FirstInventorySlot);
 		return true;
 	}
 	return false;
@@ -150,8 +136,8 @@ bool URSInventoryComponent::MotionItem(FInventoryItem FirstInventorySlot)
 bool URSInventoryComponent::CombineItem(
 	const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot, int32& RemainingCount)
 {
-	int32 FirstIndexItem = FirstInventorySlot.SlotIndex;
-	int32 SecondIndexItem = SecondInventorySlot.SlotIndex;
+	const int32 FirstIndexItem = FirstInventorySlot.SlotIndex;
+	const int32 SecondIndexItem = SecondInventorySlot.SlotIndex;
 	if (FirstInventorySlot.bStack && (FirstInventorySlot.ItemID == SecondInventorySlot.ItemID))
 	{
 		if ((FirstInventorySlot.Count + SecondInventorySlot.Count) > FirstInventorySlot.MaxCount)
@@ -179,7 +165,7 @@ bool URSInventoryComponent::UseItem(const FInventoryItem& FirstInventorySlot)
 {
 	if (FirstInventorySlot.bCanUse)
 	{
-		auto Item = RemoveItem(FirstInventorySlot, 1);
+		const auto Item = RemoveItem(FirstInventorySlot, 1);
 		OnInventoryEvent.Broadcast(Use, Item);
 		return true;
 	}
@@ -232,7 +218,6 @@ void URSInventoryComponent::ChangeItem(int32 Index, const FInventoryItem& Item, 
 	OnInventoryEvent.Broadcast(Changed, InventoryBox[Index]);
 }
 
-// Called when the game starts
 void URSInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -254,7 +239,6 @@ bool URSInventoryComponent::DivideItem(const FInventoryItem& FirstInventorySlot,
 
 bool URSInventoryComponent::SwapItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot)
 {
-	// ToDo
 	ChangeItem(SecondInventorySlot.SlotIndex, FirstInventorySlot, FirstInventorySlot.Count);
 	ChangeItem(FirstInventorySlot.SlotIndex, SecondInventorySlot, SecondInventorySlot.Count);
 	return true;
