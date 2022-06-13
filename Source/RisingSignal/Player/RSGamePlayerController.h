@@ -12,5 +12,5 @@
 UCLASS()
 class RISINGSIGNAL_API ARSGamePlayerController : public AALSPlayerController
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 };

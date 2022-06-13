@@ -13,17 +13,17 @@ class ARSGamePLayer;
 UCLASS()
 class RISINGSIGNAL_API AGameHUD : public ADebugHUD
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 protected:
-	// Draw the HUD.
-	virtual void DrawHUD() override;
+    // Draw the HUD.
+    virtual void DrawHUD() override;
 
-	/** Overridable native event for when play begins for this actor. */
-	virtual void BeginPlay() override;
+    /** Overridable native event for when play begins for this actor. */
+    virtual void BeginPlay() override;
 
 private:
-	// Current pointer on Character
-	UPROPERTY()
-	ARSGamePLayer* GamePlayer;
+    // Current pointer on Character
+    UPROPERTY()
+    ARSGamePLayer* GamePlayer;
 };
