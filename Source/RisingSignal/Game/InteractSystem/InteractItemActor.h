@@ -33,7 +33,7 @@ private:
     UStaticMeshComponent* Mesh;
 
     // @private Soft pointer on InteractItemDataAsset
-    UPROPERTY(
-        EditAnywhere, Category = "Settings Interact", meta = (DisplayName = "Данные об предмете", ToolTip = "Укажите данные об предмете"))
-    TSoftObjectPtr<UInteractItemDataAsset> InteractItem;
+    UPROPERTY(EditAnywhere, Category = "Settings Interact", meta = (DisplayName = "Данные об предмете",
+        ToolTip = "Укажите данные об предмете"))
+    UInteractItemDataAsset* InteractItem;
 };
