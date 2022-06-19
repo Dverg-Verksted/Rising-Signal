@@ -11,3 +11,8 @@ FPrimaryAssetId UJournalBaseEntity::GetPrimaryAssetId() const
 {
     return FPrimaryAssetId(JournalType, GetFName());
 }
+
+FString UJournalBaseEntity::GetChapterName()
+{
+    return Map.GetAssetName();
+}
