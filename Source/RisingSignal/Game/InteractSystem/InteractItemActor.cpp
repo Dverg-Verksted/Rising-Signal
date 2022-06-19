@@ -2,6 +2,8 @@
 
 #include "Game/InteractSystem/InteractItemActor.h"
 
+#include "InteractItemDataAsset.h"
+#include "Engine/AssetManager.h"
 #include "Library/RSFunctionLibrary.h"
 
 // Sets default values
@@ -36,8 +38,12 @@ void AInteractItemActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyC
 
     LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Name changed property: %s"), *PropertyChangedEvent.Property->GetName()));
 
-    if (PropertyChangedEvent.Property->GetName() == TEXT("InteractItem"))
+    if (PropertyChangedEvent.Property->GetName() == TEXT("InteractItem") && this->InteractItem)
     {
+        FStreamableManager& AssetLoader = UAssetManager::Get().GetStreamableManager();
+        UStaticMesh* L_Mesh = Cast<UStaticMesh>(AssetLoader.LoadSynchronous(this->InteractItem->GetMeshItem()));
+        if (!L_Mesh) return;
+        this->Mesh->SetStaticMesh(L_Mesh);
     }
 }
 
