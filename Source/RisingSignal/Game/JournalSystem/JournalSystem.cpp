@@ -6,29 +6,53 @@
 UJournalSystem::UJournalSystem()
 {
     PrimaryComponentTick.bCanEverTick = false;
+    ArrNoteObj.SetNum(3);
 }
 
 void UJournalSystem::AddNoteItem(UJournalNoteEntity* NewNoteObj)
 {
     if (!NewNoteObj)
     {
-        LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("The Note object: %s is nullptr"), *GetName()));
+        LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("The Note object: %s is nullptr"), *GetName()));
         return;
     }
     if (NewNoteObj->Date.IsEmpty())
     {
-        LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("The field Date: %s is empty"), *GetName()));
+        LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("The field Date: %s is empty"), *NewNoteObj->Date.ToString()));
         return;
     }
     if (NewNoteObj->Description.IsEmpty())
     {
-        LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("The field Description: %s is empty"), *GetName()));
+        LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("The field Description: %s is empty"), *NewNoteObj->Description.ToString()));
         return;
     }
     
     const FString AssetName = NewNoteObj->GetChapterName();
     const int32 IndexStruct = GetNoteChapterIndex(AssetName);
-    this->ArrNoteObj[IndexStruct].ArrNote.AddUnique(NewNoteObj);
+
+    if (this->ArrNoteObj.IsValidIndex(IndexStruct))
+    {
+        this->ArrNoteObj[IndexStruct].ArrNote.AddUnique(NewNoteObj);
+    }
+
+    LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Name: %s "), *GetName()));
+    LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field AssetName: %s "), *AssetName));
+    LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field IndexStruct: %d "), IndexStruct));
+    LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Date: %s "), *NewNoteObj->Date.ToString()));
+    LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Description: %s "), *NewNoteObj->Description.ToString()));
+    // LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Description: %s "), *this->ArrNoteObj[IndexStruct].ChapterName));
+
+    for (auto Name : this->ArrNoteObj)
+    {
+        LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Name: %s "), *GetName()));
+        LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field ChapterName: %s "), *Name.ChapterName));
+        for (auto fields : Name.ArrNote)
+        {
+            LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field ChapterName: %s "), *fields->Date.ToString()));
+            LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field ChapterName: %s "), *fields->Description.ToString()));
+        }
+
+    }
 }
 
 void UJournalSystem::AddAudioItem(UJournalAudioEntity* NewAudioObj)
@@ -168,7 +192,7 @@ int32 UJournalSystem::GetNoteChapterIndex(FString NoteName)
     
     int32 Index = 0;
 
-    for (auto arr : this->ArrNoteObj)
+    for (auto& Arr : this->ArrNoteObj)//TODO исправить баг
     {
         if (this->ArrNoteObj[Index].ChapterName == NoteName)
         {
@@ -177,7 +201,7 @@ int32 UJournalSystem::GetNoteChapterIndex(FString NoteName)
         Index++;
     }
 
-    return 0;
+    return Index;
 }
 
 int32 UJournalSystem::GetAudioChapterIndex(FString AudioName)
@@ -189,7 +213,7 @@ int32 UJournalSystem::GetAudioChapterIndex(FString AudioName)
     
     int32 Index = 0;
     
-    for (auto arr : this->ArrAudioObj)
+    for (auto& Arr : this->ArrAudioObj)
     {
         if (this->ArrAudioObj[Index].ChapterName == AudioName)
         {
@@ -198,7 +222,7 @@ int32 UJournalSystem::GetAudioChapterIndex(FString AudioName)
         Index++;
     }
     
-    return 0;
+    return Index;
 
 }
 
@@ -211,7 +235,7 @@ int32 UJournalSystem::GetPhotoChapterIndex(FString PhotoName)
     
     int32 Index = 0;
     
-    for (auto arr : this->ArrPhotoObj)
+    for (auto& Arr : this->ArrPhotoObj)
     {
        
         if (this->ArrPhotoObj[Index].ChapterName == PhotoName)
@@ -221,7 +245,7 @@ int32 UJournalSystem::GetPhotoChapterIndex(FString PhotoName)
         Index++;
     }
     
-    return 0;
+    return Index;
 }
 
 void UJournalSystem::DeleteNoteObjByIndex(int32 Index)

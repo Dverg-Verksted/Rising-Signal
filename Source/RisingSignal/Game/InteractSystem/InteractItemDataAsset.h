@@ -83,9 +83,37 @@ public:
     FORCEINLINE bool IsCanCraft() const { return this->bCanCraft; }
 
     /**
-  * @public Get texture Photo journal
-  * @return FSoftObjectPath
- **/
+      * @public Get type Note journal
+      * @return FPrimaryAssetType
+    **/
+    UFUNCTION(BlueprintCallable, Category = "InteractItemDataAsset | NoteItem | GetData")
+    FORCEINLINE FPrimaryAssetType GetTypeNoteItem() const { return this->JournalNoteType; }
+
+    /**
+      * @public Get type Audio journal
+      * @return FPrimaryAssetType
+    **/
+    UFUNCTION(BlueprintCallable, Category = "InteractItemDataAsset | AudioItem | GetData")
+    FORCEINLINE FPrimaryAssetType GetTypeAudioItem() const { return this->JournalAudioType; }
+
+    /**
+      * @public Get texture Audio journal
+      * @return FSoftObjectPath
+    **/
+    UFUNCTION(BlueprintCallable, Category = "InteractItemDataAsset | AudioItem | GetData")
+    FORCEINLINE FSoftObjectPath GetTextureAudioItem() const { return this->JournalAudio; }
+
+    /**
+      * @public Get type Audio journal
+      * @return FPrimaryAssetType
+    **/
+    UFUNCTION(BlueprintCallable, Category = "InteractItemDataAsset | PhotoItem | GetData")
+    FORCEINLINE FPrimaryAssetType GetTypePhotoItem() const { return this->JournalPhotoType; }
+    
+    /**
+      * @public Get texture Photo journal
+      * @return FSoftObjectPath
+    **/
     UFUNCTION(BlueprintCallable, Category = "InteractItemDataAsset | PhotoItem | GetData")
     FORCEINLINE FSoftObjectPath GetTexturePhotoItem() const { return this->JournalPhoto; }
 
@@ -139,21 +167,56 @@ private:
 
 #pragma region NoteItem
 
+    FPrimaryAssetType JournalNoteType;
 
+    UPROPERTY(EditAnywhere, Category="Settings Data Item", meta = (AllowedClasses= "World"))
+    FSoftObjectPath NoteMap;//TODO
+
+    UPROPERTY(EditAnywhere, Category = "Settings Data Item",
+        meta = (DisplayName = "Заголовок журнала Записки", ToolTip = "Заголовок журнала записки"))
+    FText JournalNoteHeader;//TODO
+    
+    UPROPERTY(EditAnywhere, Category = "Settings Data Item", meta = (DisplayName = "Дата: -- день", ToolTip = "Отображение дня, целое число",
+        EditCondition = "TypeItem == ETypeItem::NoteItem", EditConditionHides))
+    FText Date;//TODO
+
+    UPROPERTY(EditAnywhere, Category = "Settings Data Item", meta = (DisplayName = "Описание", ToolTip = "Описание чего-либо в широком смысле",
+        EditCondition = "TypeItem == ETypeItem::NoteItem", EditConditionHides))
+    FText Description;//TODO
 
 #pragma endregion
 
 #pragma region AudioItem
 
+    FPrimaryAssetType JournalAudioType;
 
+    UPROPERTY(EditAnywhere, Category="Settings Data Item", meta = (AllowedClasses= "World"))
+    FSoftObjectPath AudioMap;
+
+    UPROPERTY(EditAnywhere, Category = "Settings Data Item",
+        meta = (DisplayName = "Заголовок журнала аудиозаписи", ToolTip = "Заголовок журнала аудиозаписи"))
+    FText JournalAudioHeader;//TODO
+    
+    UPROPERTY(EditAnywhere, Category = "Settings Data Item", meta = (DisplayName = "Аудиозапись", ToolTip = "Добавление аудиозаписи типа USoundCue",
+        EditCondition = "TypeItem == ETypeItem::AudioItem", EditConditionHides, AllowedClasses = "USoundCue"))
+    FSoftObjectPath JournalAudio;//TODO
 
 #pragma endregion
 
 #pragma region PhotoItem
 
-    UPROPERTY(EditAnywhere, Category = "Settings Data Item", meta = (DisplayName = "Фотография", ToolTip = "Здесь хранятся фотографии",
+    FPrimaryAssetType JournalPhotoType;
+
+    UPROPERTY(EditAnywhere, Category="Settings Data Item", meta = (AllowedClasses= "World"))
+    FSoftObjectPath PhotoMap;
+
+    UPROPERTY(EditAnywhere, Category = "Settings Data Item",
+        meta = (DisplayName = "Заголовок журнала фотографии", ToolTip = "Заголовок журнала фотографии"))
+    FText JournalPhotoHeader;//TODO
+    
+    UPROPERTY(EditAnywhere, Category = "Settings Data Item", meta = (DisplayName = "Фотография", ToolTip = "Добавление фотографии типа Texture2D",
         EditCondition = "TypeItem == ETypeItem::PhotoItem", EditConditionHides, AllowedClasses = "Texture2D"))
-    FSoftObjectPath JournalPhoto;
+    FSoftObjectPath JournalPhoto;//TODO
 
 #pragma endregion
     

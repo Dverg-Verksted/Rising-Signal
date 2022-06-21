@@ -25,7 +25,7 @@ struct FChapterDataNote
 {
     GENERATED_BODY()
 
-    FString ChapterName = TEXT("Глава 1 Акт 1");
+    FString ChapterName = TEXT("Map_TestInventory");
 
     UPROPERTY()
     TArray<UJournalNoteEntity*> ArrNote;
@@ -36,7 +36,7 @@ struct FChapterDataAudio
 {
     GENERATED_BODY()
 
-    FString ChapterName = TEXT("Глава 1 Акт 1");
+    FString ChapterName = TEXT("Map_TestInventory");
 
     UPROPERTY()
     TArray<UJournalAudioEntity*> ArrAudio;
@@ -47,7 +47,7 @@ struct FChapterDataPhoto
 {
     GENERATED_BODY()
 
-    FString ChapterName = TEXT("Глава 1 Акт 1");
+    FString ChapterName = TEXT("Map_TestInventory");
 
     UPROPERTY()
     TArray<UJournalPhotoEntity*> ArrPhoto;
