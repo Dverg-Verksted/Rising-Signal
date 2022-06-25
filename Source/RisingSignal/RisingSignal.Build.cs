@@ -8,7 +8,7 @@ public class RisingSignal : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "ALSV4_CPP", "PhysicsCore" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "PhysicsCore" });
 
         PrivateDependencyModuleNames.AddRange(new string[] {});
 

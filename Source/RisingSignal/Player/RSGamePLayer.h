@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Character/ALSCharacter.h"
+#include "GameFramework/Character.h"
 #include "RSGamePLayer.generated.h"
 
 class UCameraComponent;
@@ -12,7 +12,7 @@ class USpringArmComponent;
  * @class Own player (^_^)
  */
 UCLASS()
-class RISINGSIGNAL_API ARSGamePLayer : public AALSCharacter
+class RISINGSIGNAL_API ARSGamePLayer : public ACharacter
 {
     GENERATED_BODY()
 
