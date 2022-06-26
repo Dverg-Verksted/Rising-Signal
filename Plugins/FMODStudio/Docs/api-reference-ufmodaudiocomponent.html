@@ -118,7 +118,6 @@
 <span class="p">);</span>
 </pre></div>
 
-
 <dl>
 <dt>bReset</dt>
 <dd>Whether the activation should happen even if ShouldActivate returns false.</dd>
@@ -133,7 +132,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="kt">float</span> <span class="n">AmbientLPF</span><span class="p">;</span>
 </pre></div>
 
-
 <p>Used for automating volume and/or LPF with Ambient Zones.</p>
 <p><strong>See Also:</strong> <a href="user-guide.html#ambient-zone-settings">Ambient Zones</a></p>
 <h2 api="struct" id="ufmodaudiocomponent_ambientlpfid"><a href="#ufmodaudiocomponent_ambientlpfid">UFMODAudioComponent::AmbientLPFID</a></h2>
@@ -146,7 +144,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="n">FMOD_STUDIO_PARAMETER_ID</span> <span class="n">AmbientLPFID</span><span class="p">;</span>
 </pre></div>
 
-
 <p><strong>See Also:</strong> <a href="user-guide.html#ambient-zone-settings">Ambient Zones</a>, <a href="https://fmod.com/resources/documentation-api?version=2.2&amp;page=studio-api-common.html#fmod_studio_parameter_id">FMOD_STUDIO_PARAMETER_ID</a></p>
 <h2 api="struct" id="ufmodaudiocomponent_ambientvolume"><a href="#ufmodaudiocomponent_ambientvolume">UFMODAudioComponent::AmbientVolume</a></h2>
 <p>Calculated Ambient volume level for that frame.</p>
@@ -157,7 +154,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="kt">float</span> <span class="n">AmbientVolume</span><span class="p">;</span>
 </pre></div>
-
 
 <p>Used for automating volume and/or LPF with Ambient Zones.</p>
 <p><strong>See Also:</strong> <a href="user-guide.html#ambient-zone-settings">Ambient Zones</a></p>
@@ -171,7 +167,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="n">FMOD_STUDIO_PARAMETER_ID</span> <span class="n">AmbientVolumeID</span><span class="p">;</span>
 </pre></div>
 
-
 <p><strong>See Also:</strong> <a href="user-guide.html#ambient-zone-settings">Ambient Zones</a>, <a href="https://fmod.com/resources/documentation-api?version=2.2&amp;page=studio-api-common.html#fmod_studio_parameter_id">FMOD_STUDIO_PARAMETER_ID</a></p>
 <h2 api="function" id="ufmodaudiocomponent_applyvolumelpf"><a href="#ufmodaudiocomponent_applyvolumelpf">UFMODAudioComponent::ApplyVolumeLPF</a></h2>
 <p>Apply Volume and LPF to Event.</p>
@@ -183,7 +178,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="kt">void</span> <span class="nf">ApplyVolumeLPF</span><span class="p">();</span>
 </pre></div>
 
-
 <h2 api="struct" id="ufmodaudiocomponent_attenuationdetails"><a href="#ufmodaudiocomponent_attenuationdetails">UFMODAudioComponent::AttenuationDetails</a></h2>
 <p>FMOD Custom Attenuation Details.</p>
 <p>
@@ -193,7 +187,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="k">struct</span> <span class="n">FFMODAttenuationDetails</span> <span class="n">AttenuationDetails</span><span class="p">;</span>
 </pre></div>
-
 
 <p><strong>See Also:</strong> <span class="dead-link" class="apilink" href="#ffmodattenuationdetails" title="">FFMODAttenuationDetails</span class="dead-link"></p>
 <h2 api="struct" id="ufmodaudiocomponent_bapplyambientvolumes"><a href="#ufmodaudiocomponent_bapplyambientvolumes">UFMODAudioComponent::bApplyAmbientVolumes</a></h2>
@@ -206,7 +199,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="n">uint32</span> <span class="nl">bApplyAmbientVolumes</span> <span class="p">:</span> <span class="mi">1</span><span class="p">;</span>
 </pre></div>
 
-
 <h2 api="struct" id="ufmodaudiocomponent_bapplyocclusionparameter"><a href="#ufmodaudiocomponent_bapplyocclusionparameter">UFMODAudioComponent::bApplyOcclusionParameter</a></h2>
 <p>Whether we apply gain and low-pass based on occlusion onto a parameter.</p>
 <p>
@@ -216,7 +208,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="n">uint32</span> <span class="nl">bApplyOcclusionParameter</span> <span class="p">:</span> <span class="mi">1</span><span class="p">;</span>
 </pre></div>
-
 
 <h2 api="struct" id="ufmodaudiocomponent_bautodestroy"><a href="#ufmodaudiocomponent_bautodestroy">UFMODAudioComponent::bAutoDestroy</a></h2>
 <p>Auto destroy this component on completion.</p>
@@ -228,7 +219,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="n">uint32</span> <span class="nl">bAutoDestroy</span> <span class="p">:</span> <span class="mi">1</span><span class="p">;</span>
 </pre></div>
 
-
 <h2 api="struct" id="ufmodaudiocomponent_bdefaultparametervaluescached"><a href="#ufmodaudiocomponent_bdefaultparametervaluescached">UFMODAudioComponent::bDefaultParameterValuesCached</a></h2>
 <p>Have the Event parameters default values been cached.</p>
 <p>
@@ -239,7 +229,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="kt">bool</span> <span class="n">bDefaultParameterValuesCached</span><span class="p">;</span>
 </pre></div>
 
-
 <h2 api="struct" id="ufmodaudiocomponent_benabletimelinecallbacks"><a href="#ufmodaudiocomponent_benabletimelinecallbacks">UFMODAudioComponent::bEnableTimelineCallbacks</a></h2>
 <p>Enable timeline callbacks for this sound, so that OnTimelineMarker and OnTimelineBeat can be used.</p>
 <p>
@@ -249,7 +238,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="n">uint32</span> <span class="nl">bEnableTimelineCallbacks</span> <span class="p">:</span> <span class="mi">1</span><span class="p">;</span>
 </pre></div>
-
 
 <p><strong>See Also:</strong> <a class="apilink" href="api-reference-ufmodaudiocomponent.html#ufmodaudiocomponent_ontimelinemarker" title="Called when we reach a named marker (if bEnableTimelineCallbacks is true).">UFMODAudioComponent::OnTimelineMarker</a>, <a class="apilink" href="api-reference-ufmodaudiocomponent.html#ufmodaudiocomponent_ontimelinebeat" title="Called when we reach a beat of a tempo (if bEnableTimelineCallbacks is true).">UFMODAudioComponent::OnTimelineBeat</a></p>
 <h2 api="struct" id="ufmodaudiocomponent_bstopwhenownerdestroyed"><a href="#ufmodaudiocomponent_bstopwhenownerdestroyed">UFMODAudioComponent::bStopWhenOwnerDestroyed</a></h2>
@@ -262,7 +250,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="n">uint32</span> <span class="nl">bStopWhenOwnerDestroyed</span> <span class="p">:</span> <span class="mi">1</span><span class="p">;</span>
 </pre></div>
 
-
 <h2 api="function" id="ufmodaudiocomponent_cachedefaultparametervalues"><a href="#ufmodaudiocomponent_cachedefaultparametervalues">UFMODAudioComponent::CacheDefaultParameterValues</a></h2>
 <p>Cache default event parameter values</p>
 <p>
@@ -273,7 +260,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="kt">void</span> <span class="n">CacheDefaultParameterValues</span><span class="p">()</span>
 </pre></div>
 
-
 <h2 api="struct" id="ufmodaudiocomponent_callbackbeatqueue"><a href="#ufmodaudiocomponent_callbackbeatqueue">UFMODAudioComponent::CallbackBeatQueue</a></h2>
 <p>Stores the Timeline Beats as they are triggered.</p>
 <p>
@@ -283,7 +269,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FTimelineBeatProperties</span><span class="o">&gt;</span> <span class="n">CallbackBeatQueue</span><span class="p">;</span>
 </pre></div>
-
 
 <p><strong>See Also:</strong> <a class="apilink" href="api-reference-ufmodaudiocomponent.html#ufmodaudiocomponent_eventcallbackaddbeat" title="Timeline Beat callback.">UFMODAudioComponent::EventCallbackAddBeat</a></p>
 <h2 api="struct" id="ufmodaudiocomponent_callbacklock"><a href="#ufmodaudiocomponent_callbacklock">UFMODAudioComponent::CallbackLock</a></h2>
@@ -296,7 +281,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="n">FCriticalSection</span> <span class="n">CallbackLock</span><span class="p">;</span>
 </pre></div>
 
-
 <h2 api="struct" id="ufmodaudiocomponent_callbackmarkerqueue"><a href="#ufmodaudiocomponent_callbackmarkerqueue">UFMODAudioComponent::CallbackMarkerQueue</a></h2>
 <p>Stores the Timeline Markers as they are triggered.</p>
 <p>
@@ -306,7 +290,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FTimelineMarkerProperties</span><span class="o">&gt;</span> <span class="n">CallbackMarkerQueue</span><span class="p">;</span>
 </pre></div>
-
 
 <p><strong>See Also:</strong> <a class="apilink" href="api-reference-ufmodaudiocomponent.html#ufmodaudiocomponent_eventcallbackaddmarker" title="Timeline Marker callback.">UFMODAudioComponent::EventCallbackAddMarker</a></p>
 <h2 api="struct" id="ufmodaudiocomponent_currentinteriorlpf"><a href="#ufmodaudiocomponent_currentinteriorlpf">UFMODAudioComponent::CurrentInteriorLPF</a></h2>
@@ -318,7 +301,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="kt">float</span> <span class="n">CurrentInteriorLPF</span><span class="p">;</span>
 </pre></div>
-
 
 <p>Used for automating volume and/or LPF with Ambient Zones.</p>
 <p><strong>See Also:</strong> <a href="user-guide.html#ambient-zone-settings">Ambient Zones</a></p>
@@ -332,7 +314,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="kt">float</span> <span class="n">CurrentInteriorVolume</span><span class="p">;</span>
 </pre></div>
 
-
 <p>Used for automating volume and/or LPF with Ambient Zones.</p>
 <p><strong>See Also:</strong> <a href="user-guide.html#ambient-zone-settings">Ambient Zones</a></p>
 <h2 api="function" id="ufmodaudiocomponent_deactivate"><a href="#ufmodaudiocomponent_deactivate">UFMODAudioComponent::Deactivate</a></h2>
@@ -345,7 +326,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="k">virtual</span> <span class="kt">void</span> <span class="nf">Deactivate</span><span class="p">();</span>
 </pre></div>
 
-
 <h2 api="function" id="ufmodaudiocomponent_endplay"><a href="#ufmodaudiocomponent_endplay">UFMODAudioComponent::EndPlay</a></h2>
 <p>Overridable function called whenever this actor is being removed from a level.</p>
 <p>
@@ -355,7 +335,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="k">virtual</span> <span class="kt">void</span> <span class="n">EndPlay</span><span class="p">(</span><span class="k">const</span> <span class="n">EEndPlayReason</span><span class="o">::</span><span class="n">Type</span> <span class="n">EndPlayReason</span><span class="p">)</span> <span class="k">override</span>
 </pre></div>
-
 
 <dl>
 <dt>EndPlayReason</dt>
@@ -371,7 +350,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="n">TAssetPtr</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">UFMODEvent</span><span class="o">&gt;</span> <span class="n">Event</span><span class="p">;</span>
 </pre></div>
 
-
 <p><strong>See Also:</strong> <a class="apilink" href="api-reference-ufmodevent.html" title="">UFMODEvent</a></p>
 <h2 api="function" id="ufmodaudiocomponent_eventcallback"><a href="#ufmodaudiocomponent_eventcallback">UFMODAudioComponent_EventCallback</a></h2>
 <p>Generic callback used for the Studio Instance.</p>
@@ -385,7 +363,6 @@
   <span class="n">FMOD_STUDIO_EVENTINSTANCE</span> <span class="o">*</span><span class="n">event</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">parameters</span>
 <span class="p">);</span>
 </pre></div>
-
 
 <dl>
 <dt>type</dt>
@@ -409,7 +386,6 @@
 <span class="p">);</span>
 </pre></div>
 
-
 <dl>
 <dt>props</dt>
 <dd>Callback properties.</dd>
@@ -426,7 +402,6 @@
   <span class="k">struct</span> <span class="n">FMOD_STUDIO_TIMELINE_MARKER_PROPERTIES</span> <span class="o">*</span><span class="n">props</span>
 <span class="p">);</span>
 </pre></div>
-
 
 <dl>
 <dt>props</dt>
@@ -445,7 +420,6 @@
 <span class="p">);</span>
 </pre></div>
 
-
 <dl>
 <dt>props</dt>
 <dd>Callback properties.</dd>
@@ -463,7 +437,6 @@
 <span class="p">);</span>
 </pre></div>
 
-
 <dl>
 <dt>props</dt>
 <dd>Callback properties.</dd>
@@ -479,7 +452,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="n">int32</span> <span class="n">EventLength</span><span class="p">;</span>
 </pre></div>
 
-
 <h2 api="function" id="ufmodaudiocomponent_getstudiomodule"><a href="#ufmodaudiocomponent_getstudiomodule">UFMODAudioComponent::GetStudioModule</a></h2>
 <p>Return a cached reference to the current IFMODStudioModule.</p>
 <p>
@@ -489,7 +461,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="n">IFMODStudioModule</span><span class="o">&amp;</span> <span class="n">GetStudioModule</span><span class="p">();</span>
 </pre></div>
-
 
 <p><strong>See Also:</strong> <a class="apilink" href="api-reference-ifmodstudiomodule.html" title="">IFMODStudioModule</a></p>
 <h2 api="struct" id="ufmodaudiocomponent_interiorlastupdatetime"><a href="#ufmodaudiocomponent_interiorlastupdatetime">UFMODAudioComponent::InteriorLastUpdateTime</a></h2>
@@ -502,7 +473,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="kt">double</span> <span class="n">InteriorLastUpdateTime</span><span class="p">;</span>
 </pre></div>
 
-
 <h2 api="struct" id="ufmodaudiocomponent_lastlpf"><a href="#ufmodaudiocomponent_lastlpf">UFMODAudioComponent::LastLPF</a></h2>
 <p>Previously set LPF value.</p>
 <p>
@@ -512,7 +482,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="kt">float</span> <span class="n">LastLPF</span><span class="p">;</span>
 </pre></div>
-
 
 <p>Used for automating volume and/or LPF with Ambient Zones.</p>
 <p><strong>See Also:</strong> <a href="user-guide.html#ambient-zone-settings">Ambient Zones</a></p>
@@ -526,7 +495,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="kt">float</span> <span class="n">LastVolume</span><span class="p">;</span>
 </pre></div>
 
-
 <p>Used for automating volume and/or LPF with Ambient Zones.</p>
 <p><strong>See Also:</strong> <a href="user-guide.html#ambient-zone-settings">Ambient Zones</a></p>
 <h2 api="struct" id="ufmodaudiocomponent_module"><a href="#ufmodaudiocomponent_module">UFMODAudioComponent::Module</a></h2>
@@ -539,7 +507,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="n">IFMODStudioModule</span><span class="o">*</span> <span class="n">Module</span><span class="p">;</span>
 </pre></div>
 
-
 <p><strong>See Also:</strong> <a class="apilink" href="api-reference-ifmodstudiomodule.html" title="">IFMODStudioModule</a></p>
 <h2 api="struct" id="ufmodaudiocomponent_occlusiondetails"><a href="#ufmodaudiocomponent_occlusiondetails">UFMODAudioComponent::OcclusionDetails</a></h2>
 <p>FMOD Custom Occlusion Details.</p>
@@ -550,7 +517,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="k">struct</span> <span class="n">FFMODOcclusionDetails</span> <span class="n">OcclusionDetails</span><span class="p">;</span>
 </pre></div>
-
 
 <p><strong>See Also:</strong> <span class="dead-link" class="apilink" href="#ffmodocclusiondetails" title="">FFMODOcclusionDetails</span class="dead-link"></p>
 <h2 api="struct" id="ufmodaudiocomponent_occlusionid"><a href="#ufmodaudiocomponent_occlusionid">UFMODAudioComponent::OcclusionID</a></h2>
@@ -563,7 +529,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="n">FMOD_STUDIO_PARAMETER_ID</span> <span class="n">OcclusionID</span><span class="p">;</span>
 </pre></div>
 
-
 <p><strong>See Also:</strong> <a href="user-guide.html#occlusion">Occlusion</a>, <a href="https://fmod.com/resources/documentation-api?version=2.2&amp;page=studio-api-common.html#fmod_studio_parameter_id">FMOD_STUDIO_PARAMETER_ID</a></p>
 <h2 api="struct" id="ufmodaudiocomponent_oneventstopped"><a href="#ufmodaudiocomponent_oneventstopped">UFMODAudioComponent::OnEventStopped</a></h2>
 <p>Called when an event stops, either because it played to completion or because a Stop() call turned it off early.</p>
@@ -575,7 +540,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="n">FOnEventStopped</span> <span class="n">OnEventStopped</span><span class="p">;</span>
 </pre></div>
 
-
 <h2 api="function" id="ufmodaudiocomponent_onplaybackcompleted"><a href="#ufmodaudiocomponent_onplaybackcompleted">UFMODAudioComponent::OnPlaybackCompleted</a></h2>
 <p>Called when the event has finished stopping.</p>
 <p>
@@ -585,7 +549,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="kt">void</span> <span class="nf">OnPlaybackCompleted</span><span class="p">();</span>
 </pre></div>
-
 
 <h2 api="function" id="ufmodaudiocomponent_onregister"><a href="#ufmodaudiocomponent_onregister">UFMODAudioComponent::OnRegister</a></h2>
 <p>Called when a component is registered, after Scene is set, but before CreateRenderState_Concurrent or OnCreatePhysicsState are called.</p>
@@ -597,7 +560,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="k">virtual</span> <span class="kt">void</span> <span class="nf">OnRegister</span><span class="p">();</span>
 </pre></div>
 
-
 <h2 api="struct" id="ufmodaudiocomponent_ontimelinebeat"><a href="#ufmodaudiocomponent_ontimelinebeat">UFMODAudioComponent::OnTimelineBeat</a></h2>
 <p>Called when we reach a beat of a tempo (if bEnableTimelineCallbacks is true).</p>
 <p>
@@ -607,7 +569,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="n">FOnTimelineMarker</span> <span class="n">OnTimelineBeat</span><span class="p">;</span>
 </pre></div>
-
 
 <p><strong>See Also:</strong> <a class="apilink" href="api-reference-ufmodaudiocomponent.html#ufmodaudiocomponent_benabletimelinecallbacks" title="Enable timeline callbacks for this sound, so that OnTimelineMarker and OnTimelineBeat can be used.">UFMODAudioComponent::bEnableTimelineCallbacks</a></p>
 <h2 api="struct" id="ufmodaudiocomponent_ontimelinemarker"><a href="#ufmodaudiocomponent_ontimelinemarker">UFMODAudioComponent::OnTimelineMarker</a></h2>
@@ -620,7 +581,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="n">FOnTimelineMarker</span> <span class="n">OnTimelineMarker</span><span class="p">;</span>
 </pre></div>
 
-
 <p><strong>See Also:</strong> <a class="apilink" href="api-reference-ufmodaudiocomponent.html#ufmodaudiocomponent_benabletimelinecallbacks" title="Enable timeline callbacks for this sound, so that OnTimelineMarker and OnTimelineBeat can be used.">UFMODAudioComponent::bEnableTimelineCallbacks</a></p>
 <h2 api="function" id="ufmodaudiocomponent_onunregister"><a href="#ufmodaudiocomponent_onunregister">UFMODAudioComponent::OnUnregister</a></h2>
 <p>Called when a component is unregistered. Called after DestroyRenderState_Concurrent and OnDestroyPhysicsState are called.</p>
@@ -631,7 +591,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="k">virtual</span> <span class="kt">void</span> <span class="nf">OnUnregister</span><span class="p">();</span>
 </pre></div>
-
 
 <h2 api="function" id="ufmodaudiocomponent_onupdatetransform"><a href="#ufmodaudiocomponent_onupdatetransform">UFMODAudioComponent::OnUpdateTransform</a></h2>
 <p>Native callback when this component is moved.</p>
@@ -646,7 +605,6 @@
 <span class="p">);</span>
 </pre></div>
 
-
 <p>Used to update the 3D positional information of the Event.</p>
 <h2 api="struct" id="ufmodaudiocomponent_parametercache"><a href="#ufmodaudiocomponent_parametercache">UFMODAudioComponent::ParameterCache</a></h2>
 <p>Cache of the current Events parameters.</p>
@@ -657,7 +615,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="n">TMap</span><span class="o">&lt;</span><span class="n">FName</span><span class="p">,</span> <span class="kt">float</span><span class="o">&gt;</span> <span class="n">ParameterCache</span><span class="p">;</span>
 </pre></div>
-
 
 <h2 api="function" id="ufmodaudiocomponent_playinternal"><a href="#ufmodaudiocomponent_playinternal">UFMODAudioComponent::PlayInternal</a></h2>
 <p>Internal play function which can play Events in the editor.</p>
@@ -670,7 +627,6 @@
   <span class="n">EFMODSystemContext</span><span class="o">::</span><span class="n">Type</span> <span class="n">Context</span>
 <span class="p">);</span>
 </pre></div>
-
 
 <dl>
 <dt>Context</dt>
@@ -687,7 +643,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="n">FMOD</span><span class="o">::</span><span class="n">Sound</span> <span class="o">*</span><span class="n">ProgrammerSound</span><span class="p">;</span>
 </pre></div>
 
-
 <p><strong>See Also:</strong> <a href="https://fmod.com/resources/documentation-api?version=2.2&amp;page=core-api-sound.html">FMOD::Sound</a></p>
 <h2 api="struct" id="ufmodaudiocomponent_programmersoundname"><a href="#ufmodaudiocomponent_programmersoundname">UFMODAudioComponent::ProgrammerSoundName</a></h2>
 <p>Sound name used for programmer sound.</p>
@@ -698,7 +653,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="n">FString</span> <span class="n">ProgrammerSoundName</span><span class="p">;</span>
 </pre></div>
-
 
 <p>The integration will look up the name in any loaded audio table.</p>
 <h2 api="function" id="ufmodaudiocomponent_releaseeventcache"><a href="#ufmodaudiocomponent_releaseeventcache">UFMODAudioComponent::ReleaseEventCache</a></h2>
@@ -711,7 +665,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="kt">void</span> <span class="nf">ReleaseEventCache</span><span class="p">();</span>
 </pre></div>
 
-
 <p><strong>See Also:</strong> <a class="apilink" href="api-reference-ufmodaudiocomponent.html#ufmodaudiocomponent_studioinstance" title="Actual Studio instance handle.">UFMODAudioComponent::StudioInstance</a></p>
 <h2 api="function" id="ufmodaudiocomponent_releaseeventinstance"><a href="#ufmodaudiocomponent_releaseeventinstance">UFMODAudioComponent::ReleaseEventInstance</a></h2>
 <p>Release the Studio Instance.</p>
@@ -722,7 +675,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="kt">void</span> <span class="nf">ReleaseEventInstance</span><span class="p">();</span>
 </pre></div>
-
 
 <p><strong>See Also:</strong> <a class="apilink" href="api-reference-ufmodaudiocomponent.html#ufmodaudiocomponent_studioinstance" title="Actual Studio instance handle.">UFMODAudioComponent::StudioInstance</a></p>
 <h2 api="function" id="ufmodaudiocomponent_setprogrammersound"><a href="#ufmodaudiocomponent_setprogrammersound">UFMODAudioComponent::SetProgrammerSound</a></h2>
@@ -736,7 +688,6 @@
   <span class="n">FMOD</span><span class="o">::</span><span class="n">Sound</span> <span class="o">*</span><span class="n">Sound</span>
 <span class="p">);</span>
 </pre></div>
-
 
 <dl>
 <dt>Sound</dt>
@@ -753,7 +704,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="kt">float</span> <span class="n">SourceInteriorLPF</span><span class="p">;</span>
 </pre></div>
 
-
 <p>Used for automating volume and/or LPF with Ambient Zones.</p>
 <p><strong>See Also:</strong> <a href="user-guide.html#ambient-zone-settings">Ambient Zones</a></p>
 <h2 api="struct" id="ufmodaudiocomponent_sourceinteriorvolume"><a href="#ufmodaudiocomponent_sourceinteriorvolume">UFMODAudioComponent::SourceInteriorVolume</a></h2>
@@ -765,7 +715,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="kt">float</span> <span class="n">SourceInteriorVolume</span><span class="p">;</span>
 </pre></div>
-
 
 <p>Used for automating volume and/or LPF with Ambient Zones.</p>
 <p><strong>See Also:</strong> <a href="user-guide.html#ambient-zone-settings">Ambient Zones</a></p>
@@ -779,7 +728,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="kt">float</span> <span class="n">StoredProperties</span><span class="p">[</span><span class="n">EFMODEventProperty</span><span class="o">::</span><span class="n">Count</span><span class="p">];</span>
 </pre></div>
 
-
 <p><strong>See Also:</strong> <span class="dead-link" class="apilink" href="#efmodeventproperty" title="">EFMODEventProperty</span class="dead-link"></p>
 <h2 api="struct" id="ufmodaudiocomponent_studioinstance"><a href="#ufmodaudiocomponent_studioinstance">UFMODAudioComponent::StudioInstance</a></h2>
 <p>Actual Studio instance handle.</p>
@@ -790,7 +738,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="n">FMOD</span><span class="o">::</span><span class="n">Studio</span><span class="o">::</span><span class="n">EventInstance</span> <span class="o">*</span><span class="n">StudioInstance</span><span class="p">;</span>
 </pre></div>
-
 
 <h2 api="function" id="ufmodaudiocomponent_tickcomponent"><a href="#ufmodaudiocomponent_tickcomponent">UFMODAudioComponent::TickComponent</a></h2>
 <p>Function called every frame on this ActorComponent.</p>
@@ -806,7 +753,6 @@
 <span class="p">);</span>
 </pre></div>
 
-
 <p>Only executes if the component is registered, and also PrimaryComponentTick.bCanEverTick must be set to true.</p>
 <h2 api="struct" id="ufmodaudiocomponent_triggercue"><a href="#ufmodaudiocomponent_triggercue">UFMODAudioComponent::TriggerCue</a></h2>
 <p>Trigger a cue in an event.</p>
@@ -818,7 +764,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="kt">void</span> <span class="nf">TriggerCue</span><span class="p">();</span>
 </pre></div>
 
-
 <h2 api="function" id="ufmodaudiocomponent_updateattenuation"><a href="#ufmodaudiocomponent_updateattenuation">UFMODAudioComponent::UpdateAttenuation</a></h2>
 <p>Update attenuation if we have it set.</p>
 <p>
@@ -828,7 +773,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="kt">void</span> <span class="nf">UpdateAttenuation</span><span class="p">();</span>
 </pre></div>
-
 
 <h2 api="struct" id="ufmodaudiocomponent_updateinteriorvolumes"><a href="#ufmodaudiocomponent_updateinteriorvolumes">UFMODAudioComponent::UpdateInteriorVolumes</a></h2>
 <p>Update gain and low-pass based on interior volumes.</p>
@@ -840,7 +784,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="kt">void</span> <span class="nf">UpdateInteriorVolumes</span><span class="p">();</span>
 </pre></div>
 
-
 <h2 api="struct" id="ufmodaudiocomponent_wasoccluded"><a href="#ufmodaudiocomponent_wasoccluded">UFMODAudioComponent::wasOccluded</a></h2>
 <p>Was the object occluded in the previous frame.</p>
 <p>
@@ -851,10 +794,9 @@
 <div class="highlight language-cpp"><pre><span></span><span class="kt">bool</span> <span class="n">wasOccluded</span><span class="p">;</span>
 </pre></div>
 
-
 <p><strong>See Also:</strong> <a href="user-guide.html#occlusion">Occlusion</a></p></div>
 
-<p class="manual-footer">Unreal Integration 2.02.05 (2022-02-04). &copy; 2022 Firelight Technologies Pty Ltd.</p>
+<p class="manual-footer">Unreal Integration 2.02.07 (2022-05-18). &copy; 2022 Firelight Technologies Pty Ltd.</p>
 </body>
 </html>
 

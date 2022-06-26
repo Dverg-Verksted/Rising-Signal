@@ -148,7 +148,6 @@
     +--- Source
 </pre></div>
 
-
 <h3 id="additional-platforms"><a href="#additional-platforms">2.1.2 Additional Platforms</a></h3>
 <p>After installing the integration plugin for your host platform you may need to install additional plugins for other platforms which you are targetting.</p>
 <h4 id="windows-desktop"><a href="#windows-desktop">Windows Desktop</a></h4>
@@ -190,7 +189,6 @@
                 +--- FMODStudio
     +--- Source
 </pre></div>
-
 
 <p>Additional platform specific installation instructions may be included in the <code>Extras</code> directory of the integration plugin packages.</p>
 <h3 id="old-versions"><a href="#old-versions">2.1.4 Old Versions</a></h3>
@@ -440,7 +438,6 @@ You will need to add these parameter names to the integration settings.</p>
 <span class="p">}</span>
 </pre></div>
 
-
 <p>You can use a mixture of FMOD Studio wrapper and FMOD Studio API functions. For example:</p>
 <div class="highlight language-cpp"><pre><span></span><span class="c1">// Call wrapper helper function to create and start an event instance</span>
 <span class="n">FFMODEventInstance</span> <span class="n">InstanceWrapper</span> <span class="o">=</span> <span class="n">UFMODBlueprintStatics</span><span class="o">::</span><span class="n">PlayEventAtLocation</span><span class="p">(</span><span class="n">ThisActor</span><span class="p">,</span> <span class="n">MyEvent</span><span class="p">,</span> <span class="n">FTransform</span><span class="p">(</span><span class="n">MyLocation</span><span class="p">),</span> <span class="nb">true</span><span class="p">);</span>
@@ -449,7 +446,6 @@ You will need to add these parameter names to the integration settings.</p>
 <span class="n">Instance</span><span class="o">-&gt;</span><span class="n">setVolume</span><span class="p">(</span><span class="mf">0.5f</span><span class="p">);</span>
 <span class="c1">// The instance handle will be cleaned up automatically when the sound finishes</span>
 </pre></div>
-
 
 <h3 id="further-programming-documentation"><a href="#further-programming-documentation">2.13.3 Further Programming Documentation</a></h3>
 <p>For further documentation, see:<br />
@@ -510,7 +506,6 @@ You will need to add these parameter names to the integration settings.</p>
 <span class="p">}</span>
 </pre></div>
 
-
 <h3 id="troubleshooting"><a href="#troubleshooting">2.14.4 Troubleshooting</a></h3>
 <p>Also, when setting the name to an audio table entry, you will need to make sure the audio table bank is already loaded before the event starts.</p>
 <p>The FMOD audio component only supports a single programmer sound per event. If you want to have an event that has multiple programmer sounds, each one playing a different sound, then you'll need to create the event directly via the FMOD API and provide your own callback. You can look at how the FMOD audio component programmer sound callback works and use that as a base for your own class.</p>
@@ -518,10 +513,13 @@ You will need to add these parameter names to the integration settings.</p>
 <p>These steps describe how to prepare your project for deployment. This is relevant to both the Launch option as well as the "File &gt; Package Project" menu item.<br />
 If any platforms require specific steps, they can be found in <a href="platform-specifics.html">Platform Specifics</a>.</p>
 <h3 id="packaging-banks"><a href="#packaging-banks">2.15.1 Packaging banks</a></h3>
-<p>The directory containing the built FMOD banks should be added to the "Additional Non-Asset Directories To Copy" list. You will be prompted to do this in the FMOD Studio settings pane of Unreal project settings ("Edit &gt; Project Settings &gt; FMOD Studio"):</p>
+<p>The directory containing the built FMOD banks should be added to the "Additional Non-Asset Directories To Copy" list, and directories containing generated assets should be added to the "Additional Non-Asset Directories To Cook" list. You will be prompted to do this in the FMOD Studio settings pane of Unreal project settings ("Edit &gt; Project Settings &gt; FMOD Studio"):</p>
 <p><img alt="Project deployment" src="images/project-deploy.png" /></p>
-<p>This can also be done manually by selecting the "Edit &gt; Project Settings..." menu item and navigating to the Packaging section from the left hand pane, under the Project heading and adding the bank output directory to the "Additional Non-Asset Directories To Copy" list.</p>
+<p>This can also be done manually by selecting the "Edit &gt; Project Settings..." menu item and navigating to the Packaging section from the left hand pane, under the Project heading and adding the bank output directory to the "Additional Non-Asset Directories To Copy" list.<br />
+Generated assests can be manually added to the "Additional Non-Asset Directories To Cook" list in the same way.</p>
+<p><img alt="Additional non-asset directories" src="images/additional-non-asset-directories.png" /></p>
 <p>When the bank output directory is added to the "Additional Non-Asset Directories To Copy" list the banks will be copied as loose files when packaging your project. This is the recommended approach. It is possible to have the banks added to Unreal's .PAK file by adding the bank output directory to the "Additional Non-Asset Directories to Package" list, but we no longer recommend this approach because adding the banks to the .PAK file can lead to the packaged project deadlocking in the filesystem.</p>
+<p>When directories are included in the "Additional Non-Asset Directories To Cook" list Unreal's default cooking behaviour, cooking all maps during packaging, will no longer occur. If you want to re-enable this behaviour you can tick "Cook everything in the project content directory (ignore list of maps below)".</p>
 <h3 id="mutli-platform-builds"><a href="#mutli-platform-builds">2.15.2 Mutli-platform builds</a></h3>
 <p>By default the directory containing banks for the "Desktop" platform is added to the "Additional Non-Asset Directories To Copy" list and the banks for the Desktop platform are the ones which will be available at runtime. This is usually correct for the Windows, Mac and Linux platforms.</p>
 <p>For other platforms the relevant <code>PlatformGame.ini</code> file can be edited so the correct platform-specific banks are copied instead. See <a href="platform-specifics.html">Platform Specifics</a> for details.</p>
@@ -542,17 +540,14 @@ If any platforms require specific steps, they can be found in <a href="platform-
 <div class="highlight language-text"><pre><span></span>fmod_gain
 </pre></div>
 
-
 <h3 id="loading-blueprints-before-plugin-load"><a href="#loading-blueprints-before-plugin-load">2.15.5 Loading blueprints before plugin load</a></h3>
 <p>One issue to be aware of is where blueprints are serialized from disk too early, before any plugins are loaded. This can occur from the following code, which is included by default in example C++ projects constructor:</p>
 <div class="highlight language-cpp"><pre><span></span><span class="k">static</span> <span class="n">ConstructorHelpers</span><span class="o">::</span><span class="n">FClassFinder</span><span class="o">&lt;</span><span class="n">APawn</span><span class="o">&gt;</span> <span class="n">PlayerPawnClassFinder</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;/Game/FirstPersonCPP/Blueprints/FirstPersonCharacter&quot;</span><span class="p">));</span>
 </pre></div>
 
-
 <p>The finder will serialize the first person character blueprint, but any FMOD references will fail to load since the FMOD plugin has not been created yet. To make sure that the FMOD plugin is loaded first, add the line of code above the class finder.</p>
 <div class="highlight language-cpp"><pre><span></span><span class="n">IFMODStudioModule</span><span class="o">::</span><span class="n">Get</span><span class="p">();</span>
 </pre></div>
-
 
 <h3 id="disabling-unreal-audio-device"><a href="#disabling-unreal-audio-device">2.15.6 Disabling Unreal Audio Device</a></h3>
 <p>By default FMOD Studio works side-by-side with the inbuilt Unreal audio device on the following platforms:</p>
@@ -579,7 +574,6 @@ AudioDeviceModuleName=
 AudioMixerModuleName=
 </pre></div>
 
-
 <p>The audio device can be disabled for every platform that you want to ship with.</p>
 <h2 id="source-control"><a href="#source-control">2.16 Source Control</a></h2>
 <p>Not all of the plugin files are required to be checked in to source control, below the necessary files are marked:</p>
@@ -603,7 +597,6 @@ AudioMixerModuleName=
     +--- Source
 </pre></div>
 
-
 <p>Other files/folders are optional and will depend on your teams setup.</p>
 <div class="admonition warning">
 <p>FMOD Banks cannot be added using the In-Editor source control, as the editor only interacts with UAssets, they need to be added to source control from outside of the UE Editor.</p>
@@ -625,12 +618,10 @@ Now it is possible to add these generated assets to source control which will re
             +--- VCAs
 </pre></div>
 
-
 <h2 id="commandlet"><a href="#commandlet">2.17 Commandlet</a></h2>
 <p>From UE4.26 onwards, FMOD for Unreal now provides a Commandlet for generating the serialized UAssets without having to open the Editor.</p>
 <div class="highlight language-text"><pre><span></span>{editor-executable} {ProjectPath.uproject} -run=FMODGenerateAssets [-rebuild]
 </pre></div>
-
 
 <ul>
 <li><strong>editor-executable:</strong> When using Unreal Engine 4, this will be <code>UE4Editor-cmd.exe</code>. When using Unreal Engine 5, this will be <code>UnrealEditor-cmd.exe</code>.</li>
@@ -638,7 +629,7 @@ Now it is possible to add these generated assets to source control which will re
 </ul>
 <p>This can be especially useful for build machines that don't normally run the Editor at all, which is what normally triggers the assets to be built, and does not require the generated assets to be checked in to source control.</p></div>
 
-<p class="manual-footer">Unreal Integration 2.02.05 (2022-02-04). &copy; 2022 Firelight Technologies Pty Ltd.</p>
+<p class="manual-footer">Unreal Integration 2.02.07 (2022-05-18). &copy; 2022 Firelight Technologies Pty Ltd.</p>
 </body>
 </html>
 

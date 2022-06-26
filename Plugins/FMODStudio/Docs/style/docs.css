@@ -19,6 +19,7 @@ body {
     margin-left: auto;
     margin-right: auto;
     max-width: 100%;
+    line-height: 24px;
 }
 
 .docs-body a {
@@ -77,6 +78,7 @@ code {
 pre code {
     display: block;
     padding: 5px;
+    overflow: auto;
 }
 
 blockquote {
@@ -163,6 +165,7 @@ ol li ol {
 
 .manual-toc > ul {
     padding: 0px;
+    margin-block-start: 1em;
 }
 
 .manual-toc > ul > li {
@@ -194,8 +197,8 @@ ol li ol {
     color: black;
 }
 
-.manual-current-chapter > ul { margin-top: 14px; }
-.manual-current-chapter li { padding-top: 18px; font-size: 14px; }
+.manual-current-chapter > ul { margin-top: 10px; }
+.manual-current-chapter li { padding-top: 10px; font-size: 14px; }
 .manual-current-chapter > ul > li:first-child { padding-top: 0px; }
 
 .manual-current-chapter li > ul > li > ul {
@@ -239,6 +242,7 @@ ul.subchapters .manual-active-chapter > a { border-bottom: 2px solid black; }
 }
 
 .manual-content.api dt {
+    font-weight: initial;
     font-style:italic;
     margin-bottom: 1em;
 }
@@ -257,7 +261,8 @@ ul.subchapters .manual-active-chapter > a { border-bottom: 2px solid black; }
 }
 
 .manual-content.api dd {
-    margin-bottom: 2em;
+    margin-bottom: 1em;
+    margin-inline-start: 40px;
 }
 
 .manual-content.studio dd {
@@ -353,3 +358,12 @@ a.token:hover {
 
 [id]:target { animation:highlighter 3s }
 @keyframes highlighter { 25% { background-color: gold; } 75% { background-color: gold; } }
+
+.mixdowntable table {
+    white-space: nowrap;
+}
+
+.mixdowntable table td, .mixdowntable table th {
+    min-width: 4em;
+    text-align: center;
+}

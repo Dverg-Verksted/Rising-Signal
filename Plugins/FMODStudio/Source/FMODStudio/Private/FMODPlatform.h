@@ -1,4 +1,4 @@
-// Copyright (c), Firelight Technologies Pty, Ltd. 2012-2021.
+// Copyright (c), Firelight Technologies Pty, Ltd. 2012-2022.
 #pragma once
 
 #include "Containers/UnrealString.h"
@@ -6,6 +6,8 @@
 #include "FMODSettings.h"
 
 FString FMODPlatform_GetDllPath(const TCHAR *ShortName, bool bExplicitPath, bool bUseLibPrefix);
+
+EFMODPlatforms::Type FMODPlatform_CurrentPlatform();
 
 FString FMODPlatform_PlatformName();
 

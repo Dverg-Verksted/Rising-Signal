@@ -47,7 +47,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="n">FString</span> <span class="n">AttachName</span><span class="p">;</span>
 </pre></div>
 
-
 <h2 api="struct" id="ufmodanimnotifyplay_bfollow"><a href="#ufmodanimnotifyplay_bfollow">UFMODAnimNotifyPlay::bFollow</a></h2>
 <p>Should this sound follow its owner.</p>
 <p>
@@ -58,7 +57,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="n">unit32</span> <span class="nl">bFollow</span> <span class="p">:</span> <span class="mi">1</span><span class="p">;</span>
 </pre></div>
 
-
 <h2 api="struct" id="ufmodanimnotifyplay_event"><a href="#ufmodanimnotifyplay_event">UFMODAnimNotifyPlay::Event</a></h2>
 <p>FMODEvent reference to play.</p>
 <p>
@@ -68,7 +66,6 @@
 </p>
 <div class="highlight language-cpp"><pre><span></span><span class="n">TAssetPtr</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">UFMODEvent</span><span class="o">&gt;</span> <span class="n">Event</span><span class="p">;</span>
 </pre></div>
-
 
 <p><strong>See Also:</strong> <a class="apilink" href="api-reference-ufmodevent.html" title="">UFMODEvent</a></p>
 <h2 api="function" id="ufmodanimnotifyplay_notify"><a href="#ufmodanimnotifyplay_notify">UFMODAnimNotifyPlay::Notify</a></h2>
@@ -81,7 +78,6 @@
 <div class="highlight language-cpp"><pre><span></span><span class="k">virtual</span> <span class="kt">void</span> <span class="n">Notify</span><span class="p">(</span><span class="n">USkeletalMeshComponent</span> <span class="o">*</span><span class="n">MeshComp</span><span class="p">,</span> <span class="n">UAnimSequenceBase</span> <span class="o">*</span><span class="n">AnimSeq</span><span class="p">)</span> <span class="k">override</span>
 </pre></div>
 
-
 <dl>
 <dt>MeshComp</dt>
 <dd>USceneComponent used for the position of the Event.</dd>
@@ -91,7 +87,7 @@
 <p>If <a class="apilink" href="api-reference-ufmodanimnotifyplay.html#ufmodanimnotifyplay_bfollow" title="Should this sound follow its owner.">UFMODAnimNotifyPlay::bFollow</a> is true <a class="apilink" href="blueprint-reference-common.html#play-event-attached" title="Play an event attached to and following the specified component.">Play Event Attached</a> is called using the current <a class="apilink" href="api-reference-ufmodanimnotifyplay.html#ufmodanimnotifyplay_attachname" title="Socket or bone name to attach sound to.">UFMODAnimNotifyPlay::AttachName</a>.<br />
 Otherwise <a class="apilink" href="blueprint-reference-common.html#play-event-at-location" title="Plays an event at the given location.">Play Event At Location</a> is called using the <code>MeshComp</code> for the positional information.</p></div>
 
-<p class="manual-footer">Unreal Integration 2.02.05 (2022-02-04). &copy; 2022 Firelight Technologies Pty Ltd.</p>
+<p class="manual-footer">Unreal Integration 2.02.07 (2022-05-18). &copy; 2022 Firelight Technologies Pty Ltd.</p>
 </body>
 </html>
 
