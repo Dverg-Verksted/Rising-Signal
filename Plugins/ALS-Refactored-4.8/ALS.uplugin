@@ -1,0 +1,54 @@
+{
+	"FileVersion": 3,
+	"Version": 9,
+	"VersionName": "4.8",
+	"FriendlyName": "Advanced Locomotion System Refactored",
+	"Description": "Completely refactored and bug fixed version of the Community Version of Advanced Locomotion System V4.",
+	"Category": "Animation",
+	"CreatedBy": "Sixze",
+	"CreatedByURL": "https://github.com/Sixze",
+	"DocsURL": "https://github.com/Sixze/ALS-Refactored",
+	"MarketplaceURL": "https://www.unrealengine.com/marketplace/en-US/product/advanced-locomotion-system-v1",
+	"SupportURL": "https://github.com/Sixze/ALS-Refactored/issues",
+	"EnabledByDefault": true,
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "ALS",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "ALSCamera",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "ALSExample",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "ALSEditor",
+			"Type": "UncookedOnly",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "GameplayTagsEditor",
+			"Enabled": true
+		},
+		{
+			"Name": "ControlRig",
+			"Enabled": true
+		},
+		{
+			"Name": "Niagara",
+			"Enabled": true
+		}
+	]
+}
