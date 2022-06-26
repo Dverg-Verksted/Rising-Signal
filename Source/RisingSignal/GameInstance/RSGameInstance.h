@@ -12,6 +12,5 @@
 UCLASS()
 class RISINGSIGNAL_API URSGameInstance : public UGameInstance
 {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
 };

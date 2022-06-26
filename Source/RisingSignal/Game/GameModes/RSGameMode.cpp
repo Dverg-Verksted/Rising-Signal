@@ -6,11 +6,11 @@
 
 void ARSGameMode::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
 
-	this->PC = Cast<ARSGamePlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	check(this->PC);
+    this->PC = Cast<ARSGamePlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+    check(this->PC);
 
-	this->GameHUD = Cast<AGameHUD>(this->PC->GetHUD());
-	check(this->GameHUD);
+    this->GameHUD = Cast<AGameHUD>(this->PC->GetHUD());
+    check(this->GameHUD);
 }

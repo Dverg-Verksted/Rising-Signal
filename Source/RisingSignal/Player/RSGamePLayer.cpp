@@ -8,20 +8,20 @@
 
 ARSGamePLayer::ARSGamePLayer()
 {
-	this->SpringArm = CreateDefaultSubobject<USpringArmComponent>(FName("Spring arm component"));
-	this->SpringArm->SetupAttachment(GetRootComponent());
-	this->SpringArm->bUsePawnControlRotation = true;
+    this->SpringArm = CreateDefaultSubobject<USpringArmComponent>(FName("Spring arm component"));
+    this->SpringArm->SetupAttachment(GetRootComponent());
+    this->SpringArm->bUsePawnControlRotation = true;
 
-	this->Camera = CreateDefaultSubobject<UCameraComponent>(FName("Camera component"));
-	this->Camera->SetupAttachment(this->SpringArm);
+    this->Camera = CreateDefaultSubobject<UCameraComponent>(FName("Camera component"));
+    this->Camera->SetupAttachment(this->SpringArm);
 }
 
 void ARSGamePLayer::Tick(float DeltaSeconds)
 {
-	Super::Tick(DeltaSeconds);
+    Super::Tick(DeltaSeconds);
 }
 
 void ARSGamePLayer::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
 }

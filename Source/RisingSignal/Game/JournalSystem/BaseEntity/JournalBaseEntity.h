@@ -1,4 +1,4 @@
-// It is owned by the company Dverg Verksted.
+﻿// It is owned by the company Dverg Verksted.
 
 #pragma once
 
@@ -12,18 +12,25 @@
 UCLASS(Abstract, BlueprintType)
 class RISINGSIGNAL_API UJournalBaseEntity : public UDataAsset
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	FPrimaryAssetType JournalType;
+    FPrimaryAssetType JournalType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Journal",
-		meta = (DisplayName = "Заголовок Журнала", ToolTip = "Заголовок присутствует в каждой сущности журнала"))
-	FText JournalHeader;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Journal", meta = (AllowedClasses= "World"))
+    FSoftObjectPath Map;
 
-	UFUNCTION(BlueprintCallable, Category = "Journal",
-		meta = (DisplayName = "Метод для получения ID сущности журнала", ToolTip = "Метод для получения ID сущности журнала"))
-	FString GetIdentifierString();
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Journal",
+        meta = (DisplayName = "Заголовок Журнала", ToolTip = "Заголовок присутствует в каждой сущности журнала"))
+    FText JournalHeader;
 
-	virtual FPrimaryAssetId GetPrimaryAssetId() const override;
+    UFUNCTION(BlueprintCallable, Category = "Journal",
+        meta = (DisplayName = "Метод для получения ID сущности журнала", ToolTip = "Метод для получения ID сущности журнала"))
+    FString GetIdentifierString();
+
+    virtual FPrimaryAssetId GetPrimaryAssetId() const override;
+
+    // Get Chapter's Name
+    UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
+    FString GetChapterName();
 };
