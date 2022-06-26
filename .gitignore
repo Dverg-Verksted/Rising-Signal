@@ -11,6 +11,7 @@
 
 Plugins/*/Binaries/*
 Plugins/*/Intermediate/*
+!Plugins/FMODStudio/Binaries/*
 
 # Built data for maps
 *_BuiltData.uasset
