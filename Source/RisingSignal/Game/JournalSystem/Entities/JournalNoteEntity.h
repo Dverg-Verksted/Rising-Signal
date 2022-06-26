@@ -12,16 +12,16 @@
 UCLASS()
 class RISINGSIGNAL_API UJournalNoteEntity : public UJournalBaseEntity
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	UJournalNoteEntity() {}
+    UJournalNoteEntity() {}
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Journal",
-		meta = (DisplayName = "Дата: -- день", ToolTip = "Значение для отображения дня"))
-	FText Date;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Journal",
+        meta = (DisplayName = "Дата: -- день", ToolTip = "Значение для отображения дня"))
+    FText Date;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Journal",
-		meta = (DisplayName = "Описание", ToolTip = "Описание какого-либо события, действия в широком формате"))
-	FText Description;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Journal",
+        meta = (DisplayName = "Описание", ToolTip = "Описание какого-либо события, действия в широком формате"))
+    FText Description;
 };

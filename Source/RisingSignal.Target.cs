@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 public class RisingSignalTarget : TargetRules
 {
-	public RisingSignalTarget( TargetInfo Target) : base(Target)
-	{
-		Type = TargetType.Game;
-		DefaultBuildSettings = BuildSettingsVersion.V2;
-		ExtraModuleNames.AddRange( new string[] { "RisingSignal" } );
-	}
+    public RisingSignalTarget(TargetInfo Target) : base(Target)
+    {
+        Type = TargetType.Game;
+        DefaultBuildSettings = BuildSettingsVersion.V2;
+        ExtraModuleNames.AddRange(new string[] { "RisingSignal" });
+    }
 }
