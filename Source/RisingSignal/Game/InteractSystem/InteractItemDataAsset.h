@@ -169,11 +169,13 @@ private:
 
     FPrimaryAssetType JournalNoteType;
 
-    UPROPERTY(EditAnywhere, Category="Settings Data Item", meta = (AllowedClasses= "World"))
+    UPROPERTY(EditAnywhere, Category="Settings Data Item", meta = (AllowedClasses= "World", EditCondition = "TypeItem == ETypeItem::NoteItem",
+        EditConditionHides))
     FSoftObjectPath NoteMap;//TODO
 
     UPROPERTY(EditAnywhere, Category = "Settings Data Item",
-        meta = (DisplayName = "Заголовок журнала Записки", ToolTip = "Заголовок журнала записки"))
+    meta = (DisplayName = "Заголовок журнала Записки", ToolTip = "Заголовок журнала записки", EditCondition = "TypeItem == ETypeItem::NoteItem",
+        EditConditionHides))
     FText JournalNoteHeader;//TODO
     
     UPROPERTY(EditAnywhere, Category = "Settings Data Item", meta = (DisplayName = "Дата: -- день", ToolTip = "Отображение дня, целое число",
@@ -190,15 +192,15 @@ private:
 
     FPrimaryAssetType JournalAudioType;
 
-    UPROPERTY(EditAnywhere, Category="Settings Data Item", meta = (AllowedClasses= "World"))
+    UPROPERTY(EditAnywhere, Category="Settings Data Item", meta = (AllowedClasses= "World", EditCondition = "TypeItem == ETypeItem::AudioItem", EditConditionHides))
     FSoftObjectPath AudioMap;
 
     UPROPERTY(EditAnywhere, Category = "Settings Data Item",
-        meta = (DisplayName = "Заголовок журнала аудиозаписи", ToolTip = "Заголовок журнала аудиозаписи"))
+        meta = (DisplayName = "Заголовок журнала аудиозаписи", ToolTip = "Заголовок журнала аудиозаписи", EditCondition = "TypeItem == ETypeItem::AudioItem", EditConditionHides))
     FText JournalAudioHeader;//TODO
     
     UPROPERTY(EditAnywhere, Category = "Settings Data Item", meta = (DisplayName = "Аудиозапись", ToolTip = "Добавление аудиозаписи типа USoundCue",
-        EditCondition = "TypeItem == ETypeItem::AudioItem", EditConditionHides, AllowedClasses = "USoundCue"))
+        EditCondition = "TypeItem == ETypeItem::AudioItem", EditConditionHides, AllowedClasses = "SoundCue"))
     FSoftObjectPath JournalAudio;//TODO
 
 #pragma endregion
@@ -207,11 +209,11 @@ private:
 
     FPrimaryAssetType JournalPhotoType;
 
-    UPROPERTY(EditAnywhere, Category="Settings Data Item", meta = (AllowedClasses= "World"))
+    UPROPERTY(EditAnywhere, Category="Settings Data Item", meta = (AllowedClasses= "World", EditCondition = "TypeItem == ETypeItem::PhotoItem", EditConditionHides))
     FSoftObjectPath PhotoMap;
 
     UPROPERTY(EditAnywhere, Category = "Settings Data Item",
-        meta = (DisplayName = "Заголовок журнала фотографии", ToolTip = "Заголовок журнала фотографии"))
+        meta = (DisplayName = "Заголовок журнала фотографии", ToolTip = "Заголовок журнала фотографии", EditCondition = "TypeItem == ETypeItem::PhotoItem", EditConditionHides))
     FText JournalPhotoHeader;//TODO
     
     UPROPERTY(EditAnywhere, Category = "Settings Data Item", meta = (DisplayName = "Фотография", ToolTip = "Добавление фотографии типа Texture2D",

@@ -40,8 +40,7 @@ void AInteractItemActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyC
 
     if (PropertyChangedEvent.Property->GetName() == TEXT("InteractItem") && this->InteractItem)
     {
-        FStreamableManager& AssetLoader = UAssetManager::Get().GetStreamableManager();
-        UStaticMesh* L_Mesh = Cast<UStaticMesh>(AssetLoader.LoadSynchronous(this->InteractItem->GetMeshItem()));
+        UStaticMesh* L_Mesh = LoadObject<UStaticMesh>(nullptr, *(this->InteractItem->GetMeshItem().ToString()));
         if (!L_Mesh) return;
         this->Mesh->SetStaticMesh(L_Mesh);
     }
