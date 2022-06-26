@@ -13,12 +13,12 @@
 UCLASS()
 class RISINGSIGNAL_API UJournalAudioEntity : public UJournalBaseEntity
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	UJournalAudioEntity() {}
+    UJournalAudioEntity() {}
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Journal",
-		meta = (DisplayName = "Аудио-объект журнала", ToolTip = "Здесь хранятся аудиозаписи"))
-	TSoftObjectPtr<USoundCue> JournalAudio;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Journal",
+        meta = (DisplayName = "Аудио-объект журнала", ToolTip = "Здесь хранятся аудиозаписи"))
+    TSoftObjectPtr<USoundCue> JournalAudio;
 };

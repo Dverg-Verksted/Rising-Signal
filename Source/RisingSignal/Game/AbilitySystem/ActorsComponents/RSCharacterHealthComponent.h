@@ -26,63 +26,63 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterAbility, FCharacterAbili
  * @note Parent [RSHealthComponent] -> this [RSCharacterHealthComponent]
  */
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent),
-	HideCategories = ("Variable", "Tags", "ComponentTick", "ComponentReplication", "Activation", "Cooking", "AssetUserData", "Collision"))
+    HideCategories = ("Variable", "Tags", "ComponentTick", "ComponentReplication", "Activation", "Cooking", "AssetUserData", "Collision"))
 class RISINGSIGNAL_API URSCharacterHealthComponent : public URSHealthComponent
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 protected:
-	/*Struct contain all values witch use in the ability system.*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Способность",
-		meta = (DisplayName = "Настройки выносливости", AllowPrivateAccess = "true",
-			ToolTip = "В этой структуре все параметры выносливости"))
-	FCharacterAbilityStruct CharacterAbilityStruct;
+    /*Struct contain all values witch use in the ability system.*/
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Способность",
+        meta = (DisplayName = "Настройки выносливости", AllowPrivateAccess = "true",
+            ToolTip = "В этой структуре все параметры выносливости"))
+    FCharacterAbilityStruct CharacterAbilityStruct;
 
 public:
-	// Delegate
-	UPROPERTY(BlueprintAssignable)
-	FOnStaminaChange OnStaminaChange;
+    // Delegate
+    UPROPERTY(BlueprintAssignable)
+    FOnStaminaChange OnStaminaChange;
 
-	// Delegate
-	UPROPERTY(BlueprintAssignable)
-	FOnCharacterAbility OnCharacterAbility;
+    // Delegate
+    UPROPERTY(BlueprintAssignable)
+    FOnCharacterAbility OnCharacterAbility;
 
-	// The pointer timer handle for stamina cool down.
-	FTimerHandle TimerHandle_StaminaCoolDown;
-	// The pointer timer handle for stamina recover rate time.
-	FTimerHandle TimerHandle_StaminaRecoverRateTimer;
+    // The pointer timer handle for stamina cool down.
+    FTimerHandle TimerHandle_StaminaCoolDown;
+    // The pointer timer handle for stamina recover rate time.
+    FTimerHandle TimerHandle_StaminaRecoverRateTimer;
 
-	/**
-	 * Getter function for current stamina.
-	 * @return Current stamina.
-	 */
-	float GetCurrentStamina() { return CharacterAbilityStruct.Stamina; }
-	/**
-	 * Function broadcast FOnStaminaChange and checking limit values and time recover rate.
-	 * @param ChangeValue the new value of increment stamina.
-	 */
-	void ChangeStaminaValue(float ChangeValue);
-	/**
-	 * Function cool down the stamina when time ends.
-	 */
-	void CoolDownStaminaEnd();
-	/**
-	 * Function recovery the stamina over time.
-	 */
-	void RecoveryStamina();
+    /**
+     * Getter function for current stamina.
+     * @return Current stamina.
+     */
+    float GetCurrentStamina() { return CharacterAbilityStruct.Stamina; }
+    /**
+     * Function broadcast FOnStaminaChange and checking limit values and time recover rate.
+     * @param ChangeValue the new value of increment stamina.
+     */
+    void ChangeStaminaValue(float ChangeValue);
+    /**
+     * Function cool down the stamina when time ends.
+     */
+    void CoolDownStaminaEnd();
+    /**
+     * Function recovery the stamina over time.
+     */
+    void RecoveryStamina();
 
-	/**
-	 * The override function is called when the character's health value changes with new broadcast of dilagate.
-	 *
-	 * @param ChangeValue The amount of health to change by.
-	 */
-	virtual void ChangeHealthValue(float ChangeValue) override;
+    /**
+     * The override function is called when the character's health value changes with new broadcast of dilagate.
+     *
+     * @param ChangeValue The amount of health to change by.
+     */
+    virtual void ChangeHealthValue(float ChangeValue) override;
 
-	/**
-	 * This is a function that returns the value of the stamina.
-	 * @return Stamina value.
-	 * @note BlueprintCallable function.
-	 */
-	UFUNCTION(BlueprintCallable)
-	float GetStaminaValue() { return CharacterAbilityStruct.Stamina; }
+    /**
+     * This is a function that returns the value of the stamina.
+     * @return Stamina value.
+     * @note BlueprintCallable function.
+     */
+    UFUNCTION(BlueprintCallable)
+    float GetStaminaValue() { return CharacterAbilityStruct.Stamina; }
 };

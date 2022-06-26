@@ -24,57 +24,57 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDead);
  * @param CoefficientDamage The value witch contain coefficient damage.
  */
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent),
-	HideCategories = ("Variable", "Tags", "ComponentTick", "ComponentReplication", "Activation", "Cooking", "AssetUserData", "Collision"))
+    HideCategories = ("Variable", "Tags", "ComponentTick", "ComponentReplication", "Activation", "Cooking", "AssetUserData", "Collision"))
 class RISINGSIGNAL_API URSHealthComponent : public UActorComponent
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	// Sets default values for this component's properties
-	URSHealthComponent();
+    // Sets default values for this component's properties
+    URSHealthComponent();
 
-	// Delegate
-	UPROPERTY(BlueprintAssignable)
-	FOnHealthChange OnHealthChange;
+    // Delegate
+    UPROPERTY(BlueprintAssignable)
+    FOnHealthChange OnHealthChange;
 
-	// Delegate
-	UPROPERTY(BlueprintAssignable)
-	FOnDead OnDead;
+    // Delegate
+    UPROPERTY(BlueprintAssignable)
+    FOnDead OnDead;
 
-	/*Struct contain all values witch use in the health.*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Здоровье",
-		meta = (DisplayName = "Настройки здоровья", AllowPrivateAccess = "true", ToolTip = "В этой структуре все параметры здоровья"))
-	FHealthStruct HealthStruct;
+    /*Struct contain all values witch use in the health.*/
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Здоровье",
+        meta = (DisplayName = "Настройки здоровья", AllowPrivateAccess = "true", ToolTip = "В этой структуре все параметры здоровья"))
+    FHealthStruct HealthStruct;
 
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+    // Called when the game starts
+    virtual void BeginPlay() override;
 
 public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+    // Called every frame
+    virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	/**
-	 * Getter function for current health.
-	 * @return Current health.
-	 * @note BlueprintCallable function.
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Health")
-	float GetCurrentHealth() { return HealthStruct.Health; }
+    /**
+     * Getter function for current health.
+     * @return Current health.
+     * @note BlueprintCallable function.
+     */
+    UFUNCTION(BlueprintCallable, Category = "Health")
+    float GetCurrentHealth() { return HealthStruct.Health; }
 
-	/**
-	 * Setter function for set health value.
-	 * @param NewHealth the new value of health.
-	 * @note BlueprintCallable function.
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Health")
-	void SetCurrentHealth(float NewHealth) { HealthStruct.Health = NewHealth; }
+    /**
+     * Setter function for set health value.
+     * @param NewHealth the new value of health.
+     * @note BlueprintCallable function.
+     */
+    UFUNCTION(BlueprintCallable, Category = "Health")
+    void SetCurrentHealth(float NewHealth) { HealthStruct.Health = NewHealth; }
 
-	/**
-	 * Function broadcast FOnHealthChange and checking limit values.
-	 * @param ChangeValue the new value of health.
-	 * @note BlueprintCallable function.
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Health")
-	virtual void ChangeHealthValue(float ChangeValue);
+    /**
+     * Function broadcast FOnHealthChange and checking limit values.
+     * @param ChangeValue the new value of health.
+     * @note BlueprintCallable function.
+     */
+    UFUNCTION(BlueprintCallable, Category = "Health")
+    virtual void ChangeHealthValue(float ChangeValue);
 };

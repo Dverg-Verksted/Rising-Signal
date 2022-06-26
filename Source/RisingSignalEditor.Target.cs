@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 public class RisingSignalEditorTarget : TargetRules
 {
-	public RisingSignalEditorTarget( TargetInfo Target) : base(Target)
-	{
-		Type = TargetType.Editor;
-		DefaultBuildSettings = BuildSettingsVersion.V2;
-		ExtraModuleNames.AddRange( new string[] { "RisingSignal" } );
-	}
+    public RisingSignalEditorTarget(TargetInfo Target) : base(Target)
+    {
+        Type = TargetType.Editor;
+        DefaultBuildSettings = BuildSettingsVersion.V2;
+        ExtraModuleNames.AddRange(new string[] { "RisingSignal" });
+    }
 }
