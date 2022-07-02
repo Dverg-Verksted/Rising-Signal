@@ -167,7 +167,7 @@ int32 UJournalSystem::GetArrPhotoObjSize()
 TArray<FChapterDataNote> UJournalSystem::GetAllNote()
 {
     // TODO подумать и добавить проверки?
-    return (this->ArrNoteObj[0].);
+    return (this->ArrNoteObj);
 }
 
 TArray<FChapterDataAudio> UJournalSystem::GetAllAudio()
