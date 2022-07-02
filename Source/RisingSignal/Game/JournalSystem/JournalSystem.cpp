@@ -41,8 +41,6 @@ void UJournalSystem::AddNoteItem(UJournalNoteEntity* NewNoteObj)
     LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Name: %s "), *GetName()));
     LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field AssetName: %s "), *AssetName));
     LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field IndexStruct: %d "), IndexStruct));
-    // LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Date: %s "), *NewNoteObj->Date.ToString()));
-    // LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Description: %s "), *NewNoteObj->Description.ToString()));
 
     for (auto Name : this->ArrNoteObj)
     {
@@ -169,7 +167,7 @@ int32 UJournalSystem::GetArrPhotoObjSize()
 TArray<FChapterDataNote> UJournalSystem::GetAllNote()
 {
     // TODO подумать и добавить проверки?
-    return (this->ArrNoteObj);
+    return (this->ArrNoteObj[0].);
 }
 
 TArray<FChapterDataAudio> UJournalSystem::GetAllAudio()

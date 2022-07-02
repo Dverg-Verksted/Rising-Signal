@@ -10,7 +10,7 @@
 #include "Library/RSFunctionLibrary.h"
 #include "JournalSystem.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FJournalSystemUpdateSignature);
+
 
 UENUM(BlueprintType)
 enum class EStateJournalSystem : uint8
@@ -24,10 +24,11 @@ USTRUCT(BlueprintType)
 struct FChapterDataNote
 {
     GENERATED_BODY()
-
+    
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
     FString ChapterName = TEXT("Map_TestInventory");
 
-    UPROPERTY()
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
     TArray<UJournalNoteEntity*> ArrNote;
 };
 
@@ -35,10 +36,11 @@ USTRUCT(BlueprintType)
 struct FChapterDataAudio
 {
     GENERATED_BODY()
-
+    
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
     FString ChapterName = TEXT("Map_TestInventory");
 
-    UPROPERTY()
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
     TArray<UJournalAudioEntity*> ArrAudio;
 };
 
@@ -46,12 +48,19 @@ USTRUCT(BlueprintType)
 struct FChapterDataPhoto
 {
     GENERATED_BODY()
-
+    
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
     FString ChapterName = TEXT("Map_TestInventory");
 
-    UPROPERTY()
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
     TArray<UJournalPhotoEntity*> ArrPhoto;
 };
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FJournalSystemUpdateSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FJournalSystemUpdateSignatureNote,EStateJournalSystem, StateEvent, FChapterDataNote, ItemDataNote);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FJournalSystemUpdateSignaturePhoto,EStateJournalSystem, StateEvent, FChapterDataAudio, ItemDataAudio);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FJournalSystemUpdateSignatureAudio,EStateJournalSystem, StateEvent, FChapterDataPhoto, ItemDataPhoto);
+
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class RISINGSIGNAL_API UJournalSystem : public UActorComponent
@@ -130,6 +139,15 @@ public:
     //Delegate signature on update events
     UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="UJournalSystem|Signature")
     FJournalSystemUpdateSignature OnJournalSystemUpdate;
+
+    UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="UJournalSystem|Signature")
+    FJournalSystemUpdateSignature OnJournalSystemUpdateNote;
+
+    UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="UJournalSystem|Signature")
+    FJournalSystemUpdateSignature OnJournalSystemUpdatePhoto;
+
+    UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="UJournalSystem|Signature")
+    FJournalSystemUpdateSignature OnJournalSystemUpdateAudio;
 
 protected:
     virtual void BeginPlay() override;
