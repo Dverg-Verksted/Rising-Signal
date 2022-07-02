@@ -26,7 +26,7 @@ struct FChapterDataNote
     GENERATED_BODY()
     
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
-    FString ChapterName = TEXT("Map_TestInventory");
+    FString ChapterName = TEXT("Map_TESTREF");
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
     TArray<UJournalNoteEntity*> ArrNote;
@@ -38,7 +38,7 @@ struct FChapterDataAudio
     GENERATED_BODY()
     
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
-    FString ChapterName = TEXT("Map_TestInventory");
+    FString ChapterName = TEXT("Map_TESTREF");
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
     TArray<UJournalAudioEntity*> ArrAudio;
@@ -50,7 +50,7 @@ struct FChapterDataPhoto
     GENERATED_BODY()
     
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
-    FString ChapterName = TEXT("Map_TestInventory");
+    FString ChapterName = TEXT("Map_TESTREF");
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
     TArray<UJournalPhotoEntity*> ArrPhoto;
