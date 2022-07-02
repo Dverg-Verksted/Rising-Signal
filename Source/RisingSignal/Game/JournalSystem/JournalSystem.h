@@ -128,7 +128,7 @@ public:
     void DeletePhotoObjByIndex(int32 Index);
 
     //Delegate signature on update events
-    UPROPERTY(BlueprintAssignable, Category="UJournalSystem|Signature")
+    UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="UJournalSystem|Signature")
     FJournalSystemUpdateSignature OnJournalSystemUpdate;
 
 protected:

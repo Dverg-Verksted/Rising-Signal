@@ -6,7 +6,9 @@
 UJournalSystem::UJournalSystem()
 {
     PrimaryComponentTick.bCanEverTick = false;
-    ArrNoteObj.SetNum(3);
+    ArrNoteObj.SetNum(10);
+    ArrAudioObj.SetNum(10);
+    ArrPhotoObj.SetNum(10);
 }
 
 void UJournalSystem::AddNoteItem(UJournalNoteEntity* NewNoteObj)
@@ -32,26 +34,25 @@ void UJournalSystem::AddNoteItem(UJournalNoteEntity* NewNoteObj)
 
     if (this->ArrNoteObj.IsValidIndex(IndexStruct))
     {
+        OnJournalSystemUpdate.Broadcast();
         this->ArrNoteObj[IndexStruct].ArrNote.AddUnique(NewNoteObj);
     }
 
     LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Name: %s "), *GetName()));
     LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field AssetName: %s "), *AssetName));
     LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field IndexStruct: %d "), IndexStruct));
-    LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Date: %s "), *NewNoteObj->Date.ToString()));
-    LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Description: %s "), *NewNoteObj->Description.ToString()));
-    // LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Description: %s "), *this->ArrNoteObj[IndexStruct].ChapterName));
+    // LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Date: %s "), *NewNoteObj->Date.ToString()));
+    // LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Description: %s "), *NewNoteObj->Description.ToString()));
 
     for (auto Name : this->ArrNoteObj)
     {
-        LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Name: %s "), *GetName()));
-        LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field ChapterName: %s "), *Name.ChapterName));
+        LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("The field Name: %s "), *GetName()));
+        LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("The field ChapterName: %s "), *Name.ChapterName));
         for (auto fields : Name.ArrNote)
         {
-            LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field ChapterName: %s "), *fields->Date.ToString()));
-            LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field ChapterName: %s "), *fields->Description.ToString()));
+            LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("The field ChapterName: %s "), *fields->Date.ToString()));
+            LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("The field ChapterName: %s "), *fields->Description.ToString()));
         }
-
     }
 }
 
