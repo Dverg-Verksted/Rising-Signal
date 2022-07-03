@@ -10,7 +10,7 @@ public class RisingSignal : ModuleRules
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "PhysicsCore" });
 
-        PrivateDependencyModuleNames.AddRange(new string[] {});
+        PrivateDependencyModuleNames.AddRange(new string[] { "ALS", "ALSCamera" });
 
         PublicIncludePaths.AddRange(new string[] { "RisingSignal" });
 
