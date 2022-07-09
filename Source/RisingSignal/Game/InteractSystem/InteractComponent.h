@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Library/RSFunctionLibrary.h"
 #include "InteractComponent.generated.h"
 
+class ARSGamePlayerController;
+class AInteractItemActor;
 class UBoxComponent;
 class ARSGamePLayer;
 
@@ -19,6 +22,8 @@ class RISINGSIGNAL_API UInteractComponent : public UActorComponent
 {
     GENERATED_BODY()
 
+#pragma region Default
+
 public:
     // Sets default values for this component's properties
     UInteractComponent();
@@ -26,6 +31,10 @@ public:
 protected:
     // Called when the game starts
     virtual void BeginPlay() override;
+
+#define LOG_INTERACT(LogVerb, Text) Print_Log(LogVerb, Text, __LINE__, __FUNCTION__)
+
+    void Print_Log(ELogRSVerb LogVerb, FString Text, int Line, const char* Function) const;
 
 #if WITH_EDITOR
 
@@ -36,16 +45,53 @@ protected:
 
 #endif
 
+#pragma endregion
+
+#pragma region DataInteract
+    
 private:
+
     // @private Size box collision
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Interact", meta = (AllowPrivateAccess = true))
-    FVector SizeBoxCollision = FVector(50.f);
+    FVector SizeBoxCollision{50.f};
 
-    // @private Owner component
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Interact", meta = (AllowPrivateAccess = true))
+    float RateTimeChecked{1.0f};
+
+    // @private Owner Actor component
     UPROPERTY()
     ARSGamePLayer* OwnerPlayer;
 
-    // @private Box component Collision
+    // @private Owner Controller actor
+    UPROPERTY()
+    ARSGamePlayerController* PlayerController;
+
+    // @private Box Collision component
     UPROPERTY()
     UBoxComponent* BoxCollision;
+
+    // @private Target item from the world
+    UPROPERTY()
+    AInteractItemActor* TargetInteractItem;
+
+    // @private Array interact item
+    UPROPERTY()
+    TArray<AInteractItemActor*> ArrInteractItem;
+
+    // @private Timer to check the distance of the player to the interactive object
+    FTimerHandle CheckedInteractItemTimerHandle;
+
+    UFUNCTION()
+    void RegisterBeginOverlapInteractItem(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+    UFUNCTION()
+    void RegisterEndOverlapInteractItem(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+    /**
+     * @private Checking the distance and changing the target object
+     **/
+    void CheckDistanceToItem();
+
+#pragma endregion
+
 };

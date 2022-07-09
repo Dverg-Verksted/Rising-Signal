@@ -12,6 +12,8 @@ class RISINGSIGNAL_API AInteractItemActor : public AActor
 {
     GENERATED_BODY()
 
+#pragma region Default
+
 public:
     // Sets default values for this actor's properties
     AInteractItemActor();
@@ -27,13 +29,21 @@ protected:
 
 #endif
 
+#pragma endregion
+
+#pragma region DataInteractItem
+
 private:
-    // @private
+
+    // @private Mesh component
     UPROPERTY(EditDefaultsOnly, Category = "Components")
     UStaticMeshComponent* Mesh;
 
-    // @private Soft pointer on InteractItemDataAsset
+    // @private pointer on InteractItemDataAsset
     UPROPERTY(EditAnywhere, Category = "Settings Interact", meta = (DisplayName = "Данные об предмете",
         ToolTip = "Укажите данные об предмете"))
     UInteractItemDataAsset* InteractItem;
+
+#pragma endregion
+
 };
