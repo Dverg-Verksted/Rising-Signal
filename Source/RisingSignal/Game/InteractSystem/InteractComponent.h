@@ -92,6 +92,11 @@ private:
      **/
     void CheckDistanceToItem();
 
+    /**
+     * @private 
+     **/
+    void RegisterInteractEvent();
+
 #pragma endregion
 
 };

@@ -41,7 +41,7 @@ void UInteractComponent::BeginPlay()
         LOG_INTERACT(ELogRSVerb::Error, "Player controller is nullptr");
         return;
     }
-    // PlayerController->OnInteract.AddDynamic(this, &);
+    PlayerController->OnInteract.AddDynamic(this, &UInteractComponent::RegisterInteractEvent);
 
     if (!BoxCollision)
     {
@@ -121,6 +121,11 @@ void UInteractComponent::CheckDistanceToItem()
             *TempTargetItem->GetName(), L_MinDistance));
         TargetInteractItem = TempTargetItem;
     }
+}
+
+void UInteractComponent::RegisterInteractEvent()
+{
+    LOG_INTERACT(ELogRSVerb::Display, "Pressed button interact");
 }
 
 #if WITH_EDITOR
