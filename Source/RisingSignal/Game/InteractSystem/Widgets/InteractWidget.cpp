@@ -10,7 +10,7 @@ void UInteractWidget::StartAnimation()
 
 void UInteractWidget::EndAnimation()
 {
-    PlayAnimation(this->EndAnim);
+    PlayAnimation(this->EndAnim,0,1, EUMGSequencePlayMode::Forward,-1,false);
 }
 
 void UInteractWidget::SetText(const FText& NewText) const
