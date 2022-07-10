@@ -4,13 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Entities/JournalAudioEntity.h"
-#include "Entities/JournalNoteEntity.h"
-#include "Entities/JournalPhotoEntity.h"
-#include "Library/RSFunctionLibrary.h"
 #include "JournalSystem.generated.h"
-
-
 
 UENUM(BlueprintType)
 enum class EStateJournalSystem : uint8
@@ -18,6 +12,63 @@ enum class EStateJournalSystem : uint8
     Note,
     Photo,
     Audio
+};
+
+USTRUCT(BlueprintType)
+struct FInteractItemNote
+{
+    GENERATED_BODY()
+    
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
+    FText NoteHeader;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
+    FText NoteDescription;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
+    FText NoteDate;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
+    FSoftObjectPath NoteMap;
+    
+    bool operator==(const FInteractItemNote& Other) const
+    {
+        return this->NoteHeader.ToString() == Other.NoteHeader.ToString();
+    }
+};
+
+USTRUCT(BlueprintType)
+struct FInteractItemAudio
+{
+    GENERATED_BODY()
+    
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
+    FText AudioHeader;
+    
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
+    FSoftObjectPath AudioMap;
+
+    bool operator==(const FInteractItemAudio& Other) const
+    {
+        return this->AudioHeader.ToString() == Other.AudioHeader.ToString();
+    }
+};
+
+USTRUCT(BlueprintType)
+struct FInteractItemPhoto
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
+    FText PhotoHeader;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
+    FSoftObjectPath PhotoMap;
+
+    bool operator==(const FInteractItemPhoto& Other) const
+    {
+        return this->PhotoHeader.ToString() == Other.PhotoHeader.ToString();
+    }
 };
 
 USTRUCT(BlueprintType)
@@ -29,7 +80,7 @@ struct FChapterDataNote
     FString ChapterName = TEXT("Map_TESTREF");
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
-    TArray<UJournalNoteEntity*> ArrNote;
+    TArray<FInteractItemNote> ArrNote;
 };
 
 USTRUCT(BlueprintType)
@@ -41,7 +92,7 @@ struct FChapterDataAudio
     FString ChapterName = TEXT("Map_TESTREF");
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
-    TArray<UJournalAudioEntity*> ArrAudio;
+    TArray<FInteractItemAudio> ArrAudio;
 };
 
 USTRUCT(BlueprintType)
@@ -53,7 +104,7 @@ struct FChapterDataPhoto
     FString ChapterName = TEXT("Map_TESTREF");
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
-    TArray<UJournalPhotoEntity*> ArrPhoto;
+    TArray<FInteractItemPhoto> ArrPhoto;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FJournalSystemUpdateSignature);
@@ -74,13 +125,13 @@ public:
 
     // Add element to Struct's array
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Add")
-    void AddNoteItem(UJournalNoteEntity* NewNoteObj);
+    void AddNoteItem(FInteractItemNote &NewNoteObj);
 
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Add")
-    void AddAudioItem(UJournalAudioEntity* NewAudioObj);
+    void AddAudioItem(FInteractItemAudio &NewAudioObj);
 
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Add")
-    void AddPhotoItem(UJournalPhotoEntity* NewPhotoObj);
+    void AddPhotoItem(FInteractItemPhoto &NewPhotoObj);
 
     // Get State
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
@@ -88,13 +139,13 @@ public:
 
     // Get element by Index
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    UJournalNoteEntity* GetNoteObjByIndex(int32 LevelIndex, int32 NotesIndex);
+    FInteractItemNote GetNoteObjByIndex(int32 LevelIndex, int32 NotesIndex);
 
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    UJournalAudioEntity* GetAudioObjByIndex(int32 LevelIndex, int32 AudioIndex);
+    FInteractItemAudio GetAudioObjByIndex(int32 LevelIndex, int32 NotesIndex);
 
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    UJournalPhotoEntity* GetPhotoObjByIndex(int32 LevelIndex, int32 PhotoIndex);
+    FInteractItemPhoto GetPhotoObjByIndex(int32 LevelIndex, int32 NotesIndex);
 
     // Get array size
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
@@ -137,16 +188,16 @@ public:
     void DeletePhotoObjByIndex(int32 Index);
 
     //Delegate signature on update events
-    UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="UJournalSystem|Signature")
+    UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="UJournalSystem|Signature")
     FJournalSystemUpdateSignature OnJournalSystemUpdate;
 
-    UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="UJournalSystem|Signature")
+    UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="UJournalSystem|Signature")
     FJournalSystemUpdateSignature OnJournalSystemUpdateNote;
 
-    UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="UJournalSystem|Signature")
+    UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="UJournalSystem|Signature")
     FJournalSystemUpdateSignature OnJournalSystemUpdatePhoto;
 
-    UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="UJournalSystem|Signature")
+    UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="UJournalSystem|Signature")
     FJournalSystemUpdateSignature OnJournalSystemUpdateAudio;
 
 protected:

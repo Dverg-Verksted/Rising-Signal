@@ -90,6 +90,34 @@ public:
     FORCEINLINE FPrimaryAssetType GetTypeNoteItem() const { return this->JournalNoteType; }
 
     /**
+      * @public Get type Note journal
+      * @return FPrimaryAssetType
+    **/
+    UFUNCTION(BlueprintCallable, Category = "InteractItemDataAsset | NoteItem | GetData")
+    FORCEINLINE FSoftObjectPath GetNoteMap() const { return this->NoteMap; }
+
+    /**
+    * @public Get type Note journal
+    * @return FPrimaryAssetType
+    **/
+    UFUNCTION(BlueprintCallable, Category = "InteractItemDataAsset | NoteItem | GetData")
+    FORCEINLINE FText GetNoteHeader() const { return this->NoteHeader; }
+
+    /**
+    * @public Get type Note journal
+    * @return FPrimaryAssetType
+    **/
+    UFUNCTION(BlueprintCallable, Category = "InteractItemDataAsset | NoteItem | GetData")
+    FORCEINLINE FText GetNoteDate() const { return this->NoteDate; }
+
+    /**
+    * @public Get type Note journal
+    * @return FPrimaryAssetType
+    **/
+    UFUNCTION(BlueprintCallable, Category = "InteractItemDataAsset | NoteItem | GetData")
+    FORCEINLINE FText GetNoteDescription() const { return this->NoteDescription; }
+
+    /**
       * @public Get type Audio journal
       * @return FPrimaryAssetType
     **/
@@ -104,6 +132,20 @@ public:
     FORCEINLINE FSoftObjectPath GetTextureAudioItem() const { return this->JournalAudio; }
 
     /**
+    * @public Get type Note journal
+    * @return FPrimaryAssetType
+    **/
+    UFUNCTION(BlueprintCallable, Category = "InteractItemDataAsset | AudioItem | GetData")
+    FORCEINLINE FSoftObjectPath GetAudioMap() const { return this->AudioMap; }
+
+    /**
+    * @public Get type Note journal
+    * @return FPrimaryAssetType
+    **/
+    UFUNCTION(BlueprintCallable, Category = "InteractItemDataAsset | AudioItem | GetData")
+    FORCEINLINE FText GetAudioHeader() const { return this->AudioHeader; }
+    
+    /**
       * @public Get type Audio journal
       * @return FPrimaryAssetType
     **/
@@ -116,6 +158,20 @@ public:
     **/
     UFUNCTION(BlueprintCallable, Category = "InteractItemDataAsset | PhotoItem | GetData")
     FORCEINLINE FSoftObjectPath GetTexturePhotoItem() const { return this->JournalPhoto; }
+
+    /**
+    * @public Get type Note journal
+    * @return FPrimaryAssetType
+    **/
+    UFUNCTION(BlueprintCallable, Category = "InteractItemDataAsset | NoteItem | GetData")
+    FORCEINLINE FSoftObjectPath GetPhotoMap() const { return this->PhotoMap; }
+
+    /**
+    * @public Get type Note journal
+    * @return FPrimaryAssetType
+    **/
+    UFUNCTION(BlueprintCallable, Category = "InteractItemDataAsset | NoteItem | GetData")
+    FORCEINLINE FText GetPhotoHeader() const { return this->PhotoHeader; }
 
 private:
     // @private Type item
@@ -166,59 +222,68 @@ private:
 #pragma endregion
 
 #pragma region NoteItem
-
+    
+    // @private Note entity
     FPrimaryAssetType JournalNoteType;
 
+    // @private Note map Description
     UPROPERTY(EditAnywhere, Category="Settings Data Item", meta = (AllowedClasses= "World", EditCondition = "TypeItem == ETypeItem::NoteItem",
         EditConditionHides))
-    FSoftObjectPath NoteMap;//TODO
+    FSoftObjectPath NoteMap;
 
+    // @private Note Header
     UPROPERTY(EditAnywhere, Category = "Settings Data Item",
     meta = (DisplayName = "Заголовок журнала Записки", ToolTip = "Заголовок журнала записки", EditCondition = "TypeItem == ETypeItem::NoteItem",
         EditConditionHides))
-    FText JournalNoteHeader;//TODO
-    
+    FText NoteHeader;
+
+    // @private Note Date
     UPROPERTY(EditAnywhere, Category = "Settings Data Item", meta = (DisplayName = "Дата: -- день", ToolTip = "Отображение дня, целое число",
         EditCondition = "TypeItem == ETypeItem::NoteItem", EditConditionHides))
-    FText Date;//TODO
+    FText NoteDate;
 
+    // @private Note Description
     UPROPERTY(EditAnywhere, Category = "Settings Data Item", meta = (DisplayName = "Описание", ToolTip = "Описание чего-либо в широком смысле",
         EditCondition = "TypeItem == ETypeItem::NoteItem", EditConditionHides))
-    FText Description;//TODO
+    FText NoteDescription;
 
 #pragma endregion
 
 #pragma region AudioItem
-
+    
+    // @private Audio entity
     FPrimaryAssetType JournalAudioType;
 
     UPROPERTY(EditAnywhere, Category="Settings Data Item", meta = (AllowedClasses= "World", EditCondition = "TypeItem == ETypeItem::AudioItem", EditConditionHides))
     FSoftObjectPath AudioMap;
 
+    // @private Audio Header
     UPROPERTY(EditAnywhere, Category = "Settings Data Item",
         meta = (DisplayName = "Заголовок журнала аудиозаписи", ToolTip = "Заголовок журнала аудиозаписи", EditCondition = "TypeItem == ETypeItem::AudioItem", EditConditionHides))
-    FText JournalAudioHeader;//TODO
+    FText AudioHeader;
     
     UPROPERTY(EditAnywhere, Category = "Settings Data Item", meta = (DisplayName = "Аудиозапись", ToolTip = "Добавление аудиозаписи типа USoundCue",
         EditCondition = "TypeItem == ETypeItem::AudioItem", EditConditionHides, AllowedClasses = "SoundCue"))
-    FSoftObjectPath JournalAudio;//TODO
+    FSoftObjectPath JournalAudio;
 
 #pragma endregion
 
 #pragma region PhotoItem
-
+    
+    // @private Photo entity
     FPrimaryAssetType JournalPhotoType;
 
     UPROPERTY(EditAnywhere, Category="Settings Data Item", meta = (AllowedClasses= "World", EditCondition = "TypeItem == ETypeItem::PhotoItem", EditConditionHides))
     FSoftObjectPath PhotoMap;
 
+    // @private Photo Header
     UPROPERTY(EditAnywhere, Category = "Settings Data Item",
         meta = (DisplayName = "Заголовок журнала фотографии", ToolTip = "Заголовок журнала фотографии", EditCondition = "TypeItem == ETypeItem::PhotoItem", EditConditionHides))
-    FText JournalPhotoHeader;//TODO
+    FText PhotoHeader;
     
     UPROPERTY(EditAnywhere, Category = "Settings Data Item", meta = (DisplayName = "Фотография", ToolTip = "Добавление фотографии типа Texture2D",
         EditCondition = "TypeItem == ETypeItem::PhotoItem", EditConditionHides, AllowedClasses = "Texture2D"))
-    FSoftObjectPath JournalPhoto;//TODO
+    FSoftObjectPath JournalPhoto;
 
 #pragma endregion
     
