@@ -3,57 +3,114 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "AlsCharacter.h"
 #include "RSGamePLayer.generated.h"
 
-class UCameraComponent;
-class USpringArmComponent;
+
+class UAlsCameraComponent;
 /**
  * @class Own player (^_^)
  */
-UCLASS()
-class RISINGSIGNAL_API ARSGamePLayer : public ACharacter
+UCLASS(AutoExpandCategories = ("Settings|Als Character Example", "State|Als Character Example"))
+class RISINGSIGNAL_API ARSGamePLayer : public AAlsCharacter
 {
     GENERATED_BODY()
 
+#pragma region Default
+
 public:
-    // Def contructor
+
+    // Constructor
     ARSGamePLayer();
 
-#pragma region GetData
+    // Called on start play simulate
+    virtual void BeginPlay() override;
 
-    /**
-     * @public Get Spring Arm component
-     * @return USpringArmComponent*
-     **/
-    UFUNCTION(BlueprintPure, Category = "ARSGamePLayer | GetData")
-    USpringArmComponent* GetSpringArm() const { return this->SpringArm; }
+    /** 
+    *	Function called every frame on this Actor. Override this function to implement custom logic to be executed every frame.
+    *	Note that Tick is disabled by default, and you will need to check PrimaryActorTick.bCanEverTick is set to true to enable it.
+    *
+    *	@param	DeltaSeconds	Game time elapsed during last frame modified by the time dilation
+    */
+    virtual void Tick(float DeltaSeconds) override;
 
-    /**
-     * @public Get Camera component
-     * @return UCameraComponent*
-     **/
-    UFUNCTION(BlueprintPure, Category = "ARSGamePLayer | GetData")
-    UCameraComponent* GetCamera() const { return this->Camera; }
+    virtual void CalcCamera(float DeltaTime, FMinimalViewInfo& ViewInfo) override;
 
 #pragma endregion
 
+#pragma region Components
+
+private:
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+    UAlsCameraComponent* AlsCamera;
+
+#pragma endregion
+
+#pragma region PlayerInput
+
+public:
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character | PlayerInput",
+        Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "x"))
+    float LookUpMouseSensitivity{1.0f};
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character | PlayerInput",
+        Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "x"))
+    float LookRightMouseSensitivity{1.0f};
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character | PlayerInput",
+        Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "deg"))
+    float LookUpRate{45.0f};
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character | PlayerInput",
+        Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "deg"))
+    float LookRightRate{90.0f};
+    
 protected:
-    /**
-     *	Function called every frame on this Actor. Override this function to implement custom logic to be executed every frame.
-     *	Note that Tick is disabled by default, and you will need to check PrimaryActorTick.bCanEverTick is set to true to enable it.
-     *
-     *	@param	DeltaSeconds	Game time elapsed during last frame modified by the time dilation
-     */
-    virtual void Tick(float DeltaSeconds) override;
+    
+    /** Allows a Pawn to set up custom input bindings. Called upon possession by a PlayerController, using the InputComponent created by CreatePlayerInputComponent(). */
+    virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
-    virtual void BeginPlay() override;
+private:
+    
+    FTimerHandle SprintStartTimer;
 
-    // Spring arm component
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
-    USpringArmComponent* SpringArm = nullptr;
+    void InputLookUp(float Value);
 
-    // Spring arm component
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
-    UCameraComponent* Camera = nullptr;
+    void InputLookRight(float Value);
+
+    void InputMoveForward(float Value);
+
+    void InputMoveRight(float Value);
+
+    void InputSprintPressed();
+
+    void InputSprintReleased();
+
+    void InputRoll();
+
+    void InputWalk();
+
+    void InputCrouch();
+
+    void InputJumpPressed();
+
+    void InputJumpReleased();
+
+    void InputRotationModePressed();
+
+    void InputRagdollPressed();
+
+    void InputViewModePressed();
+
+    void InputSwitchShoulderPressed();
+
+#pragma endregion
+
+#pragma region Debug
+
+public:
+    virtual void DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& DebugDisplay, float& Unused, float& VerticalPosition) override;
+
+#pragma endregion
+    
 };

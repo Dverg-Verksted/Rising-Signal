@@ -1,94 +1,103 @@
 ﻿// It is owned by the company Dverg Verksted.
 
 #include "Game/JournalSystem/JournalSystem.h"
-#include "IDetailTreeNode.h"
+#include "Library/RSFunctionLibrary.h"
 
 UJournalSystem::UJournalSystem()
 {
     PrimaryComponentTick.bCanEverTick = false;
-    ArrNoteObj.SetNum(3);
+    ArrNoteObj.SetNum(10);
+    ArrAudioObj.SetNum(10);
+    ArrPhotoObj.SetNum(10);
 }
 
-void UJournalSystem::AddNoteItem(UJournalNoteEntity* NewNoteObj)
+void UJournalSystem::AddNoteItem(FInteractItemNote& NewNoteObj)
 {
-    if (!NewNoteObj)
+    if (NewNoteObj.NoteDate.IsEmpty())
     {
-        LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("The Note object: %s is nullptr"), *GetName()));
+        LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("The field Date: %s is empty"), *NewNoteObj.NoteDate.ToString()));
         return;
     }
-    if (NewNoteObj->Date.IsEmpty())
+    if (NewNoteObj.NoteHeader.IsEmpty())
     {
-        LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("The field Date: %s is empty"), *NewNoteObj->Date.ToString()));
+        LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("The field Description: %s is empty"), *NewNoteObj.NoteHeader.ToString()));
         return;
     }
-    if (NewNoteObj->Description.IsEmpty())
+    if (NewNoteObj.NoteDescription.IsEmpty())
     {
-        LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("The field Description: %s is empty"), *NewNoteObj->Description.ToString()));
+        LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("The field Description: %s is empty"), *NewNoteObj.NoteDescription.ToString()));
         return;
     }
     
-    const FString AssetName = NewNoteObj->GetChapterName();
-    const int32 IndexStruct = GetNoteChapterIndex(AssetName);
+    const int32 IndexStruct = GetNoteChapterIndex(NewNoteObj.NoteMap.GetAssetName());
 
     if (this->ArrNoteObj.IsValidIndex(IndexStruct))
     {
+        OnJournalSystemUpdate.Broadcast();
         this->ArrNoteObj[IndexStruct].ArrNote.AddUnique(NewNoteObj);
     }
-
-    LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Name: %s "), *GetName()));
-    LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field AssetName: %s "), *AssetName));
-    LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field IndexStruct: %d "), IndexStruct));
-    LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Date: %s "), *NewNoteObj->Date.ToString()));
-    LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Description: %s "), *NewNoteObj->Description.ToString()));
-    // LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Description: %s "), *this->ArrNoteObj[IndexStruct].ChapterName));
-
-    for (auto Name : this->ArrNoteObj)
+    
+    //debug
     {
-        LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Name: %s "), *GetName()));
-        LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field ChapterName: %s "), *Name.ChapterName));
-        for (auto fields : Name.ArrNote)
-        {
-            LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field ChapterName: %s "), *fields->Date.ToString()));
-            LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field ChapterName: %s "), *fields->Description.ToString()));
-        }
-
+    // LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Name: %s "), *GetName()));
+    // LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field AssetName: %s "), *AssetName));
+    // LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field IndexStruct: %d "), IndexStruct));
+    //
+    // for (auto Name : this->ArrNoteObj)
+    // {
+    //     LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("The field Name: %s "), *GetName()));
+    //     LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("The field ChapterName: %s "), *Name.ChapterName));
+    //     for (auto fields : Name.ArrNote)
+    //     {
+    //         LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("The field ChapterName: %s "), *fields->Date.ToString()));
+    //         LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("The field ChapterName: %s "), *fields->Description.ToString()));
+    //     }
+    // }
     }
 }
 
-void UJournalSystem::AddAudioItem(UJournalAudioEntity* NewAudioObj)
+void UJournalSystem::AddAudioItem(FInteractItemAudio& NewAudioObj)
 {
-    if (!NewAudioObj)
+    if (NewAudioObj.AudioHeader.IsEmpty())
     {
-        LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("The Audio object: %s is nullptr"), *GetName()));;
+        LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("The field Description: %s is empty"), *NewAudioObj.AudioHeader.ToString()));
         return;
     }
-    if (NewAudioObj->JournalAudio.IsNull())
+    if (NewAudioObj.AudioMap.IsNull())
     {
-        LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("The field JournalAudio: %s is not pointing to a live object"), *GetName()));
+        LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("The field JournalAudio: %s is not pointing to a live object"), *NewAudioObj.AudioMap.GetAssetName()));
         return;
     }
 
-    const FString AssetName = NewAudioObj->GetChapterName();
-    const int32 IndexStruct = GetAudioChapterIndex(AssetName);
-    this->ArrAudioObj[IndexStruct].ArrAudio.AddUnique(NewAudioObj);
+    const int32 IndexStruct = GetAudioChapterIndex(NewAudioObj.AudioMap.GetAssetName());
+    
+    if (this->ArrAudioObj.IsValidIndex(IndexStruct))
+    {
+        OnJournalSystemUpdate.Broadcast();
+        this->ArrAudioObj[IndexStruct].ArrAudio.AddUnique(NewAudioObj);
+    }
 }
 
-void UJournalSystem::AddPhotoItem(UJournalPhotoEntity* NewPhotoObj)
+void UJournalSystem::AddPhotoItem(FInteractItemPhoto& NewPhotoObj)
 {
-    if (!NewPhotoObj)
+    if (NewPhotoObj.PhotoHeader.IsEmpty())
     {
-        LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("The Photo object: %s is nullptr"), *GetName()));;
+        LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("The field Description: %s is empty"), *NewPhotoObj.PhotoHeader.ToString()));
         return;
     }
-    if (NewPhotoObj->JournalPhoto.IsNull())
+    if (NewPhotoObj.PhotoMap.IsNull())
     {
-        LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("The field JournalPhoto: %s is not pointing to a live object"), *GetName()));
+        LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("The field JournalPhoto: %s is not pointing to a live object"), *NewPhotoObj.PhotoMap.GetAssetName()));
         return;
     }
-
-    const FString AssetName = NewPhotoObj->GetChapterName();
-    const int32 IndexStruct = GetAudioChapterIndex(AssetName);
-    this->ArrPhotoObj[IndexStruct].ArrPhoto.AddUnique(NewPhotoObj);
+    
+    const int32 IndexStruct = GetAudioChapterIndex(NewPhotoObj.PhotoMap.GetAssetName());
+    
+    if (this->ArrPhotoObj.IsValidIndex(IndexStruct))
+    {
+        OnJournalSystemUpdate.Broadcast();
+        this->ArrPhotoObj[IndexStruct].ArrPhoto.AddUnique(NewPhotoObj);
+    }
 }
 
 void UJournalSystem::GetNextJournalState(EStateJournalSystem NextState)
@@ -96,7 +105,7 @@ void UJournalSystem::GetNextJournalState(EStateJournalSystem NextState)
     StateJournalSystem = NextState;
 }
 
-UJournalNoteEntity* UJournalSystem::GetNoteObjByIndex(int32 LevelIndex, int32 NotesIndex)
+FInteractItemNote UJournalSystem::GetNoteObjByIndex(int32 LevelIndex, int32 NotesIndex)
 {
     if (this->ArrNoteObj.IsValidIndex(LevelIndex))
     {
@@ -105,15 +114,13 @@ UJournalNoteEntity* UJournalSystem::GetNoteObjByIndex(int32 LevelIndex, int32 No
             return this->ArrNoteObj[LevelIndex].ArrNote[NotesIndex];
         }
         LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Index: %d is not valid"), NotesIndex));
-        
-        return nullptr;
+        return this->ArrNoteObj[LevelIndex].ArrNote[NotesIndex];
     }
     LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Index: %d is not valid"), LevelIndex));
-
-    return nullptr;
+    return this->ArrNoteObj[LevelIndex].ArrNote[NotesIndex];
 }
 
-UJournalAudioEntity* UJournalSystem::GetAudioObjByIndex(int32 LevelIndex, int32 AudioIndex)
+FInteractItemAudio UJournalSystem::GetAudioObjByIndex(int32 LevelIndex, int32 AudioIndex)
 {
     if (this->ArrAudioObj.IsValidIndex(LevelIndex))
     {
@@ -121,16 +128,14 @@ UJournalAudioEntity* UJournalSystem::GetAudioObjByIndex(int32 LevelIndex, int32 
         {
             return this->ArrAudioObj[LevelIndex].ArrAudio[AudioIndex];
         }
-        LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Index: %d is not valid"), AudioIndex));
-
-        return nullptr;
+        LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("Index: %d is not valid"), AudioIndex));
+        return this->ArrAudioObj[LevelIndex].ArrAudio[AudioIndex];
     }
-    LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Index: %d is not valid"), LevelIndex));
-
-    return nullptr;
+    LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("Index: %d is not valid"), LevelIndex));
+    return this->ArrAudioObj[LevelIndex].ArrAudio[AudioIndex];
 }
 
-UJournalPhotoEntity* UJournalSystem::GetPhotoObjByIndex(int32 LevelIndex, int32 PhotoIndex)
+FInteractItemPhoto UJournalSystem::GetPhotoObjByIndex(int32 LevelIndex, int32 PhotoIndex)
 {
     if (this->ArrPhotoObj.IsValidIndex(LevelIndex))
     {
@@ -139,12 +144,10 @@ UJournalPhotoEntity* UJournalSystem::GetPhotoObjByIndex(int32 LevelIndex, int32 
             return this->ArrPhotoObj[LevelIndex].ArrPhoto[PhotoIndex];
         }
         LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Index: %d is not valid"), PhotoIndex));
-
-        return nullptr;
+        return this->ArrPhotoObj[LevelIndex].ArrPhoto[PhotoIndex];
     }
     LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Index: %d is not valid"), LevelIndex));
-
-    return nullptr;
+    return this->ArrPhotoObj[LevelIndex].ArrPhoto[PhotoIndex];
 }
 
 int32 UJournalSystem::GetArrNoteObjSize()
@@ -185,16 +188,13 @@ TArray<FChapterDataPhoto> UJournalSystem::GetAllPhoto()
 
 int32 UJournalSystem::GetNoteChapterIndex(FString NoteName)
 {
-    if (NoteName.IsEmpty())
-    {
-        return 0;
-    }
-    
+    if (NoteName.IsEmpty()) return 0;
     int32 Index = 0;
 
-    for (auto& Arr : this->ArrNoteObj)//TODO исправить баг
+    for (auto& Arr : this->ArrNoteObj)
     {
-        if (this->ArrNoteObj[Index].ChapterName == NoteName)
+        
+        if (Arr.ChapterName == NoteName)
         {
             return Index;
         }
@@ -206,45 +206,33 @@ int32 UJournalSystem::GetNoteChapterIndex(FString NoteName)
 
 int32 UJournalSystem::GetAudioChapterIndex(FString AudioName)
 {
-    if (AudioName.IsEmpty())
-    {
-        return 0;
-    }
-    
+    if (AudioName.IsEmpty()) return 0;
     int32 Index = 0;
     
     for (auto& Arr : this->ArrAudioObj)
     {
-        if (this->ArrAudioObj[Index].ChapterName == AudioName)
+        if (Arr.ChapterName == AudioName)
         {
             return Index;
         }
         Index++;
     }
-    
     return Index;
-
 }
 
 int32 UJournalSystem::GetPhotoChapterIndex(FString PhotoName)
 {
-    if (PhotoName.IsEmpty())
-    {
-        return 0;
-    }
-    
+    if (PhotoName.IsEmpty()) return 0;    
     int32 Index = 0;
     
     for (auto& Arr : this->ArrPhotoObj)
     {
-       
-        if (this->ArrPhotoObj[Index].ChapterName == PhotoName)
+        if (Arr.ChapterName == PhotoName)
         {
             return Index;
         }
         Index++;
     }
-    
     return Index;
 }
 
@@ -252,27 +240,27 @@ void UJournalSystem::DeleteNoteObjByIndex(int32 Index)
 {
     if (this->ArrNoteObj.IsValidIndex(Index))
     {
-        this->ArrNoteObj.RemoveAt(Index);  // TODO добавить логирование
+        this->ArrNoteObj.RemoveAt(Index);
     }
-    // TODO добавить логирование
+    LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Index: %d "), Index));
 }
 
 void UJournalSystem::DeleteAudioObjByIndex(int32 Index)
 {
     if (this->ArrAudioObj.IsValidIndex(Index))
     {
-        this->ArrAudioObj.RemoveAt(Index);  // TODO добавить логирование
+        this->ArrAudioObj.RemoveAt(Index);
     }
-    // TODO добавить логирование
+    LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Index: %d "), Index));
 }
 
 void UJournalSystem::DeletePhotoObjByIndex(int32 Index)
 {
     if (this->ArrPhotoObj.IsValidIndex(Index))
     {
-        this->ArrPhotoObj.RemoveAt(Index);  // TODO добавить логирование
+        this->ArrPhotoObj.RemoveAt(Index);
     }
-    // TODO добавить логирование
+    LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("The field Index: %d "), Index));
 }
 
 void UJournalSystem::BeginPlay()

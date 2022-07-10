@@ -1,10 +1,11 @@
 // It is owned by the company Dverg Verksted.
 
 #include "Game/InteractSystem/InteractItemActor.h"
-
 #include "InteractItemDataAsset.h"
+#include "Components/WidgetComponent.h"
 #include "Engine/AssetManager.h"
 #include "Library/RSFunctionLibrary.h"
+#include "Widgets/InteractWidget.h"
 
 // Sets default values
 AInteractItemActor::AInteractItemActor()
@@ -16,12 +17,22 @@ AInteractItemActor::AInteractItemActor()
     PrimaryActorTick.bTickEvenWhenPaused = false;
 
     this->Mesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("Mesh component"));
+    SetRootComponent(this->Mesh);
+
+    this->WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(FName("3D Widget component"));
+    this->WidgetComponent->SetupAttachment(this->Mesh);
+    
+    static ConstructorHelpers::FClassFinder<UInteractWidget> UnitSelector(TEXT("/Game/RisingSignal/Core/HUD/UI_UserHUD/Widgets/WBP_InteractText"));
+    SubInteractWidget = UnitSelector.Class;
 }
 
 // Called when the game starts or when spawned
 void AInteractItemActor::BeginPlay()
 {
     Super::BeginPlay();
+
+    InteractWidget = Cast<UInteractWidget>(this->WidgetComponent->GetWidget());
+    InteractWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 #if UE_EDITOR
@@ -47,3 +58,27 @@ void AInteractItemActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyC
 }
 
 #endif
+
+void AInteractItemActor::LoadInteractWidget()
+{
+    if (InteractWidget)
+    {
+        LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Name iteract actor: %s | Load interact Widget"), *GetName()));
+        GetWorldTimerManager().ClearTimer(ResetInteractAnimTimerHandle);
+        InteractWidget->SetVisibility(ESlateVisibility::Visible);
+        this->InteractWidget->StartAnimation();
+    }
+}
+
+void AInteractItemActor::DestroyInteractWidget()
+{
+    if (InteractWidget)
+    {
+        LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Name iteract actor: %s | Destroy interact Widget"), *GetName()));
+        InteractWidget->EndAnimation();
+        GetWorldTimerManager().SetTimer(ResetInteractAnimTimerHandle, [&]()
+        {
+            InteractWidget->SetVisibility(ESlateVisibility::Collapsed);
+        }, InteractWidget->GetEndAnim()->GetEndTime(), false);
+    }
+}
