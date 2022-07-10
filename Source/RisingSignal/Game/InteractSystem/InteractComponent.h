@@ -93,8 +93,9 @@ private:
     void CheckDistanceToItem();
 
     /**
-     * @private 
+     * @private register and process target interact actor
      **/
+    UFUNCTION()
     void RegisterInteractEvent();
 
 #pragma endregion

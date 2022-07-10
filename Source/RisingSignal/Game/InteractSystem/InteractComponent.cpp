@@ -90,6 +90,7 @@ void UInteractComponent::RegisterEndOverlapInteractItem(UPrimitiveComponent* Ove
     LOG_INTERACT(ELogRSVerb::Display, FString::Printf(TEXT("End overlap actor: [%s]"), *OtherActor->GetName()));
 
     ArrInteractItem.Remove(Item);
+    Item->DestroyInteractWidget();
     if (ArrInteractItem.Num() == 0)
     {
         GetWorld()->GetTimerManager().ClearTimer(CheckedInteractItemTimerHandle);
@@ -119,7 +120,14 @@ void UInteractComponent::CheckDistanceToItem()
     {
         LOG_INTERACT(ELogRSVerb::Display, FString::Printf(TEXT("New target item: %s | Distance: %f"),
             *TempTargetItem->GetName(), L_MinDistance));
+        
+        if (TargetInteractItem)
+        {
+            TargetInteractItem->DestroyInteractWidget();
+        }
+        
         TargetInteractItem = TempTargetItem;
+        TargetInteractItem->LoadInteractWidget();
     }
 }
 

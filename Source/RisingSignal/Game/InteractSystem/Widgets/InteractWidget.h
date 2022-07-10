@@ -20,6 +20,8 @@ public:
     void StartAnimation();
     void EndAnimation();
     void SetText(const FText& NewText) const;
+    UWidgetAnimation* GetStartAnim() const { return StartAnim; }
+    UWidgetAnimation* GetEndAnim() const { return EndAnim; }
 
 private:
 
