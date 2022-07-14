@@ -39,6 +39,11 @@ EBTNodeResult::Type UFocusOnPointTask::ExecuteTask(UBehaviorTreeComponent& Owner
     return EBTNodeResult::InProgress;
 }
 
+uint16 UFocusOnPointTask::GetInstanceMemorySize() const
+{
+    return sizeof(FBTRotateToPointTaskMemory);
+}
+
 void UFocusOnPointTask::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
     const FBTRotateToPointTaskMemory* TaskMemory = (FBTRotateToPointTaskMemory*)NodeMemory;

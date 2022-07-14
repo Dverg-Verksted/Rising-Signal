@@ -23,10 +23,10 @@ bool ARSAICharacter::SetNewAIState(const EAIState NewState)
     if (NewState == CurrentAIState)
         return false;
 
-    const EAIState OldState = CurrentAIState;
+    LastAIState = CurrentAIState;
 
     CurrentAIState = NewState;
-    OnAIStateChanged.Broadcast(NewState, OldState);
+    OnAIStateChanged.Broadcast(NewState, LastAIState);
     return true;
 }
 

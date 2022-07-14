@@ -19,7 +19,7 @@ struct FBTRotateToPointTaskMemory
 
 
 /**
- * 
+ * Task to constantly rotate AICharacter to direction to point 
  */
 UCLASS()
 class RISINGSIGNAL_API UFocusOnPointTask : public UBTTaskNode
@@ -29,11 +29,16 @@ class RISINGSIGNAL_API UFocusOnPointTask : public UBTTaskNode
 public:
     UFocusOnPointTask();
 
+    // Getting data for MemoryNode
     virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-
+    
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aim")
     FBlackboardKeySelector FocusAimKey;
 
+    virtual uint16 GetInstanceMemorySize() const override;
+
+
 protected:
+    // Rotating character
     virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 };

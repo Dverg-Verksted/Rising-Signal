@@ -15,6 +15,7 @@ enum EAIState
 {
     Idle,
     Patrol,
+    Threaten,
     Attack
 };
 
@@ -50,9 +51,11 @@ protected:
 
     virtual void BeginPlay() override;
 
-    EAIState CurrentAIState = EAIState::Idle;
+    EAIState CurrentAIState = EAIState::Patrol;
 
     // virtual void OnDeath();
+
+    EAIState LastAIState = CurrentAIState;
 
 
 public:

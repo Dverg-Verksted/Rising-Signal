@@ -15,4 +15,6 @@ class RISINGSIGNAL_API ARSAICharacter_Wolf : public ARSAICharacter
     GENERATED_BODY()
 
     ARSAICharacter_Wolf();
+
+    virtual void Tick(float DeltaSeconds) override;
 };
