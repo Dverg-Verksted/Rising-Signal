@@ -32,14 +32,14 @@ EBTNodeResult::Type UFocusOnPointTask::ExecuteTask(UBehaviorTreeComponent& Owner
 
     float YawRotation = (AimLocation - PawnLocation).Rotation().Yaw;
 
-    const float DeltaAngle = FMath::FindDeltaAngleDegrees(PawnRotationYaw, YawRotation);
+    const float DeltaAngle = UKismetMathLibrary::NormalizeAxis(FMath::FindDeltaAngleDegrees(PawnRotationYaw, YawRotation));
 
     if (DeltaAngle <= PrecisionAngle)
         return EBTNodeResult::Succeeded;
 
     YawRotation = PawnRotationYaw + DeltaAngle;
 
-    TaskMemory->TargetYawRotation = UKismetMathLibrary::NormalizeAxis(YawRotation);
+    TaskMemory->TargetYawRotation = YawRotation;
     TaskMemory->AICharacter = Pawn;
 
     return EBTNodeResult::InProgress;
