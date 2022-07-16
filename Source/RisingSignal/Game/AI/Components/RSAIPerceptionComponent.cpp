@@ -38,8 +38,7 @@ AActor* URSAIPerceptionComponent::GetClosestEnemy() const
 
     if (bShowDebugInfo)
     {
-        URSFunctionLibrary::Print_Log(ELogRSVerb::Display, FString::Printf(TEXT("Distance to closest enemy = %f"), BestDistance),
-            39, "GetClosestEnemy");
+        LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Distance to closest enemy = %f")));
     }
 
     return BestPawn;

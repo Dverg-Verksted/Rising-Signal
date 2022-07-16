@@ -36,7 +36,10 @@ public:
     FBlackboardKeySelector FocusAimKey;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aim", meta = (ToolTip = "Остаточный угол при котором останавливается вращение"))
-    float PrecisionAngle = 10.0f;    
+    float PrecisionAngle = 10.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aim", meta = (ToolTip = "Скорость вращения персонажа"))
+    float TurnSpeed = 50;
 
     virtual uint16 GetInstanceMemorySize() const override;
 

@@ -5,6 +5,7 @@
 
 #include "RSAIController.h"
 #include "Game/AbilitySystem/ActorsComponents/RSHealthComponent.h"
+#include "Library/RSFunctionLibrary.h"
 
 // Sets default values
 ARSAICharacter::ARSAICharacter()
@@ -35,9 +36,14 @@ void ARSAICharacter::BeginPlay()
 {
     Super::BeginPlay();
 
-    if (ARSAIController* AIController = Cast<ARSAIController>(GetController()))
+    AIController = Cast<ARSAIController>(GetController());
+    if (AIController)
     {
         AIController->RunBehaviorTree(BehaviorTreeAsset);
+    }
+    else
+    {
+        LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("Wrong controller assigned to %s"), *GetName()));
     }
 }
 

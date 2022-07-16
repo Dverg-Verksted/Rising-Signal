@@ -17,6 +17,7 @@ class RISINGSIGNAL_API URSAIPerceptionComponent : public UAIPerceptionComponent
 public:
     AActor* GetClosestEnemy() const;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug", meta = (ToolTip = "Отображать дебаг информацию"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug",
+        meta = (ToolTip = "Отображать дебаг информацию", ConsoleVariable = "r.Wolf.ShowDebugInfo"))
     bool bShowDebugInfo = false;
 };

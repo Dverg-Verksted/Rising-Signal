@@ -9,11 +9,18 @@ ARSAICharacter_Wolf::ARSAICharacter_Wolf()
 {
 }
 
+void ARSAICharacter_Wolf::BeginPlay()
+{
+    Super::BeginPlay();
+
+    check(AIController);
+}
+
 void ARSAICharacter_Wolf::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 
-    if (const auto AIController = Cast<ARSAIController>(GetController()))
+    if (AIController)
     {
         if (AIController->GetActorToFocusOn())
         {

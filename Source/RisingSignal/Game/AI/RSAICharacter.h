@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "RSAICharacter.generated.h"
 
+class ARSAIController;
 class URSHealthComponent;
 class UBehaviorTree;
 
@@ -46,7 +47,7 @@ public:
 
     // Get current Character turn offset
     UFUNCTION(BlueprintCallable, Category = "Movement")
-    float GetTurnOffset() const {return TurnOffset;}
+    float GetTurnOffset() const { return TurnOffset; }
 
 
 protected:
@@ -54,6 +55,9 @@ protected:
     URSHealthComponent* HealthComponent;
 
     virtual void BeginPlay() override;
+
+    UPROPERTY()
+    ARSAIController* AIController;
 
     EAIState CurrentAIState = EAIState::Patrol;
 

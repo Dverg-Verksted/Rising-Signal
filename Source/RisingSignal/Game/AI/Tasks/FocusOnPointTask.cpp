@@ -62,7 +62,7 @@ void UFocusOnPointTask::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 
     LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("CurrentYaw = %f, TargetYaw = %f"), CurrentRotation, TargetRotation));
 
-    const float NewYawRotation = FMath::FInterpConstantTo(CurrentRotation, TargetRotation, DeltaSeconds, 50);
+    const float NewYawRotation = FMath::FInterpConstantTo(CurrentRotation, TargetRotation, DeltaSeconds, TurnSpeed);
     const float DeltaYaw = NewYawRotation - TargetRotation;
 
     TaskMemory->AICharacter->SetActorRotation(FRotator(0, NewYawRotation, 0));
