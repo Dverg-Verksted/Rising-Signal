@@ -1,4 +1,4 @@
-// It is owned by the company Dverg Verksted.
+﻿// It is owned by the company Dverg Verksted.
 
 #pragma once
 
@@ -34,6 +34,9 @@ public:
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aim")
     FBlackboardKeySelector FocusAimKey;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aim", meta = (ToolTip = "Остаточный угол при котором останавливается вращение"))
+    float PrecisionAngle = 10.0f;    
 
     virtual uint16 GetInstanceMemorySize() const override;
 

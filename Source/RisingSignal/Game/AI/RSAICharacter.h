@@ -44,6 +44,10 @@ public:
     UFUNCTION(BlueprintCallable, Category = "AI")
     EAIState GetAIState() const { return CurrentAIState; }
 
+    // Get current Character turn offset
+    UFUNCTION(BlueprintCallable, Category = "Movement")
+    float GetTurnOffset() const {return TurnOffset;}
+
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
@@ -53,10 +57,15 @@ protected:
 
     EAIState CurrentAIState = EAIState::Patrol;
 
-    // virtual void OnDeath();
-
     EAIState LastAIState = CurrentAIState;
 
+    float LastTurnAngle = 0.0f;
+
+    float TurnOffset = 0.0f;
+
+    void CalculateTurnOffset();
+
+    // virtual void OnDeath();
 
 public:
     // Called every frame

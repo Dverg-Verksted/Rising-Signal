@@ -30,6 +30,7 @@ bool ARSAICharacter::SetNewAIState(const EAIState NewState)
     return true;
 }
 
+
 void ARSAICharacter::BeginPlay()
 {
     Super::BeginPlay();
@@ -40,8 +41,22 @@ void ARSAICharacter::BeginPlay()
     }
 }
 
+void ARSAICharacter::CalculateTurnOffset()
+{
+    const float NewTurnAngle = GetActorRotation().Yaw;
+
+    const float NewTurnOffset = LastTurnAngle - NewTurnAngle;
+
+    LastTurnAngle = GetActorRotation().Yaw;
+
+    TurnOffset = NewTurnOffset;
+    // UE_LOG(LogTemp, Warning, TEXT("%f"), TurnOffset);
+}
+
 // Called every frame
 void ARSAICharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    CalculateTurnOffset();
 }
