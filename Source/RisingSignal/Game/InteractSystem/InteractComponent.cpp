@@ -1,8 +1,10 @@
 // It is owned by the company Dverg Verksted.
 
 #include "Game/InteractSystem/InteractComponent.h"
+#include "InteractDataItem.h"
 #include "InteractItemActor.h"
 #include "Components/BoxComponent.h"
+#include "Game/JournalSystem/JournalSystem.h"
 #include "Player/RSGamePLayer.h"
 #include "Player/RSGamePlayerController.h"
 
@@ -43,6 +45,13 @@ void UInteractComponent::BeginPlay()
     }
     PlayerController->OnInteract.AddDynamic(this, &UInteractComponent::RegisterInteractEvent);
 
+    JournalSystem = Cast<UJournalSystem>(OwnerPlayer->GetComponentByClass(UJournalSystem::StaticClass()));
+    if (!JournalSystem)
+    {
+        LOG_INTERACT(ELogRSVerb::Error, "Journal System is nullptr");
+        return;
+    }
+    
     if (!BoxCollision)
     {
         LOG_INTERACT(ELogRSVerb::Error, "Box Collision is nullptr");
@@ -69,15 +78,7 @@ void UInteractComponent::RegisterBeginOverlapInteractItem(UPrimitiveComponent* O
     if (!Item) return;
 
     LOG_INTERACT(ELogRSVerb::Display, FString::Printf(TEXT("Begin overlap actor: [%s]"), *OtherActor->GetName()));
-
-    ArrInteractItem.AddUnique(Item);
-    if (!GetWorld()->GetTimerManager().TimerExists(CheckedInteractItemTimerHandle))
-    {
-        LOG_INTERACT(ELogRSVerb::Display, FString::Printf(TEXT("Start timer for checked distance | Num item: %i | Rate time start: %f"),
-            ArrInteractItem.Num(), RateTimeChecked));
-        GetWorld()->GetTimerManager().SetTimer(CheckedInteractItemTimerHandle, this, &UInteractComponent::CheckDistanceToItem,
-            RateTimeChecked, true);
-    }
+    AddItem(Item);
 }
 
 void UInteractComponent::RegisterEndOverlapInteractItem(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -95,6 +96,40 @@ void UInteractComponent::RegisterEndOverlapInteractItem(UPrimitiveComponent* Ove
     {
         GetWorld()->GetTimerManager().ClearTimer(CheckedInteractItemTimerHandle);
         TargetInteractItem = nullptr;
+    }
+}
+
+void UInteractComponent::AddItem(AInteractItemActor* InteractItem)
+{
+    if (!InteractItem)
+    {
+        LOG_INTERACT(ELogRSVerb::Warning, "Interact item is nullptr");
+        return;
+    }
+    
+    ArrInteractItem.AddUnique(InteractItem);
+    if (!GetWorld()->GetTimerManager().TimerExists(CheckedInteractItemTimerHandle))
+    {
+        LOG_INTERACT(ELogRSVerb::Display, FString::Printf(TEXT("Start timer for checked distance | Num item: %i | Rate time start: %f"),
+            ArrInteractItem.Num(), RateTimeChecked));
+        GetWorld()->GetTimerManager().SetTimer(CheckedInteractItemTimerHandle, this, &UInteractComponent::CheckDistanceToItem,
+            RateTimeChecked, true);
+    }
+}
+
+void UInteractComponent::RemoveItem(AInteractItemActor* InteractItem)
+{
+    if (!InteractItem)
+    {
+        LOG_INTERACT(ELogRSVerb::Warning, "Interact item is nullptr");
+        return;
+    }
+
+    ArrInteractItem.Remove(InteractItem);
+    InteractItem->DestroyInteractWidget();
+    if (ArrInteractItem.Num() == 0)
+    {
+        GetWorld()->GetTimerManager().ClearTimer(CheckedInteractItemTimerHandle);
     }
 }
 
@@ -134,6 +169,59 @@ void UInteractComponent::CheckDistanceToItem()
 void UInteractComponent::RegisterInteractEvent()
 {
     LOG_INTERACT(ELogRSVerb::Display, "Pressed button interact");
+    if (TargetInteractItem)
+    {
+        RemoveItem(TargetInteractItem);
+        FDataTableRowHandle InteractDT = TargetInteractItem->GetInteractData();
+        FDataInteract* DataInteract = InteractDT.DataTable->FindRow<FDataInteract>(InteractDT.RowName, "");
+        if (!DataInteract) return;
+        switch (DataInteract->TypeItem)
+        {
+            case ETypeItem::NoteItem:
+                SendNoteData(DataInteract);
+                break;
+            case ETypeItem::AudioItem:
+                SendAudioData(DataInteract);
+                break;
+            case ETypeItem::PhotoItem:
+                SendPhotoData(DataInteract);
+                break;
+        }
+        TargetInteractItem->Destroy();
+    }
+}
+
+void UInteractComponent::SendNoteData(const FDataInteract* DataInteract) const
+{
+    if (!JournalSystem)
+    {
+        return;
+    }
+    
+    FInteractItemNote InteractItemNote;
+    InteractItemNote.NoteDate = DataInteract->NoteDate;
+    InteractItemNote.NoteDescription = DataInteract->NoteDescription;
+    InteractItemNote.NoteHeader = DataInteract->NoteHeader;
+    InteractItemNote.NoteMap = DataInteract->NoteMap;
+    JournalSystem->AddNoteItem(InteractItemNote);
+}
+
+void UInteractComponent::SendAudioData(const FDataInteract* DataInteract) const
+{
+    FInteractItemAudio InteractItemAudio;
+    InteractItemAudio.AudioHeader = DataInteract->AudioHeader;
+    InteractItemAudio.AudioMap = DataInteract->AudioMap;
+    InteractItemAudio.JournalAudio = DataInteract->JournalAudio;
+    JournalSystem->AddAudioItem(InteractItemAudio);
+}
+
+void UInteractComponent::SendPhotoData(const FDataInteract* DataInteract) const
+{
+    FInteractItemPhoto InteractItemPhoto;
+    InteractItemPhoto.PhotoHeader = DataInteract->PhotoHeader;
+    InteractItemPhoto.PhotoMap = DataInteract->PhotoMap;
+    InteractItemPhoto.JournalPhoto = DataInteract->JournalPhoto;
+    JournalSystem->AddPhotoItem(InteractItemPhoto);
 }
 
 #if WITH_EDITOR
