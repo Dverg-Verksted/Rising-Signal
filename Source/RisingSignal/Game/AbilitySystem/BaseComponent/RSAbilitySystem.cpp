@@ -3,7 +3,6 @@
 
 #include "RSAbilitySystem.h"
 
-
 // Sets default values for this component's properties
 URSAbilitySystem::URSAbilitySystem()
 {
@@ -11,9 +10,24 @@ URSAbilitySystem::URSAbilitySystem()
     // off to improve performance if you don't need them.
     PrimaryComponentTick.bCanEverTick = true;
 
-    // ...
+    OnChangeHealth.AddDynamic(this, &URSAbilitySystem::ChangeHealth);
 }
 
+void URSAbilitySystem::ChangeHealth(float const DamageTaken)
+{
+    if(!this->bIsDead)
+    {
+        this->Health -= DamageTaken;
+        UE_LOG(LogTemp, Warning, TEXT("Damage Taken %f"),DamageTaken);
+        HealthChanged.Broadcast(this->Health);
+        if (this->Health <= 0.0f)
+        {
+            OnDeath.Broadcast();
+            bIsDead = !bIsDead;
+        }
+    }
+    
+}
 
 // Called when the game starts
 void URSAbilitySystem::BeginPlay()
@@ -33,10 +47,5 @@ void URSAbilitySystem::TickComponent(float DeltaTime, ELevelTick TickType, FActo
     // ...
 }
 
-void URSAbilitySystem::ChangeHealth(float const DamageTaken)
-{
-    this->Health -= DamageTaken;
-    UE_LOG(LogTemp, Display, TEXT("%f"), DamageTaken);
-}
 
 

@@ -6,7 +6,10 @@
 #include "Components/ActorComponent.h"
 #include "RSAbilitySystem.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnChangeHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHealthChanged, float, Health);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeHealth, float, Damage);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class RISINGSIGNAL_API URSAbilitySystem : public UActorComponent
@@ -19,15 +22,21 @@ public:
     
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-    UPROPERTY(VisibleAnywhere, BlueprintAssignable, BlueprintCallable)
+    UPROPERTY(VisibleAnywhere, BlueprintAssignable)
+    FHealthChanged HealthChanged;
+    UPROPERTY(VisibleAnywhere, BlueprintCallable)
     FOnChangeHealth OnChangeHealth;
-    
+
+    UPROPERTY(BlueprintAssignable)
+    FOnDeath OnDeath;
+
     /** func change health value => current health - @param DamageTaken
      *  @param DamageTaken is count of taken damage from anywhere
      */
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION()
     void ChangeHealth(float const DamageTaken);
 
+    // Getter for return current Health value
     UFUNCTION(BlueprintCallable, BlueprintPure)
     float GetHealth() const {return  Health;};
 
@@ -55,6 +64,7 @@ protected:
     bool bNeedStress;
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", meta = (EditCondition = "bNeedStress", EditConditionHides))
     float Stress;
-    
 
+    UPROPERTY(VisibleDefaultsOnly, Category = "Ability states")
+    bool bIsDead = false;
 };
