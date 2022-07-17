@@ -6,9 +6,11 @@
 #include "Components/ActorComponent.h"
 #include "RSAbilitySystem.generated.h"
 
+// Delegate for assignment some health changes
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHealthChanged, float, Health);
+// Delegate for call on change health
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeHealth, float, Damage);
-
+// Delegate for assignment death event
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -22,23 +24,30 @@ public:
     
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+    /** Declare delegate @name FHealthChanged
+     */
     UPROPERTY(VisibleAnywhere, BlueprintAssignable)
     FHealthChanged HealthChanged;
+    /** Declare delegate @name OnChangeHealth
+     */
     UPROPERTY(VisibleAnywhere, BlueprintCallable)
     FOnChangeHealth OnChangeHealth;
-
+    /** Declare delegate @name OnDeath
+     */
     UPROPERTY(BlueprintAssignable)
     FOnDeath OnDeath;
 
-    /** func change health value => current health - @param DamageTaken
+    /** Func for delegate @name onChangeHealth
+     *  Formula: Current health - @param DamageTaken
      *  @param DamageTaken is count of taken damage from anywhere
      */
     UFUNCTION()
     void ChangeHealth(float const DamageTaken);
 
+    // TODO: Maybe erase this func, dont know why it is needed
     // Getter for return current Health value
     UFUNCTION(BlueprintCallable, BlueprintPure)
-    float GetHealth() const {return  Health;};
+    float GetHealth() const {return  Health;}
 
 protected:
     // Called when the game starts

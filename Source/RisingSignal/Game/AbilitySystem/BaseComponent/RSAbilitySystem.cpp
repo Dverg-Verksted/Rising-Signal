@@ -13,22 +13,6 @@ URSAbilitySystem::URSAbilitySystem()
     OnChangeHealth.AddDynamic(this, &URSAbilitySystem::ChangeHealth);
 }
 
-void URSAbilitySystem::ChangeHealth(float const DamageTaken)
-{
-    if(!this->bIsDead)
-    {
-        this->Health -= DamageTaken;
-        UE_LOG(LogTemp, Warning, TEXT("Damage Taken %f"),DamageTaken);
-        HealthChanged.Broadcast(this->Health);
-        if (this->Health <= 0.0f)
-        {
-            OnDeath.Broadcast();
-            bIsDead = !bIsDead;
-        }
-    }
-    
-}
-
 // Called when the game starts
 void URSAbilitySystem::BeginPlay()
 {
@@ -38,7 +22,6 @@ void URSAbilitySystem::BeginPlay()
     
 }
 
-
 // Called every frame
 void URSAbilitySystem::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -47,5 +30,18 @@ void URSAbilitySystem::TickComponent(float DeltaTime, ELevelTick TickType, FActo
     // ...
 }
 
-
-
+// Func for Change Health and call delegate
+void URSAbilitySystem::ChangeHealth(float const DamageTaken)
+{
+    if(!this->bIsDead)
+    {
+        this->Health -= DamageTaken;
+        HealthChanged.Broadcast(this->Health);
+        if (this->Health <= 0.0f)
+        {
+            OnDeath.Broadcast();
+            bIsDead = !bIsDead;
+        }
+    }
+    
+}
