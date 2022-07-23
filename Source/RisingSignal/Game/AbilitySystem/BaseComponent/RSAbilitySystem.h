@@ -28,8 +28,10 @@ public:
     
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-    TArray<URSEffect> Effects;
-    URSEffect NewEffect;
+    UPROPERTY()
+    TArray<URSEffect*> Effects;
+    UPROPERTY()
+    URSEffect* NewEffect;
     
     UPROPERTY(VisibleAnywhere, BlueprintCallable)
     FAddEffect OnEffectAdd;

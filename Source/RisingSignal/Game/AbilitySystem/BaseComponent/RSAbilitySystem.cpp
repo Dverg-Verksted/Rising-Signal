@@ -82,9 +82,9 @@ void URSAbilitySystem::StartEffect(bool IsDamage, float EffectVal, float EffectT
         EffectVal *= -1;
     }
     
-    NewEffect.IsDamage = IsDamage;
-    NewEffect.Value = EffectVal;
-    NewEffect.TimeActive = EffectTime;
+    NewEffect->IsDamage = IsDamage;
+    NewEffect->Value = EffectVal;
+    NewEffect->TimeActive = EffectTime;
     Effects.Add(NewEffect);
     
     GetOwner()->GetWorldTimerManager().SetTimer(TEffectChange, this, &URSAbilitySystem::ChangeHealthOnEffects, 1.0f, true);
