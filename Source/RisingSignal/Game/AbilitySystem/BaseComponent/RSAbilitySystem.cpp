@@ -2,6 +2,7 @@
 
 
 #include "RSAbilitySystem.h"
+#include "TimerManager.h"
 
 // Sets default values for this component's properties
 URSAbilitySystem::URSAbilitySystem()
@@ -11,15 +12,13 @@ URSAbilitySystem::URSAbilitySystem()
     PrimaryComponentTick.bCanEverTick = true;
 
     OnChangeHealth.AddDynamic(this, &URSAbilitySystem::ChangeHealth);
+    OnEffectAdd.AddDynamic(this, &URSAbilitySystem::StartEffect);
 }
 
 // Called when the game starts
 void URSAbilitySystem::BeginPlay()
 {
     Super::BeginPlay();
-
-    // ...
-    
 }
 
 // Called every frame
@@ -43,5 +42,55 @@ void URSAbilitySystem::ChangeHealth(float const DamageTaken)
             bIsDead = !bIsDead;
         }
     }
+}
+
+void URSAbilitySystem::ChangeHealthOnEffects()
+{
+    this->SumEffectValue = 0;
+
+    //UE_LOG(LogTemp, Warning, TEXT("%f"), Effects[0].Value);
+     /*for (URSEffect Effect : this->Effects)
+    {
+        if (Effect.TimeActive > 0)
+        {
+            if (Effect.IsDamage)
+            {
+                SumEffectValue -= Effect.Value;
+            }
+            else
+            {
+                SumEffectValue += Effect.Value;
+            }    
+        }
+        Effect.TimeActive--;
+    }
+    ChangeHealth(SumEffectValue);
+
+    if(SumEffectValue == 0)
+    {
+        GetOwner()->GetWorldTimerManager().ClearTimer(TEffectChange);
+    }
+    */
     
 }
+
+
+void URSAbilitySystem::StartEffect(bool IsDamage, float EffectVal, float EffectTime)
+{
+    if(!IsDamage)
+    {
+        EffectVal *= -1;
+    }
+    
+    NewEffect.IsDamage = IsDamage;
+    NewEffect.Value = EffectVal;
+    NewEffect.TimeActive = EffectTime;
+    Effects.Add(NewEffect);
+    
+    GetOwner()->GetWorldTimerManager().SetTimer(TEffectChange, this, &URSAbilitySystem::ChangeHealthOnEffects, 1.0f, true);
+    
+    UE_LOG(LogTemp, Warning, TEXT("Is damage %d \n Effect Value %f \n Effect Time %f "),
+        IsDamage, EffectVal, EffectTime);
+}
+
+

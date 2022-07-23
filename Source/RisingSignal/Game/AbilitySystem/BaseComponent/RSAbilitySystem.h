@@ -3,13 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RSEffect.h"
 #include "Components/ActorComponent.h"
+#include "Trace/Detail/EventNode.h"
 #include "RSAbilitySystem.generated.h"
 
-// Delegate for assignment some health changes
+// Delegate for assignment some health changes, return current health
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHealthChanged, float, Health);
 // Delegate for call on change health
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeHealth, float, Damage);
+//Delegate for getting effects on health value
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAddEffect, bool, IsDamage, float, EffectValue, float, EffectTime);
 // Delegate for assignment death event
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
 
@@ -24,6 +28,11 @@ public:
     
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+    TArray<URSEffect> Effects;
+    URSEffect NewEffect;
+    
+    UPROPERTY(VisibleAnywhere, BlueprintCallable)
+    FAddEffect OnEffectAdd;
     /** Declare delegate @name FHealthChanged
      */
     UPROPERTY(VisibleAnywhere, BlueprintAssignable)
@@ -43,16 +52,30 @@ public:
      */
     UFUNCTION()
     void ChangeHealth(float const DamageTaken);
+    UFUNCTION()
+    void ChangeHealthOnEffects();
 
     // TODO: Maybe erase this func, dont know why it is needed
     // Getter for return current Health value
     UFUNCTION(BlueprintCallable, BlueprintPure)
     float GetHealth() const {return  Health;}
 
+    UFUNCTION()
+    void StartEffect(bool const IsDamage, float const EffectValue, float const EffectTime);
+    
+
 protected:
     // Called when the game starts
     virtual void BeginPlay() override;
 
+
+private:
+
+    FTimerHandle TEffectChange;
+    
+    UPROPERTY()
+    float SumEffectValue;
+    
     // UPROPERTIES
     UPROPERTY(EditDefaultsOnly, Category = "Ability states")
     bool bNeedHealth;
@@ -76,4 +99,6 @@ protected:
 
     UPROPERTY(VisibleDefaultsOnly, Category = "Ability states")
     bool bIsDead = false;
+
+    
 };
