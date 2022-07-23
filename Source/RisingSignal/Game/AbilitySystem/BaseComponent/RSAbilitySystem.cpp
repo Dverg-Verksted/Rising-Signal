@@ -77,6 +77,7 @@ void URSAbilitySystem::ChangeHealthOnEffects()
 
 void URSAbilitySystem::StartEffect(bool IsDamage, float EffectVal, float EffectTime)
 {
+    if (!NewEffect) return;
     if(!IsDamage)
     {
         EffectVal *= -1;
