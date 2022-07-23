@@ -4,6 +4,17 @@
 #include "Engine/DataTable.h"
 #include "InteractDataItem.generated.h"
 
+USTRUCT(BlueprintType)
+struct FCelRange
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "1", ClampMax = "2000"))
+    int32 Min = 1;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "1", ClampMax = "2000"))
+    int32 Max = 50;
+};
+
 UENUM(BlueprintType)
 enum class ETypeItem : uint8
 {
@@ -40,30 +51,18 @@ struct FDataInteract : public FTableRowBase
     FSoftObjectPath MeshItem;
 
 #pragma region InvItem
-    
-    // @private Description item
+
+    // @private Interval count range
     UPROPERTY(EditDefaultsOnly, Category = "Settings Data Item",
-        meta = (DisplayName = "Иконка предмета", AllowedClasses = "Texture2D", ToolTip = "Выберите иконку предмета",
+        meta = (DisplayName = "Правила предметов", ToolTip = "Укажите таблицу и строку данной таблиц правил по передачи их в инвентарь",
             EditCondition = "TypeItem == ETypeItem::InvItem", EditConditionHides))
-    FSoftObjectPath TextureItem;
+    FDataTableRowHandle RowRuleInvItem;
 
-    // @private State is Stackable
+    // @private Interval count range
     UPROPERTY(EditDefaultsOnly, Category = "Settings Data Item",
-        meta = (DisplayName = "Предмет стаковый?", ToolTip = "Данный предмет стаковый ?", EditCondition = "TypeItem == ETypeItem::InvItem",
-            EditConditionHides))
-    bool bStackable = false;
-    
-    // @private State is Stackable
-    UPROPERTY(EditDefaultsOnly, Category = "Settings Data Item",
-        meta = (DisplayName = "Предмет можно использовать?", ToolTip = "Поставьте галочку если данный предмет можно использовать",
-        EditCondition = "TypeItem == ETypeItem::InvItem", EditConditionHides))
-    bool bCanUse = false;
-
-    // @private State is Stackable
-    UPROPERTY(EditDefaultsOnly, Category = "Settings Data Item",
-        meta = (DisplayName = "Предмет можно скрафтить?", ToolTip = "Поставьте галочку если данный предмет можно скрафтить",
-        EditCondition = "TypeItem == ETypeItem::InvItem", EditConditionHides))
-    bool bCanCraft = false;
+        meta = (DisplayName = "Интервал количества предметов", ToolTip = "Укажите диапозон количество предметов от которого будет выбрано случайное число для передачи в инвентарь",
+            EditCondition = "TypeItem == ETypeItem::InvItem", EditConditionHides))
+    FCelRange IntervalCount{1, 50};
 
 #pragma endregion
 
