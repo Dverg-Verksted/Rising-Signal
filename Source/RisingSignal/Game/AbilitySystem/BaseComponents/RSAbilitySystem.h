@@ -27,11 +27,6 @@ public:
     URSAbilitySystem();
     
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-    UPROPERTY()
-    TArray<URSEffect*> Effects;
-    UPROPERTY()
-    URSEffect* NewEffect;
     
     UPROPERTY(VisibleAnywhere, BlueprintCallable)
     FAddEffect OnEffectAdd;
@@ -63,7 +58,7 @@ public:
     float GetHealth() const {return  Health;}
 
     UFUNCTION()
-    void StartEffect(bool const IsDamage, float const EffectValue, float const EffectTime);
+    void AddEffect(bool const IsDamage, float const EffectValue, float const EffectTime);
     
 
 protected:
@@ -73,6 +68,9 @@ protected:
 
 private:
 
+    UPROPERTY()
+    URSEffect* EffectSystem;
+    
     FTimerHandle TEffectChange;
     
     UPROPERTY()
