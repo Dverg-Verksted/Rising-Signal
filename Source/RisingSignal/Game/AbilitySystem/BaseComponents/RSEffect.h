@@ -18,6 +18,7 @@ struct FEffect
     UPROPERTY()
     float TimeActive = 0.0f;
     
+    void ChangeTimeActive(float MinusVal){TimeActive -= MinusVal;}
 };
 
 /**

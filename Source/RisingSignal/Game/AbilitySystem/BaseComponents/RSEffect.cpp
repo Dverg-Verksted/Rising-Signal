@@ -16,8 +16,8 @@ void URSEffect::AddEffect(bool const IsDamage, float const EffectVal, float cons
 {
 
     NewEffect.IsDamage = IsDamage;
-    NewEffect->Value = EffectVal;
-    NewEffect->TimeActive = EffectTime;
+    NewEffect.Value = EffectVal;
+    NewEffect.TimeActive = EffectTime;
     ArrEffects.Add(NewEffect);
     LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("%d"),ArrEffects.Num()));
 
@@ -26,25 +26,27 @@ void URSEffect::AddEffect(bool const IsDamage, float const EffectVal, float cons
 float URSEffect::GetEffectSumValue()
 {
     float SumEffectValue = 0.0f;
-    for (const auto Effect : ArrEffects)
+    for (auto Effect : ArrEffects)
     {
-        if(Effect->IsDamage)
+        if (Effect.TimeActive <= 0.0)
         {
-            SumEffectValue -= Effect->Value;
+            //ArrEffects.Remove(Effect);
         }
         else
         {
-            SumEffectValue += Effect->Value;
-        }
-
-        Effect->TimeActive--;
-        
-        if (Effect->TimeActive <= 0)
-        {
-            ArrEffects.Remove(Effect);
+            Effect.TimeActive--;
+            if(Effect.IsDamage)
+            {
+                SumEffectValue += Effect.Value;
+            }
+            else
+            {
+                SumEffectValue -= Effect.Value;
+            }
         }
     }
 
     return SumEffectValue;
 }
+
 

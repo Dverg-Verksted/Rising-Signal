@@ -21,6 +21,8 @@ void URSAbilitySystem::BeginPlay()
 
     OnChangeHealth.AddDynamic(this, &URSAbilitySystem::ChangeHealth);
     OnEffectAdd.AddDynamic(this, &URSAbilitySystem::AddEffect);
+    EffectSystem = NewObject<URSEffect>(this);
+    
 }
 
 // Called every frame
