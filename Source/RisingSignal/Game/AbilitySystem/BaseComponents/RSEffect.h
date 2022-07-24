@@ -17,8 +17,12 @@ struct FEffect
     float Value = 0.0f;
     UPROPERTY()
     float TimeActive = 0.0f;
-    
-    void ChangeTimeActive(float MinusVal){TimeActive -= MinusVal;}
+
+    // default constructor
+    FEffect()
+    {
+        
+    }
 };
 
 /**
@@ -37,7 +41,19 @@ public:
 
     float GetEffectSumValue();
 
-    int GetEffectsNum(){return ArrEffects.Num();}
+    int GetEffectsNum()
+    {
+        int32 CountActive = 0;
+        for (auto &Effect : ArrEffects)
+        {
+            if (Effect.TimeActive > 0)
+            {
+                CountActive++;
+            }
+        }
+
+        return CountActive;
+    }
     
 private:
 
