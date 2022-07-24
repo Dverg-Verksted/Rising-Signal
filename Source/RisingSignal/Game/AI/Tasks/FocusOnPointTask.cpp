@@ -32,14 +32,15 @@ EBTNodeResult::Type UFocusOnPointTask::ExecuteTask(UBehaviorTreeComponent& Owner
 
     float YawRotation = (AimLocation - PawnLocation).Rotation().Yaw;
 
-    const float DeltaAngle = UKismetMathLibrary::NormalizeAxis(FMath::FindDeltaAngleDegrees(PawnRotationYaw, YawRotation));
+    const float DeltaAngle = FMath::FindDeltaAngleDegrees(PawnRotationYaw, YawRotation);
 
-    if (DeltaAngle <= PrecisionAngle)
+    if (FMath::Abs(DeltaAngle) <= PrecisionAngle)
         return EBTNodeResult::Succeeded;
 
-    YawRotation = PawnRotationYaw + DeltaAngle;
+    YawRotation = UKismetMathLibrary::NormalizeAxis(PawnRotationYaw + DeltaAngle);
 
-    TaskMemory->TargetYawRotation = YawRotation;
+    TaskMemory->StartYawRotation = PawnRotationYaw;
+    TaskMemory->EndYawRotation = YawRotation;
     TaskMemory->AICharacter = Pawn;
 
     return EBTNodeResult::InProgress;
@@ -53,20 +54,24 @@ uint16 UFocusOnPointTask::GetInstanceMemorySize() const
 void UFocusOnPointTask::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
     const FBTRotateToPointTaskMemory* TaskMemory = (FBTRotateToPointTaskMemory*)NodeMemory;
-    //static_cast<const FBTRotateToPointTaskMemory*>(NodeMemory);
+
     if (!TaskMemory || !TaskMemory->AICharacter)
         FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 
     const float CurrentRotation = TaskMemory->AICharacter->GetActorRotation().Yaw;
-    const float TargetRotation = TaskMemory->TargetYawRotation;
+    const float TargetRotation = TaskMemory->EndYawRotation;
 
-    LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("CurrentYaw = %f, TargetYaw = %f"), CurrentRotation, TargetRotation));
+    // LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("CurrentYaw = %f, TargetYaw = %f"), CurrentRotation, TargetRotation));
 
     const float NewYawRotation = FMath::FInterpConstantTo(CurrentRotation, TargetRotation, DeltaSeconds, TurnSpeed);
     const float DeltaYaw = NewYawRotation - TargetRotation;
 
     TaskMemory->AICharacter->SetActorRotation(FRotator(0, NewYawRotation, 0));
 
-    if (DeltaYaw <= PrecisionAngle)
+    if (FMath::Abs(DeltaYaw) <= PrecisionAngle)
+    {
+        // UE_LOG(LogTemp, Warning, TEXT("DeltaYaw = %f, PrecisionAngle = %f"), DeltaYaw, PrecisionAngle);
+
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+    }
 }

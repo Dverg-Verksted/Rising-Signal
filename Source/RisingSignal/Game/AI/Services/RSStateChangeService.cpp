@@ -23,31 +23,43 @@ void URSStateChangeService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
         {
             case EAIState::Idle:
             {
-                if (Blackboard->GetValueAsBool(IsPatrollingKey.SelectedKeyName) ||
-                    Blackboard->GetValueAsBool(IsAttackingKey.SelectedKeyName))
-                {
-                    Blackboard->SetValueAsBool(IsPatrollingKey.SelectedKeyName, false);
-                    Blackboard->SetValueAsBool(IsAttackingKey.SelectedKeyName, false);
-                }
+                Blackboard->SetValueAsBool(IsIdleKey.SelectedKeyName, true);
+                Blackboard->SetValueAsBool(IsPatrolKey.SelectedKeyName, false);
+                Blackboard->SetValueAsBool(IsThreatKey.SelectedKeyName, false);
+                Blackboard->SetValueAsBool(IsAttackKey.SelectedKeyName, false);
+
                 break;
             }
             case EAIState::Patrol:
             {
-                if (!Blackboard->GetValueAsBool(IsPatrollingKey.SelectedKeyName))
-                {
-                    Blackboard->SetValueAsBool(IsPatrollingKey.SelectedKeyName, true);
-                    Blackboard->SetValueAsBool(IsAttackingKey.SelectedKeyName, false);
-                }
+                Blackboard->SetValueAsBool(IsIdleKey.SelectedKeyName, false);
+                Blackboard->SetValueAsBool(IsPatrolKey.SelectedKeyName, true);
+                Blackboard->SetValueAsBool(IsThreatKey.SelectedKeyName, false);
+                Blackboard->SetValueAsBool(IsAttackKey.SelectedKeyName, false);
+                break;
+            }
+            case EAIState::Threaten:
+            {
+                Blackboard->SetValueAsBool(IsIdleKey.SelectedKeyName, false);
+                Blackboard->SetValueAsBool(IsPatrolKey.SelectedKeyName, false);
+                Blackboard->SetValueAsBool(IsThreatKey.SelectedKeyName, true);
+                Blackboard->SetValueAsBool(IsAttackKey.SelectedKeyName, false);
                 break;
             }
             case EAIState::Attack:
             {
-                if (!Blackboard->GetValueAsBool(IsAttackingKey.SelectedKeyName))
-                {
-                    Blackboard->SetValueAsBool(IsPatrollingKey.SelectedKeyName, false);
-                    Blackboard->SetValueAsBool(IsAttackingKey.SelectedKeyName, true);
-                }
+                Blackboard->SetValueAsBool(IsIdleKey.SelectedKeyName, false);
+                Blackboard->SetValueAsBool(IsPatrolKey.SelectedKeyName, false);
+                Blackboard->SetValueAsBool(IsThreatKey.SelectedKeyName, false);
+                Blackboard->SetValueAsBool(IsAttackKey.SelectedKeyName, true);
                 break;
+            }
+            default:
+            {
+                Blackboard->SetValueAsBool(IsIdleKey.SelectedKeyName, false);
+                Blackboard->SetValueAsBool(IsPatrolKey.SelectedKeyName, false);
+                Blackboard->SetValueAsBool(IsThreatKey.SelectedKeyName, false);
+                Blackboard->SetValueAsBool(IsAttackKey.SelectedKeyName, false);
             }
         }
     }
