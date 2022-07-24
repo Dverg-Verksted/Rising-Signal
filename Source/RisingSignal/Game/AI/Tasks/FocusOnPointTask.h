@@ -13,8 +13,11 @@ struct FBTRotateToPointTaskMemory
     /* AI Character */
     ARSAICharacter* AICharacter;
 
-    /* Yaw Rotation */
-    float TargetYawRotation;
+    /* Start Yaw Rotation */
+    float StartYawRotation;
+
+    /* End Yaw Rotation */
+    float EndYawRotation;
 };
 
 
@@ -31,7 +34,7 @@ public:
 
     // Getting data for MemoryNode
     virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-    
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aim")
     FBlackboardKeySelector FocusAimKey;
 
