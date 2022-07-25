@@ -1,4 +1,4 @@
-// It is owned by the company Dverg Verksted.
+﻿// It is owned by the company Dverg Verksted.
 
 #pragma once
 
@@ -13,13 +13,16 @@ struct FBTRotateToPointTaskMemory
     /* AI Character */
     ARSAICharacter* AICharacter;
 
-    /* Yaw Rotation */
-    float TargetYawRotation;
+    /* Start Yaw Rotation */
+    float StartYawRotation;
+
+    /* End Yaw Rotation */
+    float EndYawRotation;
 };
 
 
 /**
- * 
+ * Task to constantly rotate AICharacter to direction to point 
  */
 UCLASS()
 class RISINGSIGNAL_API UFocusOnPointTask : public UBTTaskNode
@@ -29,11 +32,22 @@ class RISINGSIGNAL_API UFocusOnPointTask : public UBTTaskNode
 public:
     UFocusOnPointTask();
 
+    // Getting data for MemoryNode
     virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aim")
     FBlackboardKeySelector FocusAimKey;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aim", meta = (ToolTip = "Остаточный угол при котором останавливается вращение"))
+    float PrecisionAngle = 10.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aim", meta = (ToolTip = "Скорость вращения персонажа"))
+    float TurnSpeed = 50;
+
+    virtual uint16 GetInstanceMemorySize() const override;
+
+
 protected:
+    // Rotating character
     virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 };

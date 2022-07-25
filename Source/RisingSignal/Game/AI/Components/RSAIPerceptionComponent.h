@@ -1,4 +1,4 @@
-// It is owned by the company Dverg Verksted.
+﻿// It is owned by the company Dverg Verksted.
 
 #pragma once
 
@@ -13,4 +13,11 @@ UCLASS()
 class RISINGSIGNAL_API URSAIPerceptionComponent : public UAIPerceptionComponent
 {
     GENERATED_BODY()
+
+public:
+    AActor* GetClosestEnemy() const;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug",
+        meta = (ToolTip = "Отображать дебаг информацию", ConsoleVariable = "r.Wolf.ShowDebugInfo"))
+    bool bShowDebugInfo = false;
 };

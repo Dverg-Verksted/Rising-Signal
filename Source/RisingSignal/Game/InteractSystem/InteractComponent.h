@@ -7,6 +7,7 @@
 #include "Library/RSFunctionLibrary.h"
 #include "InteractComponent.generated.h"
 
+class UJournalSystem;
 class ARSGamePlayerController;
 class AInteractItemActor;
 class UBoxComponent;
@@ -56,7 +57,7 @@ private:
     FVector SizeBoxCollision{50.f};
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Interact", meta = (AllowPrivateAccess = true))
-    float RateTimeChecked{1.0f};
+    float RateTimeChecked{0.25f};
 
     // @private Owner Actor component
     UPROPERTY()
@@ -65,6 +66,10 @@ private:
     // @private Owner Controller actor
     UPROPERTY()
     ARSGamePlayerController* PlayerController;
+
+    // @private Pointer on UJournalSystem
+    UPROPERTY()
+    UJournalSystem* JournalSystem;
 
     // @private Box Collision component
     UPROPERTY()
@@ -88,6 +93,18 @@ private:
     void RegisterEndOverlapInteractItem(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
     /**
+     * @private Add item
+     * @param1 AInteractItemActor
+     **/
+    void AddItem(AInteractItemActor* InteractItem);
+
+    /**
+     * @private Remove item
+     * @param1 AInteractItemActor
+     **/
+    void RemoveItem(AInteractItemActor* InteractItem);
+    
+    /**
      * @private Checking the distance and changing the target object
      **/
     void CheckDistanceToItem();
@@ -97,6 +114,10 @@ private:
      **/
     UFUNCTION()
     void RegisterInteractEvent();
+
+    void SendNoteData(const struct FDataInteract* DataInteract) const;
+    void SendAudioData(const struct FDataInteract* DataInteract) const;
+    void SendPhotoData(const struct FDataInteract* DataInteract) const;
 
 #pragma endregion
 
