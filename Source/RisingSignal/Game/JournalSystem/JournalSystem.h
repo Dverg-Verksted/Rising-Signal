@@ -28,7 +28,7 @@ struct FInteractItemNote
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
     FText NoteDate;
 
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал", meta = (AllowedClasses= "World"))
     FSoftObjectPath NoteMap;
     
     bool operator==(const FInteractItemNote& Other) const
@@ -45,8 +45,11 @@ struct FInteractItemAudio
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
     FText AudioHeader;
     
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал", meta = (AllowedClasses= "World"))
     FSoftObjectPath AudioMap;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал", meta = (AllowedClasses = "SoundCue"))
+    FSoftObjectPath JournalAudio;
 
     bool operator==(const FInteractItemAudio& Other) const
     {
@@ -62,8 +65,11 @@ struct FInteractItemPhoto
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
     FText PhotoHeader;
 
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал")
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал", meta = (AllowedClasses= "World"))
     FSoftObjectPath PhotoMap;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Журнал", meta = (AllowedClasses = "Texture2D"))
+    FSoftObjectPath JournalPhoto;
 
     bool operator==(const FInteractItemPhoto& Other) const
     {
@@ -137,15 +143,15 @@ public:
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
     void GetNextJournalState(EStateJournalSystem NextState);
 
-    // Get element by Index
-    UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    FInteractItemNote GetNoteObjByIndex(int32 LevelIndex, int32 NotesIndex);
-
-    UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    FInteractItemAudio GetAudioObjByIndex(int32 LevelIndex, int32 NotesIndex);
-
-    UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    FInteractItemPhoto GetPhotoObjByIndex(int32 LevelIndex, int32 NotesIndex);
+    // // Get element by Index
+    // UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
+    // FInteractItemNote GetNoteObjByIndex(int32 LevelIndex, int32 NotesIndex);
+    //
+    // UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
+    // FInteractItemAudio GetAudioObjByIndex(int32 LevelIndex, int32 NotesIndex);
+    //
+    // UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
+    // FInteractItemPhoto GetPhotoObjByIndex(int32 LevelIndex, int32 NotesIndex);
 
     // Get array size
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
@@ -159,23 +165,23 @@ public:
 
     // Get array
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    TArray<FChapterDataNote> GetAllNote();
+    TArray<FInteractItemNote> GetAllNote();
     
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    TArray<FChapterDataAudio> GetAllAudio();
+    TArray<FInteractItemAudio> GetAllAudio();
     
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    TArray<FChapterDataPhoto> GetAllPhoto();
+    TArray<FInteractItemPhoto> GetAllPhoto();
 
-    // Get Chapter's Index
-    UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    int32 GetNoteChapterIndex(FString NoteName);
+    // // Get Chapter's Index
+    // UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
+    // int32 GetNoteChapterIndex(FString NoteName);
 
-    UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    int32 GetAudioChapterIndex(FString AudioName);
-
-    UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    int32 GetPhotoChapterIndex(FString PhotoName);
+    // UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
+    // int32 GetAudioChapterIndex(FString AudioName);
+    //
+    // UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
+    // int32 GetPhotoChapterIndex(FString PhotoName);
 
     // Delete element by Index
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Delete")
@@ -208,11 +214,11 @@ private:
     EStateJournalSystem StateJournalSystem = EStateJournalSystem::Note;
 
     UPROPERTY()
-    TArray<FChapterDataNote> ArrNoteObj;
+    TArray<FInteractItemNote> ArrNoteObj;
 
     UPROPERTY()
-    TArray<FChapterDataAudio> ArrAudioObj;
+    TArray<FInteractItemAudio> ArrAudioObj;
 
     UPROPERTY()
-    TArray<FChapterDataPhoto> ArrPhotoObj;
+    TArray<FInteractItemPhoto> ArrPhotoObj;
 };

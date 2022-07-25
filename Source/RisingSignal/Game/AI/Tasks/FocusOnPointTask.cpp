@@ -6,6 +6,7 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Game/AI/RSAICharacter.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Library/RSFunctionLibrary.h"
 
 UFocusOnPointTask::UFocusOnPointTask()
@@ -20,7 +21,7 @@ EBTNodeResult::Type UFocusOnPointTask::ExecuteTask(UBehaviorTreeComponent& Owner
 
     const AAIController* Controller = OwnerComp.GetAIOwner();
     const UBlackboardComponent* Blackboard = OwnerComp.GetBlackboardComponent();
-    if (!Controller || !Blackboard) FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+    if (!Controller || !Blackboard) return EBTNodeResult::Failed;
 
     ARSAICharacter* Pawn = Cast<ARSAICharacter>(Controller->GetPawn());
     if (!Pawn) return EBTNodeResult::Failed;
@@ -31,29 +32,46 @@ EBTNodeResult::Type UFocusOnPointTask::ExecuteTask(UBehaviorTreeComponent& Owner
 
     float YawRotation = (AimLocation - PawnLocation).Rotation().Yaw;
 
-    YawRotation = PawnRotationYaw + FMath::FindDeltaAngleDegrees(PawnRotationYaw, YawRotation);
+    const float DeltaAngle = FMath::FindDeltaAngleDegrees(PawnRotationYaw, YawRotation);
 
-    TaskMemory->TargetYawRotation = YawRotation;
+    if (FMath::Abs(DeltaAngle) <= PrecisionAngle)
+        return EBTNodeResult::Succeeded;
+
+    YawRotation = UKismetMathLibrary::NormalizeAxis(PawnRotationYaw + DeltaAngle);
+
+    TaskMemory->StartYawRotation = PawnRotationYaw;
+    TaskMemory->EndYawRotation = YawRotation;
     TaskMemory->AICharacter = Pawn;
 
     return EBTNodeResult::InProgress;
 }
 
+uint16 UFocusOnPointTask::GetInstanceMemorySize() const
+{
+    return sizeof(FBTRotateToPointTaskMemory);
+}
+
 void UFocusOnPointTask::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
     const FBTRotateToPointTaskMemory* TaskMemory = (FBTRotateToPointTaskMemory*)NodeMemory;
+
     if (!TaskMemory || !TaskMemory->AICharacter)
         FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 
     const float CurrentRotation = TaskMemory->AICharacter->GetActorRotation().Yaw;
-    const float TargetRotation = TaskMemory->TargetYawRotation;
+    const float TargetRotation = TaskMemory->EndYawRotation;
 
     // LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("CurrentYaw = %f, TargetYaw = %f"), CurrentRotation, TargetRotation));
 
-    const float NewYawRotation = FMath::FInterpConstantTo(CurrentRotation, TargetRotation, DeltaSeconds, 250);
+    const float NewYawRotation = FMath::FInterpConstantTo(CurrentRotation, TargetRotation, DeltaSeconds, TurnSpeed);
+    const float DeltaYaw = NewYawRotation - TargetRotation;
 
     TaskMemory->AICharacter->SetActorRotation(FRotator(0, NewYawRotation, 0));
 
-    if (FMath::IsNearlyEqual(NewYawRotation, TargetRotation))
+    if (FMath::Abs(DeltaYaw) <= PrecisionAngle)
+    {
+        // UE_LOG(LogTemp, Warning, TEXT("DeltaYaw = %f, PrecisionAngle = %f"), DeltaYaw, PrecisionAngle);
+
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+    }
 }
