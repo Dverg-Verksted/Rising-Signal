@@ -1,7 +1,6 @@
 // It is owned by the company Dverg Verksted.
 
 #include "Game/InteractSystem/InteractItemActor.h"
-#include "InteractItemDataAsset.h"
 #include "Components/WidgetComponent.h"
 #include "Engine/AssetManager.h"
 #include "Library/RSFunctionLibrary.h"
@@ -21,9 +20,16 @@ AInteractItemActor::AInteractItemActor()
 
     this->WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(FName("3D Widget component"));
     this->WidgetComponent->SetupAttachment(this->Mesh);
-    
+
     static ConstructorHelpers::FClassFinder<UInteractWidget> UnitSelector(TEXT("/Game/RisingSignal/Core/HUD/UI_UserHUD/Widgets/WBP_InteractText"));
     SubInteractWidget = UnitSelector.Class;
+
+    static ConstructorHelpers::FObjectFinder<UDataTable> InteractItemDT(TEXT("DataTable'/Game/RisingSignal/Core/InteractItems/DT_DataInteract.DT_DataInteract'"));
+    DataTableInteractItem = InteractItemDT.Object;
+    if (DataTableInteractItem)
+    {
+        InteractData.DataTable = DataTableInteractItem;
+    }
 }
 
 // Called when the game starts or when spawned
@@ -49,11 +55,18 @@ void AInteractItemActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyC
 
     LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Name changed property: %s"), *PropertyChangedEvent.Property->GetName()));
 
-    if (PropertyChangedEvent.Property->GetName() == TEXT("InteractItem") && this->InteractItem)
+    if (PropertyChangedEvent.Property->GetName() == TEXT("RowName") && InteractData.DataTable)
     {
-        UStaticMesh* L_Mesh = LoadObject<UStaticMesh>(nullptr, *(this->InteractItem->GetMeshItem().ToString()));
+        const FDataInteract* DataInteract = InteractData.DataTable->FindRow<FDataInteract>(InteractData.RowName, "");
+        if (!DataInteract) return;
+        
+        UStaticMesh* L_Mesh = LoadObject<UStaticMesh>(nullptr, *(DataInteract->MeshItem.ToString()));
         if (!L_Mesh) return;
         this->Mesh->SetStaticMesh(L_Mesh);
+
+        this->TypeItem = DataInteract->TypeItem;
+        this->NameItem = DataInteract->NameItem;
+        this->DescriptionItem = DataInteract->DescriptionItem;
     }
 }
 
