@@ -20,5 +20,16 @@ public:
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
-    URSAIPerceptionComponent* RSAIPerceprionComponent;
+    URSAIPerceptionComponent* RSAIPerceptionComponent;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI",
+        meta = (ToolTip = "Имя ключа в blackboard для сохранения вражеского актора"))
+    FName FocusOnKeyName = "EnemyActor";
+
+    virtual void Tick(float DeltaSeconds) override;
+
+public: // private:
+
+    //Get from blackboard key, actor to focus on
+    AActor* GetActorToFocusOn() const;
 };

@@ -6,9 +6,6 @@
 UJournalSystem::UJournalSystem()
 {
     PrimaryComponentTick.bCanEverTick = false;
-    ArrNoteObj.SetNum(10);
-    ArrAudioObj.SetNum(10);
-    ArrPhotoObj.SetNum(10);
 }
 
 void UJournalSystem::AddNoteItem(FInteractItemNote& NewNoteObj)
@@ -29,13 +26,15 @@ void UJournalSystem::AddNoteItem(FInteractItemNote& NewNoteObj)
         return;
     }
     
-    const int32 IndexStruct = GetNoteChapterIndex(NewNoteObj.NoteMap.GetAssetName());
+    // const int32 IndexStruct = GetNoteChapterIndex(NewNoteObj.NoteMap.GetAssetName());
 
-    if (this->ArrNoteObj.IsValidIndex(IndexStruct))
-    {
-        OnJournalSystemUpdate.Broadcast();
-        this->ArrNoteObj[IndexStruct].ArrNote.AddUnique(NewNoteObj);
-    }
+    // if (this->ArrNoteObj.IsValidIndex(IndexStruct))
+    // {
+    //     OnJournalSystemUpdate.Broadcast();
+    //     this->ArrNoteObj[IndexStruct].ArrNote.AddUnique(NewNoteObj);
+    // }
+
+    this->ArrNoteObj.AddUnique(NewNoteObj);
     
     //debug
     {
@@ -69,13 +68,15 @@ void UJournalSystem::AddAudioItem(FInteractItemAudio& NewAudioObj)
         return;
     }
 
-    const int32 IndexStruct = GetAudioChapterIndex(NewAudioObj.AudioMap.GetAssetName());
+    this->ArrAudioObj.AddUnique(NewAudioObj);
+    // const int32 IndexStruct = GetAudioChapterIndex(NewAudioObj.AudioMap.GetAssetName());
+    //
+    // if (this->ArrAudioObj.IsValidIndex(IndexStruct))
+    // {
+    //     OnJournalSystemUpdate.Broadcast();
+    //     this->ArrAudioObj[IndexStruct].ArrAudio.AddUnique(NewAudioObj);
+    // }
     
-    if (this->ArrAudioObj.IsValidIndex(IndexStruct))
-    {
-        OnJournalSystemUpdate.Broadcast();
-        this->ArrAudioObj[IndexStruct].ArrAudio.AddUnique(NewAudioObj);
-    }
 }
 
 void UJournalSystem::AddPhotoItem(FInteractItemPhoto& NewPhotoObj)
@@ -90,14 +91,16 @@ void UJournalSystem::AddPhotoItem(FInteractItemPhoto& NewPhotoObj)
         LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("The field JournalPhoto: %s is not pointing to a live object"), *NewPhotoObj.PhotoMap.GetAssetName()));
         return;
     }
+
+    this->ArrPhotoObj.AddUnique(NewPhotoObj);
+    // const int32 IndexStruct = GetAudioChapterIndex(NewPhotoObj.PhotoMap.GetAssetName());
+    //
+    // if (this->ArrPhotoObj.IsValidIndex(IndexStruct))
+    // {
+    //     OnJournalSystemUpdate.Broadcast();
+    //     this->ArrPhotoObj[IndexStruct].ArrPhoto.AddUnique(NewPhotoObj);
+    // }
     
-    const int32 IndexStruct = GetAudioChapterIndex(NewPhotoObj.PhotoMap.GetAssetName());
-    
-    if (this->ArrPhotoObj.IsValidIndex(IndexStruct))
-    {
-        OnJournalSystemUpdate.Broadcast();
-        this->ArrPhotoObj[IndexStruct].ArrPhoto.AddUnique(NewPhotoObj);
-    }
 }
 
 void UJournalSystem::GetNextJournalState(EStateJournalSystem NextState)
@@ -105,50 +108,50 @@ void UJournalSystem::GetNextJournalState(EStateJournalSystem NextState)
     StateJournalSystem = NextState;
 }
 
-FInteractItemNote UJournalSystem::GetNoteObjByIndex(int32 LevelIndex, int32 NotesIndex)
-{
-    if (this->ArrNoteObj.IsValidIndex(LevelIndex))
-    {
-        if (this->ArrNoteObj[LevelIndex].ArrNote.IsValidIndex(NotesIndex))
-        {
-            return this->ArrNoteObj[LevelIndex].ArrNote[NotesIndex];
-        }
-        LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Index: %d is not valid"), NotesIndex));
-        return this->ArrNoteObj[LevelIndex].ArrNote[NotesIndex];
-    }
-    LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Index: %d is not valid"), LevelIndex));
-    return this->ArrNoteObj[LevelIndex].ArrNote[NotesIndex];
-}
+// FInteractItemNote UJournalSystem::GetNoteObjByIndex(int32 LevelIndex, int32 NotesIndex)
+// {
+//     if (this->ArrNoteObj.IsValidIndex(LevelIndex))
+//     {
+//         if (this->ArrNoteObj[LevelIndex].ArrNote.IsValidIndex(NotesIndex))
+//         {
+//             return this->ArrNoteObj[LevelIndex].ArrNote[NotesIndex];
+//         }
+//         LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Index: %d is not valid"), NotesIndex));
+//         return this->ArrNoteObj[LevelIndex].ArrNote[NotesIndex];
+//     }
+//     LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Index: %d is not valid"), LevelIndex));
+//     return this->ArrNoteObj[LevelIndex].ArrNote[NotesIndex];
+// }
 
-FInteractItemAudio UJournalSystem::GetAudioObjByIndex(int32 LevelIndex, int32 AudioIndex)
-{
-    if (this->ArrAudioObj.IsValidIndex(LevelIndex))
-    {
-        if (this->ArrAudioObj[LevelIndex].ArrAudio.IsValidIndex(AudioIndex))
-        {
-            return this->ArrAudioObj[LevelIndex].ArrAudio[AudioIndex];
-        }
-        LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("Index: %d is not valid"), AudioIndex));
-        return this->ArrAudioObj[LevelIndex].ArrAudio[AudioIndex];
-    }
-    LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("Index: %d is not valid"), LevelIndex));
-    return this->ArrAudioObj[LevelIndex].ArrAudio[AudioIndex];
-}
-
-FInteractItemPhoto UJournalSystem::GetPhotoObjByIndex(int32 LevelIndex, int32 PhotoIndex)
-{
-    if (this->ArrPhotoObj.IsValidIndex(LevelIndex))
-    {
-        if (this->ArrPhotoObj[LevelIndex].ArrPhoto.IsValidIndex(PhotoIndex))
-        {
-            return this->ArrPhotoObj[LevelIndex].ArrPhoto[PhotoIndex];
-        }
-        LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Index: %d is not valid"), PhotoIndex));
-        return this->ArrPhotoObj[LevelIndex].ArrPhoto[PhotoIndex];
-    }
-    LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Index: %d is not valid"), LevelIndex));
-    return this->ArrPhotoObj[LevelIndex].ArrPhoto[PhotoIndex];
-}
+// FInteractItemAudio UJournalSystem::GetAudioObjByIndex(int32 LevelIndex, int32 AudioIndex)
+// {
+//     if (this->ArrAudioObj.IsValidIndex(LevelIndex))
+//     {
+//         if (this->ArrAudioObj[LevelIndex].ArrAudio.IsValidIndex(AudioIndex))
+//         {
+//             return this->ArrAudioObj[LevelIndex].ArrAudio[AudioIndex];
+//         }
+//         LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("Index: %d is not valid"), AudioIndex));
+//         return this->ArrAudioObj[LevelIndex].ArrAudio[AudioIndex];
+//     }
+//     LOG_RS(ELogRSVerb::Error, FString::Printf(TEXT("Index: %d is not valid"), LevelIndex));
+//     return this->ArrAudioObj[LevelIndex].ArrAudio[AudioIndex];
+// }
+//
+// FInteractItemPhoto UJournalSystem::GetPhotoObjByIndex(int32 LevelIndex, int32 PhotoIndex)
+// {
+//     if (this->ArrPhotoObj.IsValidIndex(LevelIndex))
+//     {
+//         if (this->ArrPhotoObj[LevelIndex].ArrPhoto.IsValidIndex(PhotoIndex))
+//         {
+//             return this->ArrPhotoObj[LevelIndex].ArrPhoto[PhotoIndex];
+//         }
+//         LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Index: %d is not valid"), PhotoIndex));
+//         return this->ArrPhotoObj[LevelIndex].ArrPhoto[PhotoIndex];
+//     }
+//     LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Index: %d is not valid"), LevelIndex));
+//     return this->ArrPhotoObj[LevelIndex].ArrPhoto[PhotoIndex];
+// }
 
 int32 UJournalSystem::GetArrNoteObjSize()
 {
@@ -168,73 +171,73 @@ int32 UJournalSystem::GetArrPhotoObjSize()
     return ArrPhotoObj.Num();
 }
 
-TArray<FChapterDataNote> UJournalSystem::GetAllNote()
+TArray<FInteractItemNote> UJournalSystem::GetAllNote()
 {
     // TODO подумать и добавить проверки?
     return (this->ArrNoteObj);
 }
 
-TArray<FChapterDataAudio> UJournalSystem::GetAllAudio()
+TArray<FInteractItemAudio> UJournalSystem::GetAllAudio()
 {
     // TODO подумать и добавить проверки?
     return (this->ArrAudioObj);
 }
 
-TArray<FChapterDataPhoto> UJournalSystem::GetAllPhoto()
+TArray<FInteractItemPhoto> UJournalSystem::GetAllPhoto()
 {
     // TODO подумать и добавить проверки?
     return (this->ArrPhotoObj);
 }
 
-int32 UJournalSystem::GetNoteChapterIndex(FString NoteName)
-{
-    if (NoteName.IsEmpty()) return 0;
-    int32 Index = 0;
+// int32 UJournalSystem::GetNoteChapterIndex(FString NoteName)
+// {
+//     if (NoteName.IsEmpty()) return 0;
+//     int32 Index = 0;
+//
+//     for (auto& Arr : this->ArrNoteObj)
+//     {
+//         
+//         if (Arr.ChapterName == NoteName)
+//         {
+//             return Index;
+//         }
+//         Index++;
+//     }
+//
+//     return Index;
+// }
 
-    for (auto& Arr : this->ArrNoteObj)
-    {
-        
-        if (Arr.ChapterName == NoteName)
-        {
-            return Index;
-        }
-        Index++;
-    }
-
-    return Index;
-}
-
-int32 UJournalSystem::GetAudioChapterIndex(FString AudioName)
-{
-    if (AudioName.IsEmpty()) return 0;
-    int32 Index = 0;
-    
-    for (auto& Arr : this->ArrAudioObj)
-    {
-        if (Arr.ChapterName == AudioName)
-        {
-            return Index;
-        }
-        Index++;
-    }
-    return Index;
-}
-
-int32 UJournalSystem::GetPhotoChapterIndex(FString PhotoName)
-{
-    if (PhotoName.IsEmpty()) return 0;    
-    int32 Index = 0;
-    
-    for (auto& Arr : this->ArrPhotoObj)
-    {
-        if (Arr.ChapterName == PhotoName)
-        {
-            return Index;
-        }
-        Index++;
-    }
-    return Index;
-}
+// int32 UJournalSystem::GetAudioChapterIndex(FString AudioName)
+// {
+//     if (AudioName.IsEmpty()) return 0;
+//     int32 Index = 0;
+//     
+//     for (auto& Arr : this->ArrAudioObj)
+//     {
+//         if (Arr.ChapterName == AudioName)
+//         {
+//             return Index;
+//         }
+//         Index++;
+//     }
+//     return Index;
+// }
+//
+// int32 UJournalSystem::GetPhotoChapterIndex(FString PhotoName)
+// {
+//     if (PhotoName.IsEmpty()) return 0;    
+//     int32 Index = 0;
+//     
+//     for (auto& Arr : this->ArrPhotoObj)
+//     {
+//         if (Arr.ChapterName == PhotoName)
+//         {
+//             return Index;
+//         }
+//         Index++;
+//     }
+//     return Index;
+// }
 
 void UJournalSystem::DeleteNoteObjByIndex(int32 Index)
 {

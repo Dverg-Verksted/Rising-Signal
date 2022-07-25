@@ -19,12 +19,17 @@ public:
 
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "States")
-    FBlackboardKeySelector IsPatrollingKey;
+    FBlackboardKeySelector IsIdleKey;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "States")
-    FBlackboardKeySelector IsAttackingKey;
+    FBlackboardKeySelector IsPatrolKey;
 
-    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "States")
+    FBlackboardKeySelector IsThreatKey;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "States")
+    FBlackboardKeySelector IsAttackKey;
+
 
     virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 };

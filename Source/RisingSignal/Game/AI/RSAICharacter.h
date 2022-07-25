@@ -6,16 +6,49 @@
 #include "GameFramework/Character.h"
 #include "RSAICharacter.generated.h"
 
+class ARSAIController;
 class URSHealthComponent;
 class UBehaviorTree;
 
 
-UENUM()
+UENUM(BlueprintType)
 enum EAIState
 {
     Idle,
     Patrol,
-    Attack
+    Threaten,
+    Attack,
+    None
+};
+
+USTRUCT()
+struct FAlertIncreaseData
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, meta = (ToolTip = "Отложенный старт повышения уровня угрозы. -1 - не откладывать"))
+    float LevelUpDelay = -1;
+
+    UPROPERTY(EditAnywhere, meta = (ToolTip = "Частота повышения уровня угрозы", Units = "s"))
+    float LevelUpTimerRate = 0.1;
+
+    UPROPERTY(EditAnywhere, meta = (ToolTip = "На сколько повышается уровень угрозы каждое срабатывание"))
+    float LevelUpValue = 1;
+};
+
+USTRUCT()
+struct FAlertDecreaseData
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, meta = (ToolTip = "Отложенный старт понижения уровня угрозы. -1 - не откладывать"))
+    float LevelDownDelay = -1;
+
+    UPROPERTY(EditAnywhere, meta = (ToolTip = "Частота повышения уровня угрозы", Units = "s"))
+    float LevelDownTimerRate = 0.1;
+
+    UPROPERTY(EditAnywhere, meta = (ToolTip = "На сколько понижается уровень угрозы каждое срабатывание"))
+    float LevelDownValue = 1;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAIStateChangedSignature, EAIState, NewState, EAIState, OldState);
@@ -43,6 +76,13 @@ public:
     UFUNCTION(BlueprintCallable, Category = "AI")
     EAIState GetAIState() const { return CurrentAIState; }
 
+    // Get current Character turn offset
+    UFUNCTION(BlueprintCallable, Category = "Movement")
+    float GetTurnOffset() const { return TurnOffset; }
+
+    UFUNCTION()
+    virtual void AIStateChanged(EAIState NewState, EAIState PrevState);
+
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
@@ -50,10 +90,46 @@ protected:
 
     virtual void BeginPlay() override;
 
-    EAIState CurrentAIState = EAIState::Idle;
+    UPROPERTY()
+    ARSAIController* AIController;
+
+    EAIState CurrentAIState = EAIState::Patrol;
+
+    EAIState LastAIState = CurrentAIState;
+
+    float LastTurnAngle = 0.0f;
+
+    float TurnOffset = 0.0f;
+
+    void CalculateTurnOffset();
+
+    virtual void EnemyNoticed(bool IsNoticed);
+
+    UPROPERTY(EditAnywhere, Category = "Alert")
+    FAlertIncreaseData AlertIncreaseData;
+
+    UPROPERTY(EditAnywhere, Category = "Alert")
+    FAlertDecreaseData AlertDecreaseData;
+
+    void IncreaseAlertLevelUpdate();
+
+    void DecreaseAlertLevelUpdate();
+
+    bool TryToIncreaseAlertLevel(float Value);
+
+    bool TryToDecreaseAlertLevel(float Value);
+
+    void SetAlertLevel(float NewAlertLevel);
+
+    UPROPERTY(meta=(ClampMin = 0.0, ClampMax = 100.0))
+    float CurrentAlertLevel = 0;
+
+    bool IsAlerted() const;
+
+    FTimerHandle IncreaseAlertLevelTimer;
+    FTimerHandle DecreaseAlertLevelTimer;
 
     // virtual void OnDeath();
-
 
 public:
     // Called every frame
