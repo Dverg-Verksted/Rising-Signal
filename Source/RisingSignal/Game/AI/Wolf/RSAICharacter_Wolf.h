@@ -7,6 +7,7 @@
 #include "Game/AI/RSAICharacter.h"
 #include "RSAICharacter_Wolf.generated.h"
 
+class UNiagaraSystem;
 /**
  * 
  */
@@ -28,6 +29,11 @@ public:
     UFUNCTION(BlueprintCallable)
     float GetAlertLevel() const { return CurrentAlertLevel; }
 
+    virtual void Attack(AActor* AttackActor) override;
+
+    virtual void ProvideDamage(USkeletalMeshComponent* FromMeshComponent) override;
+
+
 
 protected:
     virtual void EnemyNoticed(bool IsNoticed) override;
@@ -40,4 +46,15 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, Category = "FX", meta=(ToolTip = "Кривая изменения цвета волка"))
     UCurveFloat* SwitchColorCurve;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack | Base Config")
+    float AttackDistance = 10.0;
+
+    UPROPERTY(EditAnywhere, Category = "Attack | Animations")
+    UAnimMontage* BiteAnimMontage;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack | FX")
+    UNiagaraSystem* BloodEffect;
+
+    void InitAnimations();
 };

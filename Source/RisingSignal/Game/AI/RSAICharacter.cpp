@@ -25,7 +25,7 @@ bool ARSAICharacter::SetNewAIState(const EAIState NewState)
     if (NewState == CurrentAIState)
         return false;
 
-    if (CurrentAIState != Threaten || CurrentAIState != Attack)
+    if (CurrentAIState != EAIState::Threaten || CurrentAIState != EAIState::Attack)
         LastAIState = CurrentAIState;
 
     CurrentAIState = NewState;
@@ -34,6 +34,10 @@ bool ARSAICharacter::SetNewAIState(const EAIState NewState)
 }
 
 void ARSAICharacter::AIStateChanged(EAIState NewState, EAIState PrevState)
+{
+}
+
+void ARSAICharacter::Attack(AActor* AttackActor)
 {
 }
 
@@ -62,12 +66,7 @@ void ARSAICharacter::CalculateTurnOffset()
 
     LastTurnAngle = GetActorRotation().Yaw;
 
-    if (NewTurnOffset < 0)
-        TurnOffset = -1;
-    else if (NewTurnOffset > 0)
-        TurnOffset = 1;
-    else
-        TurnOffset = 0;
+    TurnOffset = NewTurnOffset;
 }
 
 void ARSAICharacter::EnemyNoticed(bool IsNoticed)
@@ -116,8 +115,9 @@ void ARSAICharacter::IncreaseAlertLevelUpdate()
     if (IsAlerted())
     {
         GetWorldTimerManager().ClearTimer(IncreaseAlertLevelTimer);
-        SetNewAIState(Attack);
-        GetCharacterMovement()->MaxWalkSpeed = 600;
+        SetNewAIState(EAIState::Attack);
+        GetCharacterMovement()->MaxWalkSpeed = 500;
+        GetCharacterMovement()->RotationRate = FRotator(250);
         return;
     }
 
@@ -161,6 +161,10 @@ void ARSAICharacter::SetAlertLevel(float NewAlertLevel)
 bool ARSAICharacter::IsAlerted() const
 {
     return FMath::IsNearlyEqual(CurrentAlertLevel, 100.0f);
+}
+
+void ARSAICharacter::ProvideDamage(USkeletalMeshComponent* FromMeshComponent)
+{
 }
 
 void ARSAICharacter::Tick(float DeltaTime)

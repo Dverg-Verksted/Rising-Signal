@@ -83,6 +83,11 @@ public:
     UFUNCTION()
     virtual void AIStateChanged(EAIState NewState, EAIState PrevState);
 
+    virtual void Attack(AActor* AttackActor);
+
+    UFUNCTION()
+    virtual void ProvideDamage(USkeletalMeshComponent* FromMeshComponent);
+
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
@@ -128,6 +133,10 @@ protected:
 
     FTimerHandle IncreaseAlertLevelTimer;
     FTimerHandle DecreaseAlertLevelTimer;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack | Base Config")
+    float AttackDamage = 50.0;
+
 
     // virtual void OnDeath();
 
