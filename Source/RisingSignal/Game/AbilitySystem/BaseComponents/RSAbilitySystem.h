@@ -11,7 +11,7 @@
 // Delegate for assignment some health changes, return current health
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHealthChanged, float, Health);
 // Delegate for call on change health
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeHealth, float, Damage);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FChangeHealth, float, Damage);
 //Delegate for getting effects on health value
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAddEffect, bool, IsDamage, float, EffectValue, float, EffectTime);
 // Delegate for assignment death event
@@ -37,7 +37,7 @@ public:
     /** Declare delegate @name OnChangeHealth
      */
     UPROPERTY(VisibleAnywhere, BlueprintCallable)
-    FOnChangeHealth OnChangeHealth;
+    FChangeHealth OnChangeHealthSignature;
     /** Declare delegate @name OnDeath
      */
     UPROPERTY(BlueprintAssignable)
@@ -47,7 +47,7 @@ public:
      *  Formula: Current health - @param DamageTaken
      *  @param DamageTaken is count of taken damage from anywhere
      */
-    UFUNCTION()
+    UFUNCTION(BlueprintNativeEvent)
     void ChangeHealth(float const DamageTaken);
     UFUNCTION()
     void ChangeHealthOnEffects();
@@ -57,9 +57,8 @@ public:
     UFUNCTION(BlueprintCallable, BlueprintPure)
     float GetHealth() const {return  Health;}
 
-    UFUNCTION()
+    UFUNCTION(BlueprintNativeEvent)
     void AddEffect(bool const IsDamage, float const EffectValue, float const EffectTime);
-    
 
 protected:
     // Called when the game starts

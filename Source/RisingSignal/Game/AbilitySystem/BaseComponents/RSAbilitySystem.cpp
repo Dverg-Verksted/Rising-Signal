@@ -14,12 +14,13 @@ URSAbilitySystem::URSAbilitySystem()
     
 }
 
+
 // Called when the game starts
 void URSAbilitySystem::BeginPlay()
 {
     Super::BeginPlay();
 
-    OnChangeHealth.AddDynamic(this, &URSAbilitySystem::ChangeHealth);
+    OnChangeHealthSignature.AddDynamic(this, &URSAbilitySystem::ChangeHealth);
     OnEffectAdd.AddDynamic(this, &URSAbilitySystem::AddEffect);
     EffectSystem = NewObject<URSEffect>(this);
     
@@ -34,16 +35,27 @@ void URSAbilitySystem::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 }
 
 // Func for Change Health and call delegate
-void URSAbilitySystem::ChangeHealth(float const DamageTaken)
+// void URSAbilitySystem::ChangeHealth(float const DamageTaken)
+// {
+//     
+// }
+
+void URSAbilitySystem::ChangeHealth_Implementation(float const DamageTaken)
 {
     if(!this->bIsDead)
     {
         this->Health -= DamageTaken;
-        HealthChanged.Broadcast(this->Health);
+        if(HealthChanged.IsBound())
+        {
+            HealthChanged.Broadcast(this->Health);
+        }
         if (this->Health <= 0.0f)
         {
             bIsDead = !bIsDead;
-            OnDeath.Broadcast();
+            if(OnDeath.IsBound())
+            {
+                OnDeath.Broadcast();
+            }
         }
     }
 }
@@ -60,10 +72,9 @@ void URSAbilitySystem::ChangeHealthOnEffects()
     }
 }
 
-// Add effect to system
-void URSAbilitySystem::AddEffect(bool IsDamage, float EffectVal, float EffectTime)
+void URSAbilitySystem::AddEffect_Implementation(bool const IsDamage, float const EffectValue, float const EffectTime)
 {
-    EffectSystem->AddEffect(IsDamage, EffectVal, EffectTime);
+    EffectSystem->AddEffect(IsDamage, EffectValue, EffectTime);
 
     if(!GetOwner()->GetWorldTimerManager().IsTimerActive(TEffectChange))
     {
@@ -71,7 +82,13 @@ void URSAbilitySystem::AddEffect(bool IsDamage, float EffectVal, float EffectTim
     }
     
     UE_LOG(LogTemp, Warning, TEXT("Is damage %d \n Effect Value %f \n Effect Time %f "),
-        IsDamage, EffectVal, EffectTime);
+        IsDamage, EffectValue, EffectTime);
 }
 
+
+// Add effect to system
+// void URSAbilitySystem::AddEffect(bool const IsDamage, float const EffectValue, float const EffectTime)
+// {
+//     
+// }
 
