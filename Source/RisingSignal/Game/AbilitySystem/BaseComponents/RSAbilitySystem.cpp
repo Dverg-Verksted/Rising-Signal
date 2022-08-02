@@ -14,14 +14,19 @@ URSAbilitySystem::URSAbilitySystem()
     
 }
 
-
 // Called when the game starts
 void URSAbilitySystem::BeginPlay()
 {
     Super::BeginPlay();
 
     OnChangeHealthSignature.AddDynamic(this, &URSAbilitySystem::ChangeHealth);
-    OnEffectAdd.AddDynamic(this, &URSAbilitySystem::AddEffect);
+
+    OnChangeStaminaSignature.AddDynamic(this, &URSAbilitySystem::ChangeStamina);
+
+    OnEffectAddSignature.AddDynamic(this, &URSAbilitySystem::AddEffect);
+
+    OnChangeStressSignature.AddDynamic(this, &URSAbilitySystem::ChangeStress);
+    
     EffectSystem = NewObject<URSEffect>(this);
     
 }
@@ -35,11 +40,6 @@ void URSAbilitySystem::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 }
 
 // Func for Change Health and call delegate
-// void URSAbilitySystem::ChangeHealth(float const DamageTaken)
-// {
-//     
-// }
-
 void URSAbilitySystem::ChangeHealth_Implementation(float const DamageTaken)
 {
     if(!this->bIsDead)
@@ -70,6 +70,32 @@ void URSAbilitySystem::ChangeHealthOnEffects()
     {
         GetOwner()->GetWorldTimerManager().ClearTimer(TEffectChange);
     }
+}
+
+void URSAbilitySystem::ChangeStress_Implementation(float const ChangedValue)
+{
+    
+}
+
+void URSAbilitySystem::ChangeStamina_Implementation(float const ChangedValue)
+{
+    if (this->Stamina > 0)
+    {
+        if (this->Stamina - ChangedValue <= 100)
+        {
+            this->Stamina -= ChangedValue;
+        }
+        else
+        {
+            this->Stamina = 100;
+        }
+        
+        if(StaminaChanged.IsBound())
+        {
+            StaminaChanged.Broadcast(this->Stamina);
+        }
+    }
+    
 }
 
 void URSAbilitySystem::AddEffect_Implementation(bool const IsDamage, float const EffectValue, float const EffectTime)
