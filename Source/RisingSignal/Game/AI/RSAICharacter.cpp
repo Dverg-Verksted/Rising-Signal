@@ -187,7 +187,7 @@ void ARSAICharacter::Tick(float DeltaTime)
 
     CalculateTurnOffset();
 
-    if (AIController)
+    if (AIController && ShouldNoticePlayer)
     {
         if (AIController->GetActorToFocusOn() && !IsEnemyInSight)
         {

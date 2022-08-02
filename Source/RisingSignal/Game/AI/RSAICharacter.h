@@ -96,6 +96,9 @@ public:
 
     FEnemyInSightChangeSignature OnEnemyInSightChangeSignature;
 
+    UFUNCTION()
+    float GetAlertLevelPercent() const { return CurrentAlertLevel / 100.0f; }
+
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
@@ -122,8 +125,6 @@ protected:
 
     void CalculateTurnOffset();
 
-    
-
     bool IsEnemyInSight = false;
 
     UPROPERTY(EditAnywhere, Category = "Alert")
@@ -142,12 +143,11 @@ protected:
 
     void SetAlertLevel(float NewAlertLevel);
 
-    UPROPERTY(meta=(ClampMin = 0.0, ClampMax = 100.0))
     float CurrentAlertLevel = 0;
 
     bool IsAlerted() const;
 
-    UPROPERTY(EditAnywhere, Category = "Alert")
+    UPROPERTY(EditAnywhere, Category = "Alert", meta=(ToolTip = "Через какое время сбросывается тревога"))
     float ClearAlertTime = 5.0f;
 
     FTimerHandle IncreaseAlertLevelTimer;
@@ -157,11 +157,15 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack | Base Config")
     float AttackDamage = 50.0f;
 
-
     void ClearAlert();
 
+#pragma region DEBUG
 
-    // virtual void OnDeath();
+    UPROPERTY(EditAnywhere, Category = "Debug")
+    bool ShouldNoticePlayer = true;
+
+#pragma endregion DEBUG
+
 
 public:
     // Called every frame
