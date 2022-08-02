@@ -18,6 +18,8 @@ ARSAICharacter::ARSAICharacter()
     AIControllerClass = ARSAIController::StaticClass();
 
     HealthComponent = CreateDefaultSubobject<URSHealthComponent>(TEXT("HealthComponent"));
+
+    GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
 bool ARSAICharacter::SetNewAIState(const EAIState NewState)
@@ -56,6 +58,8 @@ void ARSAICharacter::BeginPlay()
     }
 
     OnAIStateChanged.AddDynamic(this, &ARSAICharacter::AIStateChanged);
+
+    OnEnemyInSightChangeSignature.AddUObject(this, &ARSAICharacter::EnemyInSight);
 }
 
 void ARSAICharacter::CalculateTurnOffset()
@@ -69,15 +73,18 @@ void ARSAICharacter::CalculateTurnOffset()
     TurnOffset = NewTurnOffset;
 }
 
-void ARSAICharacter::EnemyNoticed(bool IsNoticed)
+void ARSAICharacter::EnemyInSight(bool IsNoticed)
 {
-    if (IsNoticed && !IsAlerted())
+    if (IsNoticed)
     {
-        SetNewAIState(EAIState::Threaten);
+        if (!IsAlerted())
+        {
+            LOG_RS(ELogRSVerb::Warning, "Enemy Found!");
 
-        GetWorldTimerManager().ClearTimer(DecreaseAlertLevelTimer);
+            SetNewAIState(EAIState::Threaten);
 
-        if (!GetWorldTimerManager().IsTimerActive(IncreaseAlertLevelTimer))
+            GetWorldTimerManager().ClearTimer(DecreaseAlertLevelTimer);
+
             GetWorldTimerManager().SetTimer(
                 IncreaseAlertLevelTimer,
                 this,
@@ -86,26 +93,32 @@ void ARSAICharacter::EnemyNoticed(bool IsNoticed)
                 true,
                 AlertIncreaseData.LevelUpDelay
                 );
+        }
+        else
+        {
+            GetWorldTimerManager().ClearTimer(ClearAlertLevelTimer);
+        }
     }
     else
     {
-        if (FMath::IsNearlyZero(CurrentAlertLevel))
+        LOG_RS(ELogRSVerb::Warning, "No Enemy!");
+        
+        if (IsAlerted())
         {
-            SetNewAIState(Patrol);
+            GetWorldTimerManager().SetTimer(ClearAlertLevelTimer, this, &ARSAICharacter::ClearAlert, ClearAlertTime);
         }
-        else if (!IsAlerted())
+        else
         {
             GetWorldTimerManager().ClearTimer(IncreaseAlertLevelTimer);
 
-            if (!GetWorldTimerManager().IsTimerActive(DecreaseAlertLevelTimer))
-                GetWorldTimerManager().SetTimer(
-                    DecreaseAlertLevelTimer,
-                    this,
-                    &ARSAICharacter::DecreaseAlertLevelUpdate,
-                    AlertDecreaseData.LevelDownTimerRate,
-                    true,
-                    AlertDecreaseData.LevelDownDelay
-                    );
+            GetWorldTimerManager().SetTimer(
+                DecreaseAlertLevelTimer,
+                this,
+                &ARSAICharacter::DecreaseAlertLevelUpdate,
+                AlertDecreaseData.LevelDownTimerRate,
+                true,
+                AlertDecreaseData.LevelDownDelay
+                );
         }
     }
 }
@@ -116,7 +129,7 @@ void ARSAICharacter::IncreaseAlertLevelUpdate()
     {
         GetWorldTimerManager().ClearTimer(IncreaseAlertLevelTimer);
         SetNewAIState(EAIState::Attack);
-        GetCharacterMovement()->MaxWalkSpeed = 500;
+        GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
         GetCharacterMovement()->RotationRate = FRotator(250);
         return;
     }
@@ -129,6 +142,7 @@ void ARSAICharacter::DecreaseAlertLevelUpdate()
     if (FMath::IsNearlyZero(CurrentAlertLevel))
     {
         GetWorldTimerManager().ClearTimer(DecreaseAlertLevelTimer);
+        SetNewAIState(Patrol);
         return;
     }
 
@@ -175,13 +189,24 @@ void ARSAICharacter::Tick(float DeltaTime)
 
     if (AIController)
     {
-        if (AIController->GetActorToFocusOn())
+        if (AIController->GetActorToFocusOn() && !IsEnemyInSight)
         {
-            EnemyNoticed(true);
+            IsEnemyInSight = true;
+            OnEnemyInSightChangeSignature.Broadcast(IsEnemyInSight);
         }
-        else
+        else if (!AIController->GetActorToFocusOn() && IsEnemyInSight)
         {
-            EnemyNoticed(false);
+            IsEnemyInSight = false;
+            OnEnemyInSightChangeSignature.Broadcast(IsEnemyInSight);
         }
     }
+}
+
+void ARSAICharacter::ClearAlert()
+{
+    SetAlertLevel(0.0f);
+    SetNewAIState(EAIState::Patrol);
+    GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+    GetCharacterMovement()->RotationRate = FRotator(50);
+    LOG_RS(ELogRSVerb::Warning, "Alert cleared");
 }

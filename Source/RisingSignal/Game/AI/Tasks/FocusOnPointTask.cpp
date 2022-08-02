@@ -44,7 +44,7 @@ EBTNodeResult::Type UFocusOnPointTask::ExecuteTask(UBehaviorTreeComponent& Owner
 
     // YawRotation = UKismetMathLibrary::NormalizeAxis(PawnRotationYaw + DeltaAngle);
 
-    DrawDebugLine(GetWorld(), PawnLocation, PawnLocation + PawnRotation.Vector() * 800, FColor::Red, false, 5);
+    // DrawDebugLine(GetWorld(), PawnLocation, PawnLocation + PawnRotation.Vector() * 800, FColor::Red, false, 5);
 
     TaskMemory->StartRotation = PawnRotation;
     TaskMemory->EndRotation = TargetRotation;
@@ -79,9 +79,9 @@ void UFocusOnPointTask::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
     {
         // UE_LOG(LogTemp, Warning, TEXT("DeltaYaw = %f, PrecisionAngle = %f"), DeltaYaw, PrecisionAngle);
 
-        FVector PawnLocation = TaskMemory->AICharacter->GetActorLocation();
+        // FVector PawnLocation = TaskMemory->AICharacter->GetActorLocation();
         
-        DrawDebugLine(GetWorld(), PawnLocation, PawnLocation + CurrentRotation.Vector() * 800, FColor::Red, false, 5);
+        // DrawDebugLine(GetWorld(), PawnLocation, PawnLocation + CurrentRotation.Vector() * 800, FColor::Red, false, 5);
 
 
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);

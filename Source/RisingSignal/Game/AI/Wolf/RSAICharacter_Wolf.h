@@ -29,15 +29,16 @@ public:
     UFUNCTION(BlueprintCallable)
     float GetAlertLevel() const { return CurrentAlertLevel; }
 
+    virtual void AIStateChanged(EAIState NewState, EAIState PrevState) override;
+
     virtual void Attack(AActor* AttackActor) override;
 
     virtual void ProvideDamage(USkeletalMeshComponent* FromMeshComponent) override;
 
+    // virtual void EnemyInSight(bool IsNoticed) override;
 
 
 protected:
-    virtual void EnemyNoticed(bool IsNoticed) override;
-
     // Switching Materials from White to Black
     void SwitchWolfColorToBlack(bool bSwitch);
 

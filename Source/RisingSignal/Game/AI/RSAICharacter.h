@@ -11,6 +11,9 @@ class URSHealthComponent;
 class UBehaviorTree;
 
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FEnemyInSightChangeSignature, bool);
+
+
 UENUM(BlueprintType)
 enum EAIState
 {
@@ -83,15 +86,26 @@ public:
     UFUNCTION()
     virtual void AIStateChanged(EAIState NewState, EAIState PrevState);
 
+    UFUNCTION()
+    virtual void EnemyInSight(bool IsNoticed);
+
     virtual void Attack(AActor* AttackActor);
 
     UFUNCTION()
     virtual void ProvideDamage(USkeletalMeshComponent* FromMeshComponent);
 
+    FEnemyInSightChangeSignature OnEnemyInSightChangeSignature;
+
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     URSHealthComponent* HealthComponent;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+    float WalkSpeed = 100;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+    float RunSpeed = 400;
 
     virtual void BeginPlay() override;
 
@@ -108,7 +122,9 @@ protected:
 
     void CalculateTurnOffset();
 
-    virtual void EnemyNoticed(bool IsNoticed);
+    
+
+    bool IsEnemyInSight = false;
 
     UPROPERTY(EditAnywhere, Category = "Alert")
     FAlertIncreaseData AlertIncreaseData;
@@ -131,11 +147,18 @@ protected:
 
     bool IsAlerted() const;
 
+    UPROPERTY(EditAnywhere, Category = "Alert")
+    float ClearAlertTime = 5.0f;
+
     FTimerHandle IncreaseAlertLevelTimer;
     FTimerHandle DecreaseAlertLevelTimer;
+    FTimerHandle ClearAlertLevelTimer;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack | Base Config")
-    float AttackDamage = 50.0;
+    float AttackDamage = 50.0f;
+
+
+    void ClearAlert();
 
 
     // virtual void OnDeath();

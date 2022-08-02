@@ -44,6 +44,19 @@ void ARSAICharacter_Wolf::TimelineProgress(float Value)
     GetMesh()->SetScalarParameterValueOnMaterials("SwitchValue", Value);
 }
 
+void ARSAICharacter_Wolf::AIStateChanged(EAIState NewState, EAIState PrevState)
+{
+    if (NewState == EAIState::Idle || NewState == EAIState::Patrol)
+    {
+        SwitchWolfColorToBlack(false);
+    }
+    else
+    {
+        SwitchWolfColorToBlack(true);
+    }
+
+    Super::AIStateChanged(NewState, PrevState);
+}
 
 void ARSAICharacter_Wolf::Attack(AActor* AttackActor)
 {
@@ -76,20 +89,19 @@ void ARSAICharacter_Wolf::ProvideDamage(USkeletalMeshComponent* FromMeshComponen
     LOG_RS(ELogRSVerb::Warning, "DamageProvided");
 }
 
-void ARSAICharacter_Wolf::EnemyNoticed(bool IsNoticed)
-{
-    Super::EnemyNoticed(IsNoticed);
-
-    if (IsNoticed || CurrentAIState == EAIState::Attack || CurrentAIState == EAIState::Threaten)
-    {
-        SwitchWolfColorToBlack(true);
-    }
-    else
-    {
-        SwitchWolfColorToBlack(false);
-    }
-}
-
+// void ARSAICharacter_Wolf::EnemyInSight(bool IsNoticed)
+// {
+//     Super::EnemyInSight(IsNoticed);
+//
+//     if (IsNoticed || CurrentAIState == EAIState::Attack || CurrentAIState == EAIState::Threaten)
+//     {
+//         SwitchWolfColorToBlack(true);
+//     }
+//     else
+//     {
+//         SwitchWolfColorToBlack(false);
+//     }
+// }
 
 void ARSAICharacter_Wolf::SwitchWolfColorToBlack(bool bSwitch)
 {
