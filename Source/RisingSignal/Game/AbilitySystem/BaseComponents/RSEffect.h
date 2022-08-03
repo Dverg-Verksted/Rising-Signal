@@ -41,19 +41,7 @@ public:
 
     float GetEffectSumValue();
 
-    int GetEffectsNum()
-    {
-        int32 CountActive = 0;
-        for (auto &Effect : ArrEffects)
-        {
-            if (Effect.TimeActive > 0)
-            {
-                CountActive++;
-            }
-        }
-
-        return CountActive;
-    }
+    int GetEffectsNum();
     
 private:
 

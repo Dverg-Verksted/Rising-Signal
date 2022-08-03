@@ -14,10 +14,10 @@ struct FBTRotateToPointTaskMemory
     ARSAICharacter* AICharacter;
 
     /* Start Yaw Rotation */
-    float StartYawRotation;
+    FRotator StartRotation;
 
     /* End Yaw Rotation */
-    float EndYawRotation;
+    FRotator EndRotation;
 };
 
 
