@@ -7,6 +7,7 @@
 #include "Game/AbilitySystem/ActorsComponents/RSHealthComponent.h"
 #include "Library/RSFunctionLibrary.h"
 #include "Perception/AISense_Sight.h"
+#include "Player/RSGamePLayer.h"
 
 AActor* URSAIPerceptionComponent::GetClosestEnemy() const
 {
@@ -25,7 +26,7 @@ AActor* URSAIPerceptionComponent::GetClosestEnemy() const
     for (const auto PercieveActor : PercieveActors)
     {
         const auto HealthComponent = PercieveActor->FindComponentByClass<URSHealthComponent>();
-        if (HealthComponent && !FMath::IsNearlyZero(HealthComponent->GetCurrentHealth())) // TODO: Check if enemies
+        if (Cast<ARSGamePLayer>(PercieveActor) && HealthComponent && !FMath::IsNearlyZero(HealthComponent->GetCurrentHealth()))       // TODO: Check if enemies and change HealthComponent to AbilitySystem
         {
             const auto CurrentDistance = (PercieveActor->GetActorLocation() - Pawn->GetActorLocation()).Size();
             if (CurrentDistance < BestDistance)

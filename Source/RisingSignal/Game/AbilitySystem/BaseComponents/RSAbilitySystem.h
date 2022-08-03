@@ -8,14 +8,27 @@
 #include "Trace/Detail/EventNode.h"
 #include "RSAbilitySystem.generated.h"
 
-// Delegate for assignment some health changes, return current health
+#pragma region Delegates
+// Delegate for assignment some health changes, return current health value
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHealthChanged, float, Health);
 // Delegate for call on change health
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeHealth, float, Damage);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FChangeHealth, float, Damage);
+
+// Delegate for assignment some stamina changes, return current stamina value
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStaminaChanged, float, Stamina);
+// Delegate for call on change stamina
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FChangeStamina, float, ChangeValue);
+
+// Delegate for assignment some stress changes, return current stress value
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStressChanged, float, Stress);
+// Delegate for call on change stress
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FChangeStress, float, ChangeValue);
+
 //Delegate for getting effects on health value
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAddEffect, bool, IsDamage, float, EffectValue, float, EffectTime);
 // Delegate for assignment death event
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
+#pragma endregion Delegates
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class RISINGSIGNAL_API URSAbilitySystem : public UActorComponent
@@ -27,17 +40,39 @@ public:
     URSAbilitySystem();
     
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-    
+
+    /** Declare delegate @name OnEffectAdd
+     */
     UPROPERTY(VisibleAnywhere, BlueprintCallable)
-    FAddEffect OnEffectAdd;
+    FAddEffect OnEffectAddSignature;
+    
     /** Declare delegate @name FHealthChanged
      */
     UPROPERTY(VisibleAnywhere, BlueprintAssignable)
     FHealthChanged HealthChanged;
-    /** Declare delegate @name OnChangeHealth
+    /** Declare delegate @name OnChangeHealthSignature
      */
     UPROPERTY(VisibleAnywhere, BlueprintCallable)
-    FOnChangeHealth OnChangeHealth;
+    FChangeHealth OnChangeHealthSignature;
+
+    /** Declare delegate @name HungryChanged
+     */
+    UPROPERTY(VisibleAnywhere, BlueprintAssignable)
+    FStaminaChanged StaminaChanged;
+    /** Declare delegate @name OnChangeHungrySignature 
+     */
+    UPROPERTY(VisibleAnywhere, BlueprintCallable)
+    FChangeStamina OnChangeStaminaSignature;
+
+    /** Declare delegate @name StressChanged
+     */
+    UPROPERTY(VisibleAnywhere, BlueprintAssignable)
+    FStressChanged StressChanged;
+    /** Declare delegate @name OnChangeStressSignature
+     */
+    UPROPERTY(VisibleAnywhere, BlueprintCallable)
+    FChangeStress OnChangeStressSignature;
+    
     /** Declare delegate @name OnDeath
      */
     UPROPERTY(BlueprintAssignable)
@@ -47,19 +82,29 @@ public:
      *  Formula: Current health - @param DamageTaken
      *  @param DamageTaken is count of taken damage from anywhere
      */
-    UFUNCTION()
+    UFUNCTION(BlueprintNativeEvent)
     void ChangeHealth(float const DamageTaken);
+
     UFUNCTION()
     void ChangeHealthOnEffects();
 
-    // TODO: Maybe erase this func, dont know why it is needed
+    UFUNCTION(BlueprintNativeEvent)
+    void ChangeStamina(float const ChangedValue);
+
+    UFUNCTION(BlueprintNativeEvent)
+    void ChangeStress(float const ChangedValue);
+
+#pragma region Getters
     // Getter for return current Health value
     UFUNCTION(BlueprintCallable, BlueprintPure)
     float GetHealth() const {return  Health;}
-
-    UFUNCTION()
-    void AddEffect(bool const IsDamage, float const EffectValue, float const EffectTime);
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    bool GetIsDead() const {return  bIsDead;}
+#pragma endregion Getters
     
+    // Function for adding effect in effects system
+    UFUNCTION(BlueprintNativeEvent)
+    void AddEffect(bool const IsDamage, float const EffectValue, float const EffectTime);
 
 protected:
     // Called when the game starts
