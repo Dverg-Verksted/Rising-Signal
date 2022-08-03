@@ -19,8 +19,14 @@ void URSAbilitySystem::BeginPlay()
 {
     Super::BeginPlay();
 
-    OnChangeHealth.AddDynamic(this, &URSAbilitySystem::ChangeHealth);
-    OnEffectAdd.AddDynamic(this, &URSAbilitySystem::AddEffect);
+    OnChangeHealthSignature.AddDynamic(this, &URSAbilitySystem::ChangeHealth);
+
+    OnChangeStaminaSignature.AddDynamic(this, &URSAbilitySystem::ChangeStamina);
+
+    OnEffectAddSignature.AddDynamic(this, &URSAbilitySystem::AddEffect);
+
+    OnChangeStressSignature.AddDynamic(this, &URSAbilitySystem::ChangeStress);
+    
     EffectSystem = NewObject<URSEffect>(this);
     
 }
@@ -34,16 +40,31 @@ void URSAbilitySystem::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 }
 
 // Func for Change Health and call delegate
-void URSAbilitySystem::ChangeHealth(float const DamageTaken)
+void URSAbilitySystem::ChangeHealth_Implementation(float const DamageTaken)
 {
     if(!this->bIsDead)
     {
-        this->Health -= DamageTaken;
-        HealthChanged.Broadcast(this->Health);
+        if(this->Health - DamageTaken <= 100)
+        {
+            this->Health -= DamageTaken;
+        }
+        else
+        {
+            this->Health = 100;
+        }
+        
+        if(HealthChanged.IsBound())
+        {
+            HealthChanged.Broadcast(this->Health);
+        }
+        
         if (this->Health <= 0.0f)
         {
             bIsDead = !bIsDead;
-            OnDeath.Broadcast();
+            if(OnDeath.IsBound())
+            {
+                OnDeath.Broadcast();
+            }
         }
     }
 }
@@ -60,10 +81,50 @@ void URSAbilitySystem::ChangeHealthOnEffects()
     }
 }
 
-// Add effect to system
-void URSAbilitySystem::AddEffect(bool IsDamage, float EffectVal, float EffectTime)
+void URSAbilitySystem::ChangeStress_Implementation(float const ChangedValue)
 {
-    EffectSystem->AddEffect(IsDamage, EffectVal, EffectTime);
+    if(this->Stress - ChangedValue <= 100)
+    {
+        this->Stress -= ChangedValue;
+    }
+    else
+    {
+        this->Stress = 100;
+    }
+    if(StressChanged.IsBound())
+    {
+        StressChanged.Broadcast(this->Stress);
+    }
+}
+
+void URSAbilitySystem::ChangeStamina_Implementation(float const ChangedValue)
+{
+    if (this->Stamina >= 0)
+    {
+        if (this->Stamina - ChangedValue <= 100)
+        {
+            this->Stamina -= ChangedValue;
+        }
+        else
+        {
+            this->Stamina = 100;
+        }
+        
+        if(StaminaChanged.IsBound())
+        {
+            StaminaChanged.Broadcast(this->Stamina);
+        }
+    }
+    else
+    {
+        this->Stamina = 0;
+    }
+    
+}
+
+void URSAbilitySystem::AddEffect_Implementation(bool const IsDamage, float const EffectValue, float const EffectTime)
+{
+    EffectSystem->AddEffect(IsDamage, EffectValue, EffectTime);
 
     if(!GetOwner()->GetWorldTimerManager().IsTimerActive(TEffectChange))
     {
@@ -71,7 +132,13 @@ void URSAbilitySystem::AddEffect(bool IsDamage, float EffectVal, float EffectTim
     }
     
     UE_LOG(LogTemp, Warning, TEXT("Is damage %d \n Effect Value %f \n Effect Time %f "),
-        IsDamage, EffectVal, EffectTime);
+        IsDamage, EffectValue, EffectTime);
 }
 
+
+// Add effect to system
+// void URSAbilitySystem::AddEffect(bool const IsDamage, float const EffectValue, float const EffectTime)
+// {
+//     
+// }
 
