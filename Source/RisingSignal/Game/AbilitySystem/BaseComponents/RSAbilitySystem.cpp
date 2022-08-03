@@ -44,11 +44,20 @@ void URSAbilitySystem::ChangeHealth_Implementation(float const DamageTaken)
 {
     if(!this->bIsDead)
     {
-        this->Health -= DamageTaken;
+        if(this->Health - DamageTaken <= 100)
+        {
+            this->Health -= DamageTaken;
+        }
+        else
+        {
+            this->Health = 100;
+        }
+        
         if(HealthChanged.IsBound())
         {
             HealthChanged.Broadcast(this->Health);
         }
+        
         if (this->Health <= 0.0f)
         {
             bIsDead = !bIsDead;
@@ -74,12 +83,23 @@ void URSAbilitySystem::ChangeHealthOnEffects()
 
 void URSAbilitySystem::ChangeStress_Implementation(float const ChangedValue)
 {
-    
+    if(this->Stress - ChangedValue <= 100)
+    {
+        this->Stress -= ChangedValue;
+    }
+    else
+    {
+        this->Stress = 100;
+    }
+    if(StressChanged.IsBound())
+    {
+        StressChanged.Broadcast(this->Stress);
+    }
 }
 
 void URSAbilitySystem::ChangeStamina_Implementation(float const ChangedValue)
 {
-    if (this->Stamina > 0)
+    if (this->Stamina >= 0)
     {
         if (this->Stamina - ChangedValue <= 100)
         {
@@ -94,6 +114,10 @@ void URSAbilitySystem::ChangeStamina_Implementation(float const ChangedValue)
         {
             StaminaChanged.Broadcast(this->Stamina);
         }
+    }
+    else
+    {
+        this->Stamina = 0;
     }
     
 }
