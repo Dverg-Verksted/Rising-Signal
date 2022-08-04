@@ -7,8 +7,6 @@
 #include "Library/RSFunctionLibrary.h"
 #include "InteractComponent.generated.h"
 
-struct FGameplayTag;
-class UAlsAnimationInstance;
 class UJournalSystem;
 class ARSGamePlayerController;
 class AInteractItemActor;
@@ -59,9 +57,6 @@ private:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Interact", meta = (AllowPrivateAccess = true))
     float RateTimeChecked{0.25f};
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animations", meta= (AllowPrivateAccess = true))
-    UAnimMontage* GroundPickUpAnimMontage;
 
     // @private Owner Actor component
     UPROPERTY()
@@ -121,14 +116,21 @@ private:
     UFUNCTION()
     void RegisterInteractEvent();
 
-    void InitAnimations();
-
-    void StartPickUpAnimation() const;
-    void PickUpAnimationEnded() const;
-
     void SendNoteData(const struct FDataInteract* DataInteract) const;
     void SendAudioData(const struct FDataInteract* DataInteract) const;
     void SendPhotoData(const struct FDataInteract* DataInteract) const;
 
 #pragma endregion
+
+#pragma region ANIMATIONS
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animations", meta= (AllowPrivateAccess = true))
+    UAnimMontage* GroundPickUpAnimMontage;
+
+    void InitAnimations();
+
+    void StartPickUpAnimation() const;
+    void PickUpAnimationEnded() const;
+
+#pragma endregion ANIMATIONS
 };
