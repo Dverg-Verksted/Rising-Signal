@@ -110,7 +110,6 @@ protected:
     // Called when the game starts
     virtual void BeginPlay() override;
 
-
 private:
 
     UPROPERTY()
@@ -144,6 +143,5 @@ private:
 
     UPROPERTY(VisibleDefaultsOnly, Category = "Ability states")
     bool bIsDead = false;
-
     
 };
