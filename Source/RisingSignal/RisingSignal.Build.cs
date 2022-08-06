@@ -9,7 +9,7 @@ public class RisingSignal : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.AddRange(new string[]
-			{"Core", "CoreUObject", "Engine", "InputCore", "PhysicsCore", "GameplayTasks", "NavigationSystem"});
+			{"Core", "CoreUObject", "Engine", "InputCore", "PhysicsCore", "GameplayTasks", "NavigationSystem", "Niagara"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {"ALS", "ALSCamera"});
 
