@@ -39,10 +39,26 @@ float URSEffect::GetEffectSumValue()
                 SumEffectValue -= Effect.Value;
             }
         }
+        else
+        {
+            // ArrEffects.Remove(Effect);
+        }
+    }
+    return SumEffectValue;
+}
+
+int URSEffect::GetEffectsNum()
+{
+    int32 CountActive = 0;
+    for (auto &Effect : ArrEffects)
+    {
+        if (Effect.TimeActive > 0)
+        {
+            CountActive++;
+        }
     }
 
-    LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Effect value %f"),SumEffectValue));
-    return SumEffectValue;
+    return CountActive;
 }
 
 
