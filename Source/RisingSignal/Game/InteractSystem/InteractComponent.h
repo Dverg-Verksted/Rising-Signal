@@ -49,9 +49,8 @@ protected:
 #pragma endregion
 
 #pragma region DataInteract
-    
-private:
 
+private:
     // @private Size box collision
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Interact", meta = (AllowPrivateAccess = true))
     FVector SizeBoxCollision{50.f};
@@ -87,10 +86,12 @@ private:
     FTimerHandle CheckedInteractItemTimerHandle;
 
     UFUNCTION()
-    void RegisterBeginOverlapInteractItem(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+    void RegisterBeginOverlapInteractItem(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+        int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
     UFUNCTION()
-    void RegisterEndOverlapInteractItem(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+    void RegisterEndOverlapInteractItem(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+        int32 OtherBodyIndex);
 
     /**
      * @private Add item
@@ -103,7 +104,7 @@ private:
      * @param1 AInteractItemActor
      **/
     void RemoveItem(AInteractItemActor* InteractItem);
-    
+
     /**
      * @private Checking the distance and changing the target object
      **/
@@ -121,4 +122,15 @@ private:
 
 #pragma endregion
 
+#pragma region ANIMATIONS
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animations", meta= (AllowPrivateAccess = true))
+    UAnimMontage* GroundPickUpAnimMontage;
+
+    void InitAnimations();
+
+    void StartPickUpAnimation() const;
+    void PickUpAnimationEnded() const;
+
+#pragma endregion ANIMATIONS
 };
