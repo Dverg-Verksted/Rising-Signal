@@ -440,7 +440,7 @@ float UAlsAnimationInstance::CalculateStandingPlayRate() const
 	};
 
 	return FMath::Clamp(WalkRunSprintSpeedAmount / (GroundedState.StrideBlendAmount * GetSkelMeshComponent()->GetComponentScale().Z),
-	                    0.0f, 3.0f);
+	                    0.0f, 1.0f);
 }
 
 float UAlsAnimationInstance::CalculateCrouchingPlayRate() const
@@ -450,7 +450,7 @@ float UAlsAnimationInstance::CalculateCrouchingPlayRate() const
 
 	return FMath::Clamp(Character->GetLocomotionState().Speed /
 	                    (Settings->Grounded.AnimatedCrouchSpeed * GroundedState.StrideBlendAmount *
-	                     GetSkelMeshComponent()->GetComponentScale().Z), 0.0f, 2.0f);
+	                     GetSkelMeshComponent()->GetComponentScale().Z), 0.0f, 1.0f);
 }
 
 void UAlsAnimationInstance::Jump()
