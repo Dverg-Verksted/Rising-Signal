@@ -16,7 +16,7 @@ class ARSGamePLayer;
 /**
  * @class
  **/
-UCLASS(ClassGroup = (Managers), meta = (BlueprintSpawnableComponent),
+UCLASS(Blueprintable, ClassGroup = (Managers), meta = (BlueprintSpawnableComponent),
     HideCategories = ("Variable", "Transform", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
         "Mobile", "Activation", "Component Replication", "Events", "Asset User Data", "Collision"))
 class RISINGSIGNAL_API UInteractComponent : public UActorComponent
