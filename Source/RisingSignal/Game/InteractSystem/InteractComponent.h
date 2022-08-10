@@ -124,6 +124,12 @@ private:
 
 #pragma region ANIMATIONS
 
+    UFUNCTION(BlueprintCallable)
+    UAnimMontage* GetGroundPickUpAnimMontage() const { return GroundPickUpAnimMontage; }
+
+    UFUNCTION(BlueprintCallable)
+    void SetGroundPickUpAnimMontage(UAnimMontage* NewAnimMontage) { GroundPickUpAnimMontage = NewAnimMontage; }
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animations", meta= (AllowPrivateAccess = true))
     UAnimMontage* GroundPickUpAnimMontage;
 
