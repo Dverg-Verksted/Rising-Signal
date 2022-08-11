@@ -191,7 +191,7 @@ void UInteractComponent::RegisterInteractEvent()
         FDataInteract* DataInteract = InteractDT.DataTable->FindRow<FDataInteract>(InteractDT.RowName, "");
         if (!DataInteract) return;
 
-        if (DataInteract->TypeItem == ETypeItem::MoveItem)
+        if (DataInteract->TypeItem == ETypeItem::StaticItem)
         {
             // TODO Add and call StartInteractAnimation() function
             return;

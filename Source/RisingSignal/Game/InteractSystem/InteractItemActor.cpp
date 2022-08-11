@@ -21,10 +21,12 @@ AInteractItemActor::AInteractItemActor()
     this->WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(FName("3D Widget component"));
     this->WidgetComponent->SetupAttachment(this->Mesh);
 
-    static ConstructorHelpers::FClassFinder<UInteractWidget> UnitSelector(TEXT("/Game/RisingSignal/Core/HUD/UI_UserHUD/Widgets/WBP_InteractText"));
+    static ConstructorHelpers::FClassFinder<UInteractWidget> UnitSelector(
+        TEXT("/Game/RisingSignal/Core/HUD/UI_UserHUD/Widgets/WBP_InteractText"));
     SubInteractWidget = UnitSelector.Class;
 
-    static ConstructorHelpers::FObjectFinder<UDataTable> InteractItemDT(TEXT("DataTable'/Game/RisingSignal/Core/InteractItems/DT_DataInteract.DT_DataInteract'"));
+    static ConstructorHelpers::FObjectFinder<UDataTable> InteractItemDT(
+        TEXT("DataTable'/Game/RisingSignal/Core/InteractItems/DT_DataInteract.DT_DataInteract'"));
     DataTableInteractItem = InteractItemDT.Object;
     if (DataTableInteractItem)
     {
@@ -59,10 +61,17 @@ void AInteractItemActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyC
     {
         const FDataInteract* DataInteract = InteractData.DataTable->FindRow<FDataInteract>(InteractData.RowName, "");
         if (!DataInteract) return;
-        
-        UStaticMesh* L_Mesh = LoadObject<UStaticMesh>(nullptr, *(DataInteract->MeshItem.ToString()));
-        if (!L_Mesh) return;
-        this->Mesh->SetStaticMesh(L_Mesh);
+
+        if (DataInteract->MeshItem.IsNull())
+        {
+            this->Mesh->SetStaticMesh(nullptr);
+        }
+        else
+        {
+            UStaticMesh* L_Mesh = LoadObject<UStaticMesh>(nullptr, *(DataInteract->MeshItem.ToString()));
+            if (L_Mesh) return;
+            this->Mesh->SetStaticMesh(L_Mesh);
+        }
 
         this->TypeItem = DataInteract->TypeItem;
         this->NameItem = DataInteract->NameItem;

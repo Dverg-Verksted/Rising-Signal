@@ -50,6 +50,10 @@ protected:
 
 #pragma region DataInteract
 
+public:
+    UFUNCTION(BlueprintPure, Category = "UInteractComponent | InteractItem")
+    AInteractItemActor* GetInteractItem() const {return TargetInteractItem;}
+
 private:
     // @private Size box collision
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Interact", meta = (AllowPrivateAccess = true))
@@ -124,10 +128,10 @@ private:
 
 #pragma region ANIMATIONS
 
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintPure, Category = "UInteractComponent | AnimMontages")
     UAnimMontage* GetGroundPickUpAnimMontage() const { return GroundPickUpAnimMontage; }
 
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category = "UInteractComponent | AnimMontages")
     void SetGroundPickUpAnimMontage(UAnimMontage* NewAnimMontage) { GroundPickUpAnimMontage = NewAnimMontage; }
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animations", meta= (AllowPrivateAccess = true))
