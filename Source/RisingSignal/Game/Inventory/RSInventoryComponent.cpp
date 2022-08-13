@@ -5,13 +5,13 @@ URSInventoryComponent::URSInventoryComponent()
 {
     PrimaryComponentTick.bCanEverTick = true;
 
-    if (InventoryBox.Num() != MaxCountItem)
+    if (InventoryItems.Num() != MaxCountItem)
     {
         for (int i = 0; i < MaxCountItem; i++)
         {
             FInventoryItem Item;
             Item.SlotIndex = i;
-            InventoryBox.Add(FInventoryItem(i));
+            InventoryItems.Add(FInventoryItem(i));
         }
     }
 }
@@ -42,7 +42,7 @@ bool URSInventoryComponent::ActionItem(
         case Remove:
         {
             const auto Item = RemoveItem(FirstInventorySlot, -1);
-            OnInventoryEvent.Broadcast(Remove, Item);
+            OnInventorySlotChanged.Broadcast(Remove, Item);
             break;
         }
         case Divide:
@@ -51,7 +51,7 @@ bool URSInventoryComponent::ActionItem(
         }
         default:
         {
-            OnInventoryEvent.Broadcast(InventoryEvent, FirstInventorySlot);
+            OnInventorySlotChanged.Broadcast(InventoryEvent, FirstInventorySlot);
             return false;
         };
     }
@@ -60,17 +60,17 @@ bool URSInventoryComponent::ActionItem(
 
 TArray<FInventoryItem> URSInventoryComponent::GetItems()
 {
-    return InventoryBox;
+    return InventoryItems;
 }
 
-FInventoryItem URSInventoryComponent::RemoveItem(const FInventoryItem& FirstInventorySlot, int32 CountRemove)
+FInventoryItem URSInventoryComponent::RemoveItem(const FInventoryItem& InventorySlot, int32 CountRemove)
 {
-    int32 IndexItem = FirstInventorySlot.SlotIndex;
+    int32 IndexItem = InventorySlot.SlotIndex;
     if (IndexItem == -1)
     {
         return FInventoryItem();
     }
-    FInventoryItem Item = FirstInventorySlot;
+    FInventoryItem Item = InventorySlot;
 
     if (CountRemove == -1)
     {
@@ -79,14 +79,14 @@ FInventoryItem URSInventoryComponent::RemoveItem(const FInventoryItem& FirstInve
     }
     else
     {
-        if ((FirstInventorySlot.Count - CountRemove) <= 0)
+        if ((InventorySlot.Count - CountRemove) <= 0)
         {
             ChangeItem(IndexItem, FInventoryItem(), 0);
-            Item.Count = FirstInventorySlot.Count;
+            Item.Count = InventorySlot.Count;
         }
         else
         {
-            ChangeItem(IndexItem, FirstInventorySlot, FirstInventorySlot.Count - CountRemove);
+            ChangeItem(IndexItem, InventorySlot, InventorySlot.Count - CountRemove);
             Item.Count = CountRemove;
         }
     }
@@ -95,14 +95,14 @@ FInventoryItem URSInventoryComponent::RemoveItem(const FInventoryItem& FirstInve
 
 bool URSInventoryComponent::MotionItem(FInventoryItem FirstInventorySlot)
 {
-    bool bCombined = false;
+    /*bool bCombined = false;
     int32 RemainingCount = 0;
     for (int32 i = 0; i < MaxCountItem; i++)
     {
-        if ((FirstInventorySlot.bStack) && (FirstInventorySlot.ItemID == InventoryBox[i].ItemID) &&
-            (InventoryBox[i].Count != InventoryBox[i].MaxCount) && (FirstInventorySlot.SlotIndex == -1))
+        if ((FirstInventorySlot.bStack) && (FirstInventorySlot.ItemID == InventoryItems[i].ItemID) &&
+            (InventoryItems[i].Count != InventoryItems[i].MaxCount) && (FirstInventorySlot.SlotIndex == -1))
         {
-            CombineItem(FirstInventorySlot, InventoryBox[i], RemainingCount);
+            CombineItem(FirstInventorySlot, InventoryItems[i], RemainingCount);
             FirstInventorySlot.Count = RemainingCount;
             bCombined = true;
             if (RemainingCount != 0)
@@ -117,19 +117,20 @@ bool URSInventoryComponent::MotionItem(FInventoryItem FirstInventorySlot)
         InsertItem(FirstInventorySlot);
         if (FirstInventorySlot.Count != 0)
         {
-            OnInventoryEvent.Broadcast(Remove, FirstInventorySlot);
+            OnInventorySlotChanged.Broadcast(Remove, FirstInventorySlot);
         }
         return true;
     }
-    else if (bCombined && (RemainingCount == 0))
+    if (bCombined && (RemainingCount == 0))
     {
         return true;
     }
-    else if (!bCombined && (RemainingCount == 0))
+    if (!bCombined && (RemainingCount == 0))
     {
         InsertItem(FirstInventorySlot);
         return true;
     }
+    return false;*/
     return false;
 }
 
@@ -154,10 +155,8 @@ bool URSInventoryComponent::CombineItem(
         }
         return true;
     }
-    else
-    {
-        SwapItem(FirstInventorySlot, SecondInventorySlot);
-    }
+
+    SwapItem(FirstInventorySlot, SecondInventorySlot);
     return false;
 }
 
@@ -166,18 +165,21 @@ bool URSInventoryComponent::UseItem(const FInventoryItem& FirstInventorySlot)
     if (FirstInventorySlot.bCanUse)
     {
         const auto Item = RemoveItem(FirstInventorySlot, 1);
-        OnInventoryEvent.Broadcast(Use, Item);
+        if(OnInventoryItemUse.IsBound())
+        {
+            OnInventoryItemUse.Broadcast(Item);
+        }
         return true;
     }
     return false;
 }
 
-void URSInventoryComponent::InsertItem(const FInventoryItem& Item)
+void URSInventoryComponent::AddItem(const FInventoryItem& Item)
 {
     int CurrentCountItem = Item.Count;
     for (int32 i = 0; i < MaxCountItem; i++)
     {
-        if (InventoryBox[i].ItemID == -1)
+        if (InventoryItems[i].ItemID == -1)
         {
             if (CurrentCountItem > Item.MaxCount)
             {
@@ -199,23 +201,23 @@ void URSInventoryComponent::ChangeItem(int32 Index, const FInventoryItem& Item, 
     {
         return;
     }
-    InventoryBox[Index].Count = ChangedCount <= Item.MaxCount ? ChangedCount : Item.MaxCount;
-    InventoryBox[Index].bCanCraft = Item.bCanCraft;
-    InventoryBox[Index].bCanUse = Item.bCanUse;
+    InventoryItems[Index].Count = ChangedCount <= Item.MaxCount ? ChangedCount : Item.MaxCount;
+    InventoryItems[Index].bCanCraft = Item.bCanCraft;
+    InventoryItems[Index].bCanUse = Item.bCanUse;
 
-    InventoryBox[Index].MaxCount = Item.MaxCount;
-    if (InventoryBox[Index].Count <= 0)
+    InventoryItems[Index].MaxCount = Item.MaxCount;
+    if (InventoryItems[Index].Count <= 0)
     {
-        InventoryBox[Index].ItemID = -1;
-        InventoryBox[Index].ImageItem = nullptr;
+        InventoryItems[Index].ItemID = -1;
+        InventoryItems[Index].ImageItem = nullptr;
     }
     else
     {
-        InventoryBox[Index].ImageItem = Item.ImageItem;
-        InventoryBox[Index].ItemID = Item.ItemID;
+        InventoryItems[Index].ImageItem = Item.ImageItem;
+        InventoryItems[Index].ItemID = Item.ItemID;
     }
-    InventoryBox[Index].SlotIndex = Index;
-    OnInventoryEvent.Broadcast(Changed, InventoryBox[Index]);
+    InventoryItems[Index].SlotIndex = Index;
+    OnInventorySlotChanged.Broadcast(Changed, InventoryItems[Index]);
 }
 
 void URSInventoryComponent::BeginPlay()
