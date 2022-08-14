@@ -42,7 +42,6 @@ void URSAbilitySystem::CheckStateChanges()
                 HealthChanged.Broadcast(State.CurrentValue);
             }
             LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Health Value %f"), State.CurrentValue));
-            return;
         }
         if (State.StateType == EStateType::Stamina)
         {
@@ -54,7 +53,6 @@ void URSAbilitySystem::CheckStateChanges()
                 StaminaChanged.Broadcast(State.CurrentValue);
             }
             LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Stamina Value %f"), State.CurrentValue));
-            return;
         }
     }
 }
@@ -88,6 +86,7 @@ float URSAbilitySystem::GetStaminaChangedValue()
 float URSAbilitySystem::GetHealthChangedValue()
 {
     float ValueOnChangeHealth = 0.0f;
+    bool bHealthIsCriticalLevel = false;
     for (auto const &State : States)
     {
         // that will work, if hungry and temp comes after
@@ -95,9 +94,9 @@ float URSAbilitySystem::GetHealthChangedValue()
         // on health in it
         if(State.StateType == EStateType::Health)
         {
-            if (State.CurrentValue > 20)
+            if (State.CurrentValue <= 20)
             {
-               return 0.0f;
+                bHealthIsCriticalLevel = true;
             }
         }
         // check relation with hungry state
@@ -109,7 +108,7 @@ float URSAbilitySystem::GetHealthChangedValue()
                 ValueOnChangeHealth -= 1;
             }
             // if player is hungry, make decrease hp
-            if (State.CurrentValue >= 90.0f)
+            if (State.CurrentValue >= 90.0f && bHealthIsCriticalLevel)
             {
                 ValueOnChangeHealth += 1;
             }
@@ -117,12 +116,12 @@ float URSAbilitySystem::GetHealthChangedValue()
         // check relation with temperature state
         if(State.StateType == EStateType::Temp)
         {
-            if (State.CurrentValue < 15.0f)
+            if (State.CurrentValue <= 5.0f)
             {
                 ValueOnChangeHealth -= 5;
             }
             // if player is hungry, make decrease hp
-            if (State.CurrentValue > 20.0f)
+            if (State.CurrentValue > 70.0f && bHealthIsCriticalLevel)
             {
                 ValueOnChangeHealth += 1;
             }
