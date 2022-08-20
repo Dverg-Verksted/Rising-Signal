@@ -54,6 +54,41 @@ void URSAbilitySystem::CheckStateChanges()
             }
             LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Stamina Value %f"), State.CurrentValue));
         }
+        if (State.StateType == EStateType::Hungry)
+        {
+            State.CurrentValue += State.ChangedValue;
+            State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
+            if(HungryChanged.IsBound())
+            {
+                HungryChanged.Broadcast(State.CurrentValue);
+            }
+            LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Hungry Value %f"), State.CurrentValue));
+        }
+        
+        if (State.StateType == EStateType::Temp)
+        {
+            State.CurrentValue += State.ChangedValue;
+            State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
+            if(TempChanged.IsBound())
+            {
+                TempChanged.Broadcast(State.CurrentValue);
+            }
+            LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Temp Value %f"), State.CurrentValue));
+        }
+        if (State.StateType == EStateType::Stress)
+        {
+            State.CurrentValue += State.ChangedValue;
+            State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
+            if(StressChanged.IsBound())
+            {
+                StressChanged.Broadcast(State.CurrentValue);
+            }
+            LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Stress Value %f"), State.CurrentValue));
+        }
+        if(OnStateChangedSignature.IsBound())
+        {
+            OnStateChangedSignature.Broadcast(State.StateType, State.CurrentValue);
+        }
     }
 }
 
@@ -103,12 +138,12 @@ float URSAbilitySystem::GetHealthChangedValue()
         if(State.StateType == EStateType::Hungry)
         {
             // if player is not hungry, make regeneration hp
-            if (State.CurrentValue <= 0.0f)
+            if (State.CurrentValue >= 80.0f)
             {
                 ValueOnChangeHealth -= 1;
             }
             // if player is hungry, make decrease hp
-            if (State.CurrentValue >= 90.0f && bHealthIsCriticalLevel)
+            if (State.CurrentValue <= 30.0f && bHealthIsCriticalLevel)
             {
                 ValueOnChangeHealth += 1;
             }
@@ -116,12 +151,12 @@ float URSAbilitySystem::GetHealthChangedValue()
         // check relation with temperature state
         if(State.StateType == EStateType::Temp)
         {
-            if (State.CurrentValue <= 5.0f)
+            if (State.CurrentValue >= 80.0f)
             {
                 ValueOnChangeHealth -= 5;
             }
             // if player is hungry, make decrease hp
-            if (State.CurrentValue > 70.0f && bHealthIsCriticalLevel)
+            if (State.CurrentValue <= 30.0f && bHealthIsCriticalLevel)
             {
                 ValueOnChangeHealth += 1;
             }
@@ -158,6 +193,7 @@ void URSAbilitySystem::ChangeCurrentStateValue(EStateType StateTy, float Changes
         if (State.StateType == StateTy)
         {
             State.CurrentValue += ChangesValue;
+            State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
             LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("ChangesValue %f"), ChangesValue));
             return;
         }

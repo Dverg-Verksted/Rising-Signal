@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Trace/Detail/EventNode.h"
 #include "RSAbilitySystem.generated.h"
 
 class ARSGamePLayer;
+
 UENUM(BlueprintType)
 enum class EStateType : uint8
 {
@@ -40,21 +40,24 @@ struct FStateParams
 #pragma region Delegates
 // Delegate for assignment some health changes, return current health value
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHealthChanged, float, Health);
-// Delegate for call on change health
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FChangeHealth, float, Damage);
 
 // Delegate for assignment some stamina changes, return current stamina value
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStaminaChanged, float, Stamina);
-// Delegate for call on change stamina
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FChangeStamina, float, ChangeValue);
+
+// Delegate for assignment some stamina changes, return current hungry value
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHungryChanged, float, Stamina);
+
+// Delegate for assignment some stamina changes, return current temp value
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTempChanged, float, Temp);
 
 // Delegate for assignment some stress changes, return current stress value
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStressChanged, float, Stress);
-// Delegate for call on change stress
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FChangeStress, float, ChangeValue);
+
+// Universal delegate for all changed Params
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStateChangedSignature, EStateType, StateType, float, NewValue);
 
 // Delegate for assignment death event
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathSignature);
 #pragma endregion Delegates
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -73,33 +76,34 @@ public:
      */
     UPROPERTY(BlueprintAssignable)
     FHealthChanged HealthChanged;
-    /** Declare delegate @name OnChangeHealthSignature
-     */
-    UPROPERTY(BlueprintCallable)
-    FChangeHealth OnChangeHealthSignature;
 
-    /** Declare delegate @name HungryChanged
+    /** Declare delegate @name StaminaChanged
      */
     UPROPERTY(BlueprintAssignable)
     FStaminaChanged StaminaChanged;
-    /** Declare delegate @name OnChangeHungrySignature 
-     */
-    UPROPERTY(BlueprintCallable)
-    FChangeStamina OnChangeStaminaSignature;
 
+    /** Declare delegate @name HungryChanged
+    */
+    UPROPERTY(BlueprintAssignable)
+    FHungryChanged HungryChanged;
+
+    /** Declare delegate @name TempChanged
+    */
+    UPROPERTY(BlueprintAssignable)
+    FTempChanged TempChanged;
+    
     /** Declare delegate @name StressChanged
      */
     UPROPERTY(BlueprintAssignable)
     FStressChanged StressChanged;
-    /** Declare delegate @name OnChangeStressSignature
-     */
-    UPROPERTY(BlueprintCallable)
-    FChangeStress OnChangeStressSignature;
+
+    UPROPERTY(BlueprintAssignable)
+    FOnStateChangedSignature OnStateChangedSignature;
     
     /** Declare delegate @name OnDeath
      */
     UPROPERTY(BlueprintAssignable)
-    FOnDeath OnDeath;
+    FOnDeathSignature OnDeath;
 
 #pragma endregion DeclareDelegate 
 
