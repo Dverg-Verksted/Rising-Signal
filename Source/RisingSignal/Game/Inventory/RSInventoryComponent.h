@@ -8,47 +8,47 @@
 #include "Engine/DataTable.h"
 #include "RSInventoryComponent.generated.h"
 
-UENUM()
-enum EInventoryEvent
-{
-    Remove,
-    Divide,
-    Motion,
-    Use,
-    Warning,
-    Changed
-};
-
 USTRUCT(BlueprintType)
 struct FInventoryItem : public FTableRowBase
 {
     GENERATED_BODY()
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
-    int32 Count = 0;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
-    int32 SlotIndex = -1;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
+    
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
+        DisplayName="ID предмета", meta=(ToolTip = "Идентификатор предмета. Должен быть уникальным числом."))
     int32 ItemID = -1;
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
+    
+    UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "Инвентарь",
+        DisplayName="Индекс слота", meta=(ToolTip = "Параметр редактировать не нужно. По умолчанию значение всегда -1"))
+    int32 SlotIndex = -1;
+    
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
+        DisplayName = "Количество", meta=(ClampMin = 0, UIMin = 0, ToolTip = "Количество предметов, которые будет содержать InteractiveActor"))
+    int32 Count = 0;
+    
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
+        DisplayName = "Изображение", meta=(ToolTip = "Изображение, которое будет отображаться в слотах инвентаря"))
     UTexture2D* ImageItem;
 
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь", DisplayName="Можно использовать в крафте?")
     bool bCanCraft = false;
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
+    
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь", DisplayName="Стакается предмет?")
     bool bStack = true;
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
+    
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь", DisplayName = "Можно использовать?")
     bool bCanUse = false;
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
+    
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
+        DisplayName="Макс. количество", meta=(ToolTip = "Максимальное количество предметов в стаке", EditCondition="bStack == true", EditConditionHides))
     int32 MaxCount = 50;
+
 
     FInventoryItem() : ImageItem(nullptr) {}
 
     FInventoryItem(int i) : ImageItem(nullptr) { SlotIndex = i; }
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryEvent, EInventoryEvent, IventoryEvent, FInventoryItem, FirstItem);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventorySlotChangedSignature, FInventoryItem, Item);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class RISINGSIGNAL_API URSInventoryComponent : public UActorComponent
@@ -57,31 +57,37 @@ class RISINGSIGNAL_API URSInventoryComponent : public UActorComponent
 
 public:
     URSInventoryComponent();
-
-    // Delegate
+    
     UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Инвентарь")
-    FOnInventoryEvent OnInventoryEvent;
+    FOnInventorySlotChangedSignature OnInventorySlotUpdate;
+
+    UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Инвентарь")
+    FOnInventorySlotChangedSignature OnInventoryItemUse;
+    
+    UFUNCTION(BlueprintCallable, Category = "Инвентарь")
+    void AddItem(const FInventoryItem& Item);
 
     UFUNCTION(BlueprintCallable, Category = "Инвентарь")
-    bool ActionItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot, EInventoryEvent InventoryEvent);
+    bool MoveItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
 
+    UFUNCTION(BlueprintCallable, Category = "Инвентарь")
+    bool UseItem(const FInventoryItem& InventorySlot);
+    
     UFUNCTION(BlueprintCallable, Category = "Инвентарь")
     TArray<FInventoryItem> GetItems();
 
-    UPROPERTY(EditAnywhere, Category = "Инвентарь")
-    int32 MaxCountItem = 40;
 
     UFUNCTION(BlueprintPure, Category = "Инвентарь")
-    static FString ToString(FInventoryItem item)
+    static FString ToString(FInventoryItem Item)
     {
-        FString ret = "";
-        ret.Append("itemId=");
-        ret.Append(FString::FromInt(item.ItemID));
-        ret.Append("  Slot=");
-        ret.Append(FString::FromInt(item.SlotIndex));
-        ret.Append("  Count=");
-        ret.Append(FString::FromInt(item.Count));
-        return ret;
+        FString Ret = "";
+        Ret.Append("ItemId=");
+        Ret.Append(FString::FromInt(Item.ItemID));
+        Ret.Append("  Slot=");
+        Ret.Append(FString::FromInt(Item.SlotIndex));
+        Ret.Append("  Count=");
+        Ret.Append(FString::FromInt(Item.Count));
+        return Ret;
     }
 
 protected:
@@ -90,15 +96,15 @@ protected:
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:
-    FInventoryItem RemoveItem(const FInventoryItem& FirstInventorySlot, int32 CountRemove = -1);
+    void RemoveItem(const FInventoryItem& InventorySlot, int32 CountRemove = -1);
     bool DivideItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
     bool SwapItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
-    bool MotionItem(FInventoryItem FirstInventorySlot);
-    bool CombineItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot, int32& RemainingCount);
-    bool UseItem(const FInventoryItem& FirstInventorySlot);
-    void ChangeItem(int32 Index, const FInventoryItem& Item, int32 ChangedCount);
-    void InsertItem(const FInventoryItem& Item);
+    bool CombineItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
+    void UpdateSlot(int32 Index, const FInventoryItem& Item, int32 ChangedCount);
 
     UPROPERTY()
-    TArray<FInventoryItem> InventoryBox;
+    int32 MaxCountItem = 35;
+    
+    UPROPERTY()
+    TArray<FInventoryItem> InventoryItems;
 };

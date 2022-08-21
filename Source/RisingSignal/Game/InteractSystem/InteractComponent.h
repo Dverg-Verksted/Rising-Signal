@@ -16,7 +16,7 @@ class ARSGamePLayer;
 /**
  * @class
  **/
-UCLASS(ClassGroup = (Managers), meta = (BlueprintSpawnableComponent),
+UCLASS(Blueprintable, ClassGroup = (Managers), meta = (BlueprintSpawnableComponent),
     HideCategories = ("Variable", "Transform", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
         "Mobile", "Activation", "Component Replication", "Events", "Asset User Data", "Collision"))
 class RISINGSIGNAL_API UInteractComponent : public UActorComponent
@@ -49,6 +49,10 @@ protected:
 #pragma endregion
 
 #pragma region DataInteract
+
+public:
+    UFUNCTION(BlueprintPure, Category = "UInteractComponent | InteractItem")
+    AInteractItemActor* GetInteractItem() const {return TargetInteractItem;}
 
 private:
     // @private Size box collision
@@ -123,6 +127,12 @@ private:
 #pragma endregion
 
 #pragma region ANIMATIONS
+
+    UFUNCTION(BlueprintPure, Category = "UInteractComponent | AnimMontages")
+    UAnimMontage* GetGroundPickUpAnimMontage() const { return GroundPickUpAnimMontage; }
+
+    UFUNCTION(BlueprintCallable, Category = "UInteractComponent | AnimMontages")
+    void SetGroundPickUpAnimMontage(UAnimMontage* NewAnimMontage) { GroundPickUpAnimMontage = NewAnimMontage; }
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animations", meta= (AllowPrivateAccess = true))
     UAnimMontage* GroundPickUpAnimMontage;

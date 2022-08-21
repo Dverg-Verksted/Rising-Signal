@@ -21,9 +21,9 @@ private:
 
 public:
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
-    bool bICanCraft = false;
+    bool bCanCraft = false;
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
-    bool bICanUse = false;
+    bool bCanUse = false;
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь")
-    int32 MaxICount = 50;
+    int32 MaxCount = 50;
 };

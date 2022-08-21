@@ -3,31 +3,61 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RSEffect.h"
 #include "Components/ActorComponent.h"
-#include "Trace/Detail/EventNode.h"
 #include "RSAbilitySystem.generated.h"
+
+class ARSGamePLayer;
+
+UENUM(BlueprintType)
+enum class EStateType : uint8
+{
+    Health,
+    Stamina,
+    Stress,
+    Hungry,
+    Temp
+};
+
+USTRUCT(BlueprintType)
+struct FStateParams
+{
+    GENERATED_USTRUCT_BODY()
+    
+    UPROPERTY(EditAnywhere)
+    float CurrentValue = 0.0f;
+
+    UPROPERTY(EditAnywhere)
+    EStateType StateType = EStateType::Health;
+
+    // How much changes state per second
+    UPROPERTY(EditAnywhere)
+    float ChangedValue = 0.0f;
+    
+    UPROPERTY(EditAnywhere)
+    float TimeActive = 0.0f;
+};
 
 #pragma region Delegates
 // Delegate for assignment some health changes, return current health value
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHealthChanged, float, Health);
-// Delegate for call on change health
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FChangeHealth, float, Damage);
 
 // Delegate for assignment some stamina changes, return current stamina value
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStaminaChanged, float, Stamina);
-// Delegate for call on change stamina
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FChangeStamina, float, ChangeValue);
+
+// Delegate for assignment some stamina changes, return current hungry value
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHungryChanged, float, Stamina);
+
+// Delegate for assignment some stamina changes, return current temp value
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTempChanged, float, Temp);
 
 // Delegate for assignment some stress changes, return current stress value
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStressChanged, float, Stress);
-// Delegate for call on change stress
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FChangeStress, float, ChangeValue);
 
-//Delegate for getting effects on health value
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAddEffect, bool, IsDamage, float, EffectValue, float, EffectTime);
+// Universal delegate for all changed Params
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStateChangedSignature, EStateType, StateType, float, NewValue);
+
 // Delegate for assignment death event
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathSignature);
 #pragma endregion Delegates
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -41,106 +71,85 @@ public:
     
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-    /** Declare delegate @name OnEffectAdd
-     */
-    UPROPERTY(VisibleAnywhere, BlueprintCallable)
-    FAddEffect OnEffectAddSignature;
-    
+#pragma region DeclareDelegate
     /** Declare delegate @name FHealthChanged
      */
-    UPROPERTY(VisibleAnywhere, BlueprintAssignable)
+    UPROPERTY(BlueprintAssignable)
     FHealthChanged HealthChanged;
-    /** Declare delegate @name OnChangeHealthSignature
+
+    /** Declare delegate @name StaminaChanged
      */
-    UPROPERTY(VisibleAnywhere, BlueprintCallable)
-    FChangeHealth OnChangeHealthSignature;
+    UPROPERTY(BlueprintAssignable)
+    FStaminaChanged StaminaChanged;
 
     /** Declare delegate @name HungryChanged
-     */
-    UPROPERTY(VisibleAnywhere, BlueprintAssignable)
-    FStaminaChanged StaminaChanged;
-    /** Declare delegate @name OnChangeHungrySignature 
-     */
-    UPROPERTY(VisibleAnywhere, BlueprintCallable)
-    FChangeStamina OnChangeStaminaSignature;
+    */
+    UPROPERTY(BlueprintAssignable)
+    FHungryChanged HungryChanged;
 
+    /** Declare delegate @name TempChanged
+    */
+    UPROPERTY(BlueprintAssignable)
+    FTempChanged TempChanged;
+    
     /** Declare delegate @name StressChanged
      */
-    UPROPERTY(VisibleAnywhere, BlueprintAssignable)
+    UPROPERTY(BlueprintAssignable)
     FStressChanged StressChanged;
-    /** Declare delegate @name OnChangeStressSignature
-     */
-    UPROPERTY(VisibleAnywhere, BlueprintCallable)
-    FChangeStress OnChangeStressSignature;
+
+    UPROPERTY(BlueprintAssignable)
+    FOnStateChangedSignature OnStateChangedSignature;
     
     /** Declare delegate @name OnDeath
      */
     UPROPERTY(BlueprintAssignable)
-    FOnDeath OnDeath;
+    FOnDeathSignature OnDeath;
 
-    /** Func for delegate @name onChangeHealth
-     *  Formula: Current health - @param DamageTaken
-     *  @param DamageTaken is count of taken damage from anywhere
-     */
-    UFUNCTION(BlueprintNativeEvent)
-    void ChangeHealth(float const DamageTaken);
-
-    UFUNCTION()
-    void ChangeHealthOnEffects();
-
-    UFUNCTION(BlueprintNativeEvent)
-    void ChangeStamina(float const ChangedValue);
-
-    UFUNCTION(BlueprintNativeEvent)
-    void ChangeStress(float const ChangedValue);
+#pragma endregion DeclareDelegate 
 
 #pragma region Getters
-    // Getter for return current Health value
+    // Getter for return current any state in TArray States
     UFUNCTION(BlueprintCallable, BlueprintPure)
-    float GetHealth() const {return  Health;}
+    float GetCurrentStateValue(EStateType SearchState) const;
+    
     UFUNCTION(BlueprintCallable, BlueprintPure)
     bool GetIsDead() const {return  bIsDead;}
 #pragma endregion Getters
-    
-    // Function for adding effect in effects system
-    UFUNCTION(BlueprintNativeEvent)
-    void AddEffect(bool const IsDamage, float const EffectValue, float const EffectTime);
 
+    /* Universal func on change any state in TArray States
+     * Has a check for the presence of a parameter
+     * On input get type of state and change value,
+     * if damage (decrease state value) should send parameter with minus
+     */
+    UFUNCTION(BlueprintCallable)
+    void ChangeCurrentStateValue(EStateType StateTy,float ChangesValue);
+    
 protected:
     // Called when the game starts
     virtual void BeginPlay() override;
 
 private:
+    // control on state changes, it check all state on new change value
+    UFUNCTION()
+    void CheckStateChanges();
 
-    UPROPERTY()
-    URSEffect* EffectSystem;
+    //
+    UFUNCTION()
+    float GetStaminaChangedValue();
+
+    UFUNCTION()
+    float GetHealthChangedValue();
     
-    FTimerHandle TEffectChange;
-    
-    UPROPERTY()
-    float SumEffectValue;
-    
+    FTimerHandle TStateChange;
+
     // UPROPERTIES
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states")
-    bool bNeedHealth;
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", meta = (EditCondition = "bNeedHealth", EditConditionHides))
-    float Health;
     
     UPROPERTY(EditDefaultsOnly, Category = "Ability states")
-    bool bNeedHungry;
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", meta=(EditCondition = "bNeedHUngry", EditConditionHides))
-    float Hungry;
-    
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states")
-    bool bNeedStamina;
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", meta = (EditCondition = "bNeedStamina", EditConditionHides))
-    float Stamina;
-    
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states")
-    bool bNeedStress;
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", meta = (EditCondition = "bNeedStress", EditConditionHides))
-    float Stress;
+    TArray<FStateParams> States;
 
+    UPROPERTY()
+    ARSGamePLayer* GamePlayerRef;
+    
     UPROPERTY(VisibleDefaultsOnly, Category = "Ability states")
     bool bIsDead = false;
     
