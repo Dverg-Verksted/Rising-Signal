@@ -2,8 +2,12 @@
 
 
 #include "RSAbilitySystem.h"
+
 #include "TimerManager.h"
+#include "../../../../../Plugins/ElectronicNodes/Source/ElectronicNodes/Private/Lib/HotPatch.h"
+#include "GameInstance/RSGameInstance.h"
 #include "Library/RSFunctionLibrary.h"
+#include "Player/RSGamePLayer.h"
 
 // Sets default values for this component's properties
 URSAbilitySystem::URSAbilitySystem()
@@ -18,17 +22,147 @@ URSAbilitySystem::URSAbilitySystem()
 void URSAbilitySystem::BeginPlay()
 {
     Super::BeginPlay();
-
-    OnChangeHealthSignature.AddDynamic(this, &URSAbilitySystem::ChangeHealth);
-
-    OnChangeStaminaSignature.AddDynamic(this, &URSAbilitySystem::ChangeStamina);
-
-    OnEffectAddSignature.AddDynamic(this, &URSAbilitySystem::AddEffect);
-
-    OnChangeStressSignature.AddDynamic(this, &URSAbilitySystem::ChangeStress);
     
-    EffectSystem = NewObject<URSEffect>(this);
+    GetWorld()->GetTimerManager().SetTimer(TStateChange, this, &URSAbilitySystem::CheckStateChanges, 1, true);
+    GamePlayerRef = Cast<ARSGamePLayer>(GetOwner());
     
+}
+
+void URSAbilitySystem::CheckStateChanges()
+{
+    for (auto &State : States)
+    {
+        if (State.StateType == EStateType::Health)
+        {
+            State.ChangedValue = GetHealthChangedValue();
+            State.CurrentValue += State.ChangedValue;
+            State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
+            if (HealthChanged.IsBound())
+            {
+                HealthChanged.Broadcast(State.CurrentValue);
+            }
+            LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Health Value %f"), State.CurrentValue));
+        }
+        if (State.StateType == EStateType::Stamina)
+        {
+            State.ChangedValue = GetStaminaChangedValue();
+            State.CurrentValue += State.ChangedValue;
+            State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
+            if(StaminaChanged.IsBound())
+            {
+                StaminaChanged.Broadcast(State.CurrentValue);
+            }
+            LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Stamina Value %f"), State.CurrentValue));
+        }
+        if (State.StateType == EStateType::Hungry)
+        {
+            State.CurrentValue += State.ChangedValue;
+            State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
+            if(HungryChanged.IsBound())
+            {
+                HungryChanged.Broadcast(State.CurrentValue);
+            }
+            LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Hungry Value %f"), State.CurrentValue));
+        }
+        
+        if (State.StateType == EStateType::Temp)
+        {
+            State.CurrentValue += State.ChangedValue;
+            State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
+            if(TempChanged.IsBound())
+            {
+                TempChanged.Broadcast(State.CurrentValue);
+            }
+            LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Temp Value %f"), State.CurrentValue));
+        }
+        if (State.StateType == EStateType::Stress)
+        {
+            State.CurrentValue += State.ChangedValue;
+            State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
+            if(StressChanged.IsBound())
+            {
+                StressChanged.Broadcast(State.CurrentValue);
+            }
+            LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Stress Value %f"), State.CurrentValue));
+        }
+        if(OnStateChangedSignature.IsBound())
+        {
+            OnStateChangedSignature.Broadcast(State.StateType, State.CurrentValue);
+        }
+    }
+}
+
+float URSAbilitySystem::GetStaminaChangedValue()
+{
+    if(GamePlayerRef)
+    {
+        // add in player pawn enum on movement type - stand, walk, run, jump and etc.
+        float const CurrentPlayerSpeed = GamePlayerRef->GetVelocity().Size();
+        // this shitcode should rewrite on enum switcher
+        // if player stand, make regeneration stamina
+        if(CurrentPlayerSpeed <= 0)
+        {
+            return 3.0f;
+        }
+        // if player walk, make decrease stamina
+        if(CurrentPlayerSpeed <= 350)
+        {
+            return -5.0f;
+        }
+        // if player run, make more decrease stamina
+        if(CurrentPlayerSpeed >= 450)
+        {
+            return -20.0f;
+        }
+    }
+    return 0.0f;
+}
+
+float URSAbilitySystem::GetHealthChangedValue()
+{
+    float ValueOnChangeHealth = 0.0f;
+    bool bHealthIsCriticalLevel = false;
+    for (auto const &State : States)
+    {
+        // that will work, if hungry and temp comes after
+        // may be create one more for before this, and check constraint on
+        // on health in it
+        if(State.StateType == EStateType::Health)
+        {
+            if (State.CurrentValue <= 20)
+            {
+                bHealthIsCriticalLevel = true;
+            }
+        }
+        // check relation with hungry state
+        if(State.StateType == EStateType::Hungry)
+        {
+            // if player is not hungry, make regeneration hp
+            if (State.CurrentValue >= 80.0f)
+            {
+                ValueOnChangeHealth -= 1;
+            }
+            // if player is hungry, make decrease hp
+            if (State.CurrentValue <= 30.0f && bHealthIsCriticalLevel)
+            {
+                ValueOnChangeHealth += 1;
+            }
+        }
+        // check relation with temperature state
+        if(State.StateType == EStateType::Temp)
+        {
+            if (State.CurrentValue >= 80.0f)
+            {
+                ValueOnChangeHealth -= 5;
+            }
+            // if player is hungry, make decrease hp
+            if (State.CurrentValue <= 30.0f && bHealthIsCriticalLevel)
+            {
+                ValueOnChangeHealth += 1;
+            }
+        }
+    }
+    return ValueOnChangeHealth;
 }
 
 // Called every frame
@@ -39,106 +173,30 @@ void URSAbilitySystem::TickComponent(float DeltaTime, ELevelTick TickType, FActo
     // ...
 }
 
-// Func for Change Health and call delegate
-void URSAbilitySystem::ChangeHealth_Implementation(float const DamageTaken)
+float URSAbilitySystem::GetCurrentStateValue(EStateType SearchState) const
 {
-    if(!this->bIsDead)
+    for (const auto State : States)
     {
-        if(this->Health - DamageTaken <= 100)
+        if (State.StateType == SearchState)
         {
-            this->Health -= DamageTaken;
-        }
-        else
-        {
-            this->Health = 100;
-        }
-        
-        if(HealthChanged.IsBound())
-        {
-            HealthChanged.Broadcast(this->Health);
-        }
-        
-        if (this->Health <= 0.0f)
-        {
-            bIsDead = !bIsDead;
-            if(OnDeath.IsBound())
-            {
-                OnDeath.Broadcast();
-            }
+            return State.CurrentValue;
         }
     }
-}
-
-void URSAbilitySystem::ChangeHealthOnEffects()
-{
-    if(EffectSystem->GetEffectsNum() != 0)
-    {
-        ChangeHealth(EffectSystem->GetEffectSumValue());
-    }
-    else
-    {
-        GetOwner()->GetWorldTimerManager().ClearTimer(TEffectChange);
-    }
-}
-
-void URSAbilitySystem::ChangeStress_Implementation(float const ChangedValue)
-{
-    if(this->Stress - ChangedValue <= 100)
-    {
-        this->Stress -= ChangedValue;
-    }
-    else
-    {
-        this->Stress = 100;
-    }
-    if(StressChanged.IsBound())
-    {
-        StressChanged.Broadcast(this->Stress);
-    }
-}
-
-void URSAbilitySystem::ChangeStamina_Implementation(float const ChangedValue)
-{
-    if (this->Stamina >= 0)
-    {
-        if (this->Stamina - ChangedValue <= 100)
-        {
-            this->Stamina -= ChangedValue;
-        }
-        else
-        {
-            this->Stamina = 100;
-        }
-        
-        if(StaminaChanged.IsBound())
-        {
-            StaminaChanged.Broadcast(this->Stamina);
-        }
-    }
-    else
-    {
-        this->Stamina = 0;
-    }
-    
-}
-
-void URSAbilitySystem::AddEffect_Implementation(bool const IsDamage, float const EffectValue, float const EffectTime)
-{
-    EffectSystem->AddEffect(IsDamage, EffectValue, EffectTime);
-
-    if(!GetOwner()->GetWorldTimerManager().IsTimerActive(TEffectChange))
-    {
-        GetOwner()->GetWorldTimerManager().SetTimer(TEffectChange, this, &URSAbilitySystem::ChangeHealthOnEffects, 1.0f, true);
-    }
-    
-    UE_LOG(LogTemp, Warning, TEXT("Is damage %d \n Effect Value %f \n Effect Time %f "),
-        IsDamage, EffectValue, EffectTime);
+    return -1.0f;
 }
 
 
-// Add effect to system
-// void URSAbilitySystem::AddEffect(bool const IsDamage, float const EffectValue, float const EffectTime)
-// {
-//     
-// }
+void URSAbilitySystem::ChangeCurrentStateValue(EStateType StateTy, float ChangesValue)
+{
+    for (auto &State : States)
+    {
+        if (State.StateType == StateTy)
+        {
+            State.CurrentValue += ChangesValue;
+            State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
+            LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("ChangesValue %f"), ChangesValue));
+            return;
+        }
+    }
+}
 

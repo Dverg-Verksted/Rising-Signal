@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "AlsCharacter.h"
+#include "RSGamePlayerController.h"
+#include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
 #include "RSGamePLayer.generated.h"
 
-
 class UAlsCameraComponent;
+class URSAbilitySystem;
+
 /**
  * @class Own player (^_^)
  */
@@ -43,6 +46,9 @@ public:
 private:
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
     UAlsCameraComponent* AlsCamera;
+
+    UPROPERTY(EditDefaultsOnly)
+    URSAbilitySystem* AbilitySystem;
 
 #pragma endregion
 
@@ -112,5 +118,18 @@ public:
     virtual void DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& DebugDisplay, float& Unused, float& VerticalPosition) override;
 
 #pragma endregion
+
+#pragma region Extension
+
+public:
+
+    UPROPERTY()
+    ARSGamePlayerController* GamePlayerController;
+    
+private:
+    
+    void OnDeath();
+
+#pragma endregion Extension
     
 };

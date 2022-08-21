@@ -186,21 +186,38 @@ void UInteractComponent::RegisterInteractEvent()
 
     if (TargetInteractItem)
     {
-        StartPickUpAnimation();
-
         RemoveItem(TargetInteractItem);
         FDataTableRowHandle InteractDT = TargetInteractItem->GetInteractData();
         FDataInteract* DataInteract = InteractDT.DataTable->FindRow<FDataInteract>(InteractDT.RowName, "");
         if (!DataInteract) return;
+
+        if (DataInteract->TypeItem == ETypeItem::StaticItem)
+        {
+            // TODO Add and call StartInteractAnimation() function
+            return;
+        }
+
+        StartPickUpAnimation();
+
         switch (DataInteract->TypeItem)
         {
-            case ETypeItem::NoteItem: SendNoteData(DataInteract);
+            case ETypeItem::NoteItem:
+            {
+                SendNoteData(DataInteract);
                 break;
-            case ETypeItem::AudioItem: SendAudioData(DataInteract);
+            }
+            case ETypeItem::AudioItem:
+            {
+                SendAudioData(DataInteract);
                 break;
-            case ETypeItem::PhotoItem: SendPhotoData(DataInteract);
+            }
+            case ETypeItem::PhotoItem:
+            {
+                SendPhotoData(DataInteract);
                 break;
+            }
         }
+
         TargetInteractItem->Destroy();
     }
 }
