@@ -43,12 +43,13 @@ public:
 
 #pragma region Components
 
+public:
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    URSAbilitySystem* AbilitySystem;
+    
 private:
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
     UAlsCameraComponent* AlsCamera;
-
-    UPROPERTY(EditDefaultsOnly)
-    URSAbilitySystem* AbilitySystem;
 
 #pragma endregion
 
@@ -123,12 +124,15 @@ public:
 
 public:
 
-    UPROPERTY()
+    UPROPERTY(BlueprintReadOnly)
     ARSGamePlayerController* GamePlayerController;
     
 private:
-    
-    void OnDeath();
+
+    void OpenCloseInventory();
+    UFUNCTION()
+    void CheckSomeState(EStateType StateTyp, float Value);
+    void RegisterDeath();
 
 #pragma endregion Extension
     

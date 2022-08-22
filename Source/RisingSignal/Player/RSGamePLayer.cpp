@@ -2,10 +2,12 @@
 
 #include "Player/RSGamePLayer.h"
 #include "AlsCameraComponent.h"
+#include "AlsCharacterMovementComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
 #include "GameFramework/GameSession.h"
+#include "Library/RSFunctionLibrary.h"
 
 #pragma region Default
 
@@ -17,15 +19,17 @@ ARSGamePLayer::ARSGamePLayer()
     AlsCamera->SetRelativeRotation_Direct({0.0f, 90.0f, 0.0f});
 
     AbilitySystem = CreateDefaultSubobject<URSAbilitySystem>("AbilitySystem");
-    AbilitySystem->OnDeath.AddDynamic(this, &ARSGamePLayer::OnDeath);
+
+    GamePlayerController = Cast<ARSGamePlayerController>(GetController());
     
 }
 
 void ARSGamePLayer::BeginPlay()
 {
     Super::BeginPlay();
-    
-    GamePlayerController = Cast<ARSGamePlayerController>(GetController());
+
+    AbilitySystem->OnStateChangedSignature.AddDynamic(this, &ARSGamePLayer::CheckSomeState);
+    AbilitySystem->OnDeath.AddDynamic(this, &ARSGamePLayer::RegisterDeath);
     
 }
 
@@ -74,6 +78,9 @@ void ARSGamePLayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
     PlayerInputComponent->BindAction(TEXT("RotationMode"), IE_Pressed, this, &ThisClass::InputRotationModePressed);
     PlayerInputComponent->BindAction(TEXT("ViewMode"), IE_Pressed, this, &ThisClass::InputViewModePressed);
     PlayerInputComponent->BindAction(TEXT("SwitchShoulder"), IE_Pressed, this, &ThisClass::InputSwitchShoulderPressed);
+
+     PlayerInputComponent->BindAction(TEXT("Inventory"), IE_Pressed, this, &ARSGamePLayer::OpenCloseInventory);
+
 }
 
 void ARSGamePLayer::InputLookUp(const float Value)
@@ -221,6 +228,11 @@ void ARSGamePLayer::InputSwitchShoulderPressed()
 	AlsCamera->SetRightShoulder(!AlsCamera->IsRightShoulder());
 }
 
+void ARSGamePLayer::OpenCloseInventory()
+{
+    
+}
+
 #pragma endregion
 
 #pragma region Debug
@@ -234,7 +246,22 @@ void ARSGamePLayer::DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& Debug
 
 #pragma region Extension
 
-void ARSGamePLayer::OnDeath()
+void ARSGamePLayer::CheckSomeState(EStateType StateTyp, float Value)
+{
+    if(StateTyp == EStateType::Stamina)
+    {
+        if (Value <= 20)
+        {
+            GetAlsCharacterMovement()->MaxWalkSpeed = 100.0f;
+        }
+        else
+        {
+            GetAlsCharacterMovement()->MaxWalkSpeed = 450.0f;
+        }
+    }
+}
+
+void ARSGamePLayer::RegisterDeath()
 {
     // some death logic for player
 }
