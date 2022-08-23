@@ -8,6 +8,8 @@
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
 #include "RSGamePLayer.generated.h"
 
+class USpringArmComponent;
+class UCameraComponent;
 class UAlsCameraComponent;
 class URSAbilitySystem;
 
@@ -22,7 +24,6 @@ class RISINGSIGNAL_API ARSGamePLayer : public AAlsCharacter
 #pragma region Default
 
 public:
-
     // Constructor
     ARSGamePLayer();
 
@@ -46,10 +47,14 @@ public:
 public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     URSAbilitySystem* AbilitySystem;
-    
+
 private:
-    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
-    UAlsCameraComponent* AlsCamera;
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+    USpringArmComponent* SpringArm;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+    UCameraComponent* Camera;
+
 
 #pragma endregion
 
@@ -71,14 +76,12 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character | PlayerInput",
         Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "deg"))
     float LookRightRate{90.0f};
-    
+
 protected:
-    
     /** Allows a Pawn to set up custom input bindings. Called upon possession by a PlayerController, using the InputComponent created by CreatePlayerInputComponent(). */
     virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 private:
-    
     FTimerHandle SprintStartTimer;
 
     void InputLookUp(float Value);
@@ -123,17 +126,14 @@ public:
 #pragma region Extension
 
 public:
-
     UPROPERTY(BlueprintReadOnly)
     ARSGamePlayerController* GamePlayerController;
-    
-private:
 
+private:
     void OpenCloseInventory();
     UFUNCTION()
     void CheckSomeState(EStateType StateTyp, float Value);
     void RegisterDeath();
 
 #pragma endregion Extension
-    
 };

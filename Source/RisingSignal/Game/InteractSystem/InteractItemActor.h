@@ -11,7 +11,7 @@
 class UWidgetComponent;
 class UInteractWidget;
 UCLASS(HideCategories = ("Variable", "Transform", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
-        "Mobile", "Activation", "Component Replication", "Events", "Asset User Data", "Collision", "Rendering", "Input", "Actor", "LOD"))
+    "Mobile", "Activation", "Component Replication", "Events", "Asset User Data", "Collision", "Rendering", "Input", "Actor", "LOD"))
 class RISINGSIGNAL_API AInteractItemActor : public AActor
 {
     GENERATED_BODY()
@@ -38,7 +38,6 @@ protected:
 #pragma region Components
 
 private:
-    
     // @private Mesh component
     UPROPERTY(EditDefaultsOnly, Category = "Components")
     UStaticMeshComponent* Mesh;
@@ -52,7 +51,6 @@ private:
 #pragma region DataInteractItem
 
 public:
-
     /**
      * @public Load interact widget
      **/
@@ -76,10 +74,15 @@ public:
      * Temp function. Will be removed
      **/
     UFUNCTION(BlueprintPure, Category = "AInteractItemActor | DataInteractItem")
-    FDataInteract GetItemData() const { return *InteractData.DataTable->FindRow<FDataInteract>(InteractData.RowName, ""); };
-    
-private:
+    FDataInteract GetItemData() const
+    {
+        if (InteractData.DataTable && InteractData.RowName != "None")
+            return *InteractData.DataTable->FindRow<FDataInteract>(InteractData.RowName, "");
 
+        return FDataInteract();
+    };
+
+private:
     // @private pointer on InteractItemDataAsset
     UPROPERTY(EditDefaultsOnly, Category = "Settings Interact")
     UDataTable* DataTableInteractItem;
@@ -112,8 +115,7 @@ private:
     UInteractWidget* InteractWidget;
 
     FTimerHandle ResetInteractAnimTimerHandle;
-    
+
 
 #pragma endregion
-
 };

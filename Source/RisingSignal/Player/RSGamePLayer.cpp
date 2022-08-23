@@ -3,25 +3,28 @@
 #include "Player/RSGamePLayer.h"
 #include "AlsCameraComponent.h"
 #include "AlsCharacterMovementComponent.h"
+#include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
 #include "GameFramework/GameSession.h"
 #include "Library/RSFunctionLibrary.h"
+#include "GameFramework/SpringArmComponent.h"
 
 #pragma region Default
 
 ARSGamePLayer::ARSGamePLayer()
 {
-    
-    AlsCamera = CreateDefaultSubobject<UAlsCameraComponent>(TEXT("AlsCamera"));
-    AlsCamera->SetupAttachment(GetMesh());
-    AlsCamera->SetRelativeRotation_Direct({0.0f, 90.0f, 0.0f});
+    SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+    SpringArm->SetupAttachment(GetRootComponent());
+    // SpringArm->SetRelativeRotation_Direct({0.0f, 90.0f, 0.0f});
+
+    Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+    Camera->SetupAttachment(SpringArm);
 
     AbilitySystem = CreateDefaultSubobject<URSAbilitySystem>("AbilitySystem");
 
     GamePlayerController = Cast<ARSGamePlayerController>(GetController());
-    
 }
 
 void ARSGamePLayer::BeginPlay()
@@ -30,7 +33,6 @@ void ARSGamePLayer::BeginPlay()
 
     AbilitySystem->OnStateChangedSignature.AddDynamic(this, &ARSGamePLayer::CheckSomeState);
     AbilitySystem->OnDeath.AddDynamic(this, &ARSGamePLayer::RegisterDeath);
-    
 }
 
 void ARSGamePLayer::Tick(float DeltaSeconds)
@@ -40,13 +42,7 @@ void ARSGamePLayer::Tick(float DeltaSeconds)
 
 void ARSGamePLayer::CalcCamera(float DeltaTime, FMinimalViewInfo& ViewInfo)
 {
-    if (!AlsCamera->IsActive())
-    {
-        Super::CalcCamera(DeltaTime, ViewInfo);
-        return;
-    }
-
-    AlsCamera->GetViewInfo(ViewInfo);
+    Super::CalcCamera(DeltaTime, ViewInfo);
 }
 
 #pragma endregion
@@ -79,158 +75,152 @@ void ARSGamePLayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
     PlayerInputComponent->BindAction(TEXT("ViewMode"), IE_Pressed, this, &ThisClass::InputViewModePressed);
     PlayerInputComponent->BindAction(TEXT("SwitchShoulder"), IE_Pressed, this, &ThisClass::InputSwitchShoulderPressed);
 
-     PlayerInputComponent->BindAction(TEXT("Inventory"), IE_Pressed, this, &ARSGamePLayer::OpenCloseInventory);
-
+    PlayerInputComponent->BindAction(TEXT("Inventory"), IE_Pressed, this, &ARSGamePLayer::OpenCloseInventory);
 }
 
 void ARSGamePLayer::InputLookUp(const float Value)
 {
-	AddControllerPitchInput(-Value * LookUpRate * GetWorld()->GetDeltaSeconds());
+    AddControllerPitchInput(-Value * LookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
 void ARSGamePLayer::InputLookRight(const float Value)
 {
-	AddControllerYawInput(Value * LookRightRate * GetWorld()->GetDeltaSeconds());
+    AddControllerYawInput(Value * LookRightRate * GetWorld()->GetDeltaSeconds());
 }
 
 void ARSGamePLayer::InputMoveForward(const float Value)
 {
-	AddMovementInput(UAlsMath::AngleToDirection2D(GetViewState().Rotation.Yaw),
-	                 UAlsMath::NormalizeInputAxis(Value, GetInputAxisValue("MoveRight")));
+    AddMovementInput(UAlsMath::AngleToDirection2D(GetViewState().Rotation.Yaw),
+        UAlsMath::NormalizeInputAxis(Value, GetInputAxisValue("MoveRight")));
 }
 
 void ARSGamePLayer::InputMoveRight(const float Value)
 {
-	AddMovementInput(UAlsMath::AngleToDirection2D(GetViewState().Rotation.Yaw + 90.0f),
-	                 UAlsMath::NormalizeInputAxis(Value, GetInputAxisValue("MoveForward")));
+    AddMovementInput(UAlsMath::AngleToDirection2D(GetViewState().Rotation.Yaw + 90.0f),
+        UAlsMath::NormalizeInputAxis(Value, GetInputAxisValue("MoveForward")));
 }
 
 void ARSGamePLayer::InputSprintPressed()
 {
-	// Start the sprint with a slight delay to give the player enough time to start the roll with a double click instead.
+    // Start the sprint with a slight delay to give the player enough time to start the roll with a double click instead.
 
-	static constexpr auto StartDelay{0.1f};
+    static constexpr auto StartDelay{0.1f};
 
-	GetWorldTimerManager().SetTimer(SprintStartTimer,
-	                                FTimerDelegate::CreateWeakLambda(this, [this]
-	                                {
-		                                SetDesiredGait(EAlsGait::Sprinting);
-	                                }), StartDelay, false);
+    GetWorldTimerManager().SetTimer(SprintStartTimer,
+        FTimerDelegate::CreateWeakLambda(this, [this]
+        {
+            SetDesiredGait(EAlsGait::Sprinting);
+        }), StartDelay, false);
 }
 
 void ARSGamePLayer::InputSprintReleased()
 {
-	if (GetWorldTimerManager().TimerExists(SprintStartTimer))
-	{
-		GetWorldTimerManager().ClearTimer(SprintStartTimer);
-	}
-	else
-	{
-		SetDesiredGait(EAlsGait::Running);
-	}
+    if (GetWorldTimerManager().TimerExists(SprintStartTimer))
+    {
+        GetWorldTimerManager().ClearTimer(SprintStartTimer);
+    }
+    else
+    {
+        SetDesiredGait(EAlsGait::Running);
+    }
 }
 
 void ARSGamePLayer::InputRoll()
 {
-	GetWorldTimerManager().ClearTimer(SprintStartTimer);
+    GetWorldTimerManager().ClearTimer(SprintStartTimer);
 
-	static constexpr auto PlayRate{1.3f};
+    static constexpr auto PlayRate{1.3f};
 
-	TryStartRolling(PlayRate);
+    TryStartRolling(PlayRate);
 }
 
 void ARSGamePLayer::InputWalk()
 {
-	if (GetWorldTimerManager().TimerExists(SprintStartTimer))
-	{
-		return;
-	}
+    if (GetWorldTimerManager().TimerExists(SprintStartTimer))
+    {
+        return;
+    }
 
-	// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
-	// ReSharper disable once CppIncompleteSwitchStatement
-	switch (GetDesiredGait())
-	{
-		case EAlsGait::Walking:
-			SetDesiredGait(EAlsGait::Running);
-			break;
+    // ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
+    // ReSharper disable once CppIncompleteSwitchStatement
+    switch (GetDesiredGait())
+    {
+        case EAlsGait::Walking: SetDesiredGait(EAlsGait::Running);
+            break;
 
-		case EAlsGait::Running:
-			SetDesiredGait(EAlsGait::Walking);
-			break;
-	}
+        case EAlsGait::Running: SetDesiredGait(EAlsGait::Walking);
+            break;
+    }
 }
 
 void ARSGamePLayer::InputCrouch()
 {
-	switch (GetDesiredStance())
-	{
-		case EAlsStance::Standing:
-			SetDesiredStance(EAlsStance::Crouching);
-			break;
+    switch (GetDesiredStance())
+    {
+        case EAlsStance::Standing: SetDesiredStance(EAlsStance::Crouching);
+            break;
 
-		case EAlsStance::Crouching:
-			SetDesiredStance(EAlsStance::Standing);
-			break;
-	}
+        case EAlsStance::Crouching: SetDesiredStance(EAlsStance::Standing);
+            break;
+    }
 }
 
 void ARSGamePLayer::InputJumpPressed()
 {
-	if (TryStopRagdolling())
-	{
-		return;
-	}
+    if (TryStopRagdolling())
+    {
+        return;
+    }
 
-	if (TryStartMantlingGrounded())
-	{
-		return;
-	}
+    if (TryStartMantlingGrounded())
+    {
+        return;
+    }
 
-	if (GetStance() == EAlsStance::Crouching)
-	{
-		SetDesiredStance(EAlsStance::Standing);
-		return;
-	}
+    if (GetStance() == EAlsStance::Crouching)
+    {
+        SetDesiredStance(EAlsStance::Standing);
+        return;
+    }
 
-	Jump();
+    Jump();
 }
 
 void ARSGamePLayer::InputJumpReleased()
 {
-	StopJumping();
+    StopJumping();
 }
 
 void ARSGamePLayer::InputRagdollPressed()
 {
-	if (!TryStopRagdolling())
-	{
-		StartRagdolling();
-	}
+    if (!TryStopRagdolling())
+    {
+        StartRagdolling();
+    }
 }
 
 void ARSGamePLayer::InputRotationModePressed()
 {
-	SetDesiredRotationMode(GetDesiredRotationMode() != EAlsRotationMode::VelocityDirection
-		                       ? EAlsRotationMode::VelocityDirection
-		                       : EAlsRotationMode::LookingDirection);
+    SetDesiredRotationMode(GetDesiredRotationMode() != EAlsRotationMode::VelocityDirection
+                               ? EAlsRotationMode::VelocityDirection
+                               : EAlsRotationMode::LookingDirection);
 }
 
 void ARSGamePLayer::InputViewModePressed()
 {
-	SetViewMode(GetViewMode() == EAlsViewMode::FirstPerson
-		            ? EAlsViewMode::ThirdPerson
-		            : EAlsViewMode::FirstPerson);
+    SetViewMode(GetViewMode() == EAlsViewMode::FirstPerson
+                    ? EAlsViewMode::ThirdPerson
+                    : EAlsViewMode::FirstPerson);
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
 void ARSGamePLayer::InputSwitchShoulderPressed()
 {
-	AlsCamera->SetRightShoulder(!AlsCamera->IsRightShoulder());
+    // AlsCamera->SetRightShoulder(!AlsCamera->IsRightShoulder());
 }
 
 void ARSGamePLayer::OpenCloseInventory()
 {
-    
 }
 
 #pragma endregion
@@ -248,7 +238,7 @@ void ARSGamePLayer::DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& Debug
 
 void ARSGamePLayer::CheckSomeState(EStateType StateTyp, float Value)
 {
-    if(StateTyp == EStateType::Stamina)
+    if (StateTyp == EStateType::Stamina)
     {
         if (Value <= 20)
         {

@@ -69,7 +69,7 @@ void AInteractItemActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyC
         else
         {
             UStaticMesh* L_Mesh = LoadObject<UStaticMesh>(nullptr, *(DataInteract->MeshItem.ToString()));
-            if (L_Mesh) return;
+            if (!L_Mesh) return;
             this->Mesh->SetStaticMesh(L_Mesh);
         }
 
