@@ -1,6 +1,18 @@
 
 #include "Game/Inventory/RSInventoryComponent.h"
 
+FInventoryItem::FInventoryItem(FInventoryItem* OtherItem)
+{
+    this->Name = OtherItem->Name;
+    this->Description = OtherItem->Description;
+    this->ItemID = OtherItem->ItemID;
+    this->ImageItem = OtherItem->ImageItem;
+    this->bCanCraft = OtherItem->bCanCraft;
+    this->bStack = OtherItem->bStack;
+    this->bCanUse = OtherItem->bCanUse;
+    this->MaxCount = OtherItem->MaxCount;
+}
+
 URSInventoryComponent::URSInventoryComponent()
 {
     PrimaryComponentTick.bCanEverTick = true;
@@ -102,25 +114,25 @@ bool URSInventoryComponent::UseItem(const FInventoryItem& InventorySlot)
     return false;
 }
 
-void URSInventoryComponent::AddItem(const FInventoryItem& Item)
+void URSInventoryComponent::AddDataItem(const FDataTableRowHandle& RowDataHandle, int32 Count)
 {
-    int CurrentCountItem = Item.Count;
-    for (int32 i = 0; i < MaxCountItem; i++)
+    FInventoryItem* ItemToAdd = FindItemData(RowDataHandle);
+    int32 CurrentCountItem = Count;
+
+    if(CurrentCountItem > ItemToAdd->MaxCount)
     {
-        if (InventoryItems[i].ItemID == -1)
-        {
-            if (CurrentCountItem > Item.MaxCount)
-            {
-                CurrentCountItem -= Item.MaxCount;
-                UpdateSlot(i, Item, Item.MaxCount);
-            }
-            else
-            {
-                UpdateSlot(i, Item, CurrentCountItem);
-                break;
-            }
-        }
+        AddStacks(ItemToAdd, CurrentCountItem);
+        return;
     }
+
+    FInventoryItem* FreeSlot = FindFreeSlot();
+
+    if(FreeSlot == nullptr)
+    {
+        return;
+    }
+    
+    UpdateSlot(FreeSlot->SlotIndex, ItemToAdd, CurrentCountItem);
 }
 
 void URSInventoryComponent::UpdateSlot(int32 Index, const FInventoryItem& Item, int32 ChangedCount)
@@ -131,9 +143,60 @@ void URSInventoryComponent::UpdateSlot(int32 Index, const FInventoryItem& Item, 
     InventoryItems[Index].Count = ChangedCount;
     InventoryItems[Index].bCanCraft = Item.bCanCraft;
     InventoryItems[Index].bCanUse = Item.bCanUse;
+    InventoryItems[Index].bStack = Item.bStack;
     InventoryItems[Index].MaxCount = Item.MaxCount;
     
     OnInventorySlotUpdate.Broadcast(InventoryItems[Index]);
+}
+
+void URSInventoryComponent::AddStacks(FInventoryItem* Item, int32 Count)
+{
+    int32 CurrentItemCount = Count;
+    while(CurrentItemCount > 0)
+    {
+        FInventoryItem* FreeSlot = FindFreeSlot();
+        if(FreeSlot == nullptr)
+        {
+            return;
+        }
+
+        if(CurrentItemCount > Item->MaxCount)
+        {
+            CurrentItemCount -= Item->MaxCount;
+            UpdateSlot(FreeSlot->SlotIndex, Item, Item->MaxCount);
+        }
+        else
+        {
+            UpdateSlot(FreeSlot->SlotIndex, Item, CurrentItemCount);
+            CurrentItemCount = 0;
+        }
+    }
+}
+
+FInventoryItem* URSInventoryComponent::FindItemData(const FDataTableRowHandle& RowDataHandle)
+{
+    const UDataTable* DataTable = RowDataHandle.DataTable;
+    FName RowName = RowDataHandle.RowName;
+    FInventoryItem* Item = DataTable->FindRow<FInventoryItem>(RowName, TEXT("Find item data"));
+    
+    TArray<FName> RowNames = DataTable->GetRowNames();
+    for(int RowIndex = 0; RowIndex < RowNames.Num(); RowIndex++)
+    {
+        if(RowNames[RowIndex] == RowName)
+        {
+            // Index in Data Table starts at 1, so need increment RowIndex for exact match to index in Data Table.
+            ++RowIndex;
+            
+            Item->ItemID = RowIndex;
+        }
+    }
+
+    return Item;
+}
+
+FInventoryItem* URSInventoryComponent::FindFreeSlot()
+{
+    return InventoryItems.FindByPredicate([=](const FInventoryItem& Slot) { return Slot.ItemID == -1; });
 }
 
 void URSInventoryComponent::BeginPlay()

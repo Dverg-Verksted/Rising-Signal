@@ -12,17 +12,24 @@ USTRUCT(BlueprintType)
 struct FInventoryItem : public FTableRowBase
 {
     GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь",
+        DisplayName="Название", meta=(ToolTip="Название предмета"))
+    FText Name;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь",
+        DisplayName="Описание", meta=(ToolTip="Описание предмета", MultiLine=true))
+    FText Description;
     
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
+    UPROPERTY(BlueprintReadWrite, Category = "Инвентарь",
         DisplayName="ID предмета", meta=(ToolTip = "Идентификатор предмета. Должен быть уникальным числом."))
     int32 ItemID = -1;
     
-    UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "Инвентарь",
+    UPROPERTY(BlueprintReadWrite, Category = "Инвентарь",
         DisplayName="Индекс слота", meta=(ToolTip = "Параметр редактировать не нужно. По умолчанию значение всегда -1"))
     int32 SlotIndex = -1;
     
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
-        DisplayName = "Количество", meta=(ClampMin = 0, UIMin = 0, ToolTip = "Количество предметов, которые будет содержать InteractiveActor"))
+    UPROPERTY(BlueprintReadWrite, Category = "Инвентарь", DisplayName = "Количество")
     int32 Count = 0;
     
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
@@ -46,6 +53,20 @@ struct FInventoryItem : public FTableRowBase
     FInventoryItem() : ImageItem(nullptr) {}
 
     FInventoryItem(int i) : ImageItem(nullptr) { SlotIndex = i; }
+
+    FInventoryItem(FInventoryItem* OtherItem);
+
+    /*void operator = (const FInventoryItem& Other)
+    {
+        this->Name = Other.Name;
+        this->Description = Other.Description;
+        this->ItemID = Other.ItemID;
+        this->ImageItem = Other.ImageItem;
+        this->bCanCraft = Other.bCanCraft;
+        this->bStack = Other.bStack;
+        this->bCanUse = Other.bCanUse;
+        this->MaxCount = Other.MaxCount;
+    }*/
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventorySlotChangedSignature, FInventoryItem, Item);
@@ -63,9 +84,9 @@ public:
 
     UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Инвентарь")
     FOnInventorySlotChangedSignature OnInventoryItemUse;
-    
-    UFUNCTION(BlueprintCallable, Category = "Инвентарь")
-    void AddItem(const FInventoryItem& Item);
+
+    UFUNCTION(BlueprintCallable, Category="Инвентарь")
+    void AddDataItem(const FDataTableRowHandle& RowDataHandle, int32 Count);
 
     UFUNCTION(BlueprintCallable, Category = "Инвентарь")
     bool MoveItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
@@ -81,8 +102,8 @@ public:
     static FString ToString(FInventoryItem Item)
     {
         FString Ret = "";
-        Ret.Append("ItemId=");
-        Ret.Append(FString::FromInt(Item.ItemID));
+        /*Ret.Append("ItemId=");
+        Ret.Append(FString::FromInt(Item.ItemID));*/
         Ret.Append("  Slot=");
         Ret.Append(FString::FromInt(Item.SlotIndex));
         Ret.Append("  Count=");
@@ -101,6 +122,10 @@ private:
     bool SwapItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
     bool CombineItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
     void UpdateSlot(int32 Index, const FInventoryItem& Item, int32 ChangedCount);
+
+    void AddStacks(FInventoryItem* Item, int32 Count);
+    FInventoryItem* FindItemData(const FDataTableRowHandle& RowDataHandle);
+    FInventoryItem* FindFreeSlot();
 
     UPROPERTY()
     int32 MaxCountItem = 35;
