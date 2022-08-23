@@ -16,8 +16,16 @@
 ARSGamePLayer::ARSGamePLayer()
 {
     SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-    SpringArm->SetupAttachment(GetRootComponent());
-    // SpringArm->SetRelativeRotation_Direct({0.0f, 90.0f, 0.0f});
+    SpringArm->SetupAttachment(GetMesh());
+    SpringArm->SetRelativeLocation(FVector(0.0f, 0.0f, 150.0f));
+    SpringArm->SocketOffset = FVector(0.0f, 0.0f, 50.0f);
+    SpringArm->bEnableCameraLag = true;
+    SpringArm->CameraLagSpeed = 10.0f;
+    SpringArm->CameraLagMaxDistance = 100.0f;
+    SpringArm->bInheritPitch = false;
+    SpringArm->bInheritRoll = false;
+    SpringArm->bInheritYaw = false;
+    SpringArm->TargetArmLength = 700.0f;
 
     Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
     Camera->SetupAttachment(SpringArm);
