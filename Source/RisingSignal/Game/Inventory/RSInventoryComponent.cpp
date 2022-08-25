@@ -1,16 +1,16 @@
 
 #include "Game/Inventory/RSInventoryComponent.h"
 
-FInventoryItem::FInventoryItem(FInventoryItem* OtherItem)
+FInventoryItem::FInventoryItem(const FInventoryItem* OtherItem)
 {
-    this->Name = OtherItem->Name;
-    this->Description = OtherItem->Description;
-    this->ItemID = OtherItem->ItemID;
-    this->ImageItem = OtherItem->ImageItem;
-    this->bCanCraft = OtherItem->bCanCraft;
-    this->bStack = OtherItem->bStack;
-    this->bCanUse = OtherItem->bCanUse;
-    this->MaxCount = OtherItem->MaxCount;
+    Name = OtherItem->Name;
+    Description = OtherItem->Description;
+    ItemID = OtherItem->ItemID;
+    ImageItem = OtherItem->ImageItem;
+    bCanCraft = OtherItem->bCanCraft;
+    bStack = OtherItem->bStack;
+    bCanUse = OtherItem->bCanUse;
+    MaxCount = OtherItem->MaxCount;
 }
 
 URSInventoryComponent::URSInventoryComponent()
@@ -137,14 +137,10 @@ void URSInventoryComponent::AddDataItem(const FDataTableRowHandle& RowDataHandle
 
 void URSInventoryComponent::UpdateSlot(int32 Index, const FInventoryItem& Item, int32 ChangedCount)
 {
-    InventoryItems[Index].ItemID = Item.ItemID;
-    InventoryItems[Index].SlotIndex = Index;
-    InventoryItems[Index].ImageItem = Item.ImageItem;
-    InventoryItems[Index].Count = ChangedCount;
-    InventoryItems[Index].bCanCraft = Item.bCanCraft;
-    InventoryItems[Index].bCanUse = Item.bCanUse;
-    InventoryItems[Index].bStack = Item.bStack;
-    InventoryItems[Index].MaxCount = Item.MaxCount;
+    FInventoryItem CurrentItem = Item;
+    CurrentItem.SlotIndex = Index;
+    CurrentItem.Count = ChangedCount;
+    InventoryItems[Index] = CurrentItem;
     
     OnInventorySlotUpdate.Broadcast(InventoryItems[Index]);
 }

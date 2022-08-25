@@ -54,19 +54,22 @@ struct FInventoryItem : public FTableRowBase
 
     FInventoryItem(int i) : ImageItem(nullptr) { SlotIndex = i; }
 
-    FInventoryItem(FInventoryItem* OtherItem);
+    FInventoryItem(const FInventoryItem* OtherItem);
 
-    /*void operator = (const FInventoryItem& Other)
+    FInventoryItem operator = (const FInventoryItem& Other)
     {
         this->Name = Other.Name;
         this->Description = Other.Description;
+        this->SlotIndex = Other.SlotIndex;
+        this->Count = Other.Count;
         this->ItemID = Other.ItemID;
         this->ImageItem = Other.ImageItem;
         this->bCanCraft = Other.bCanCraft;
         this->bStack = Other.bStack;
         this->bCanUse = Other.bCanUse;
         this->MaxCount = Other.MaxCount;
-    }*/
+        return *this;
+    }
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventorySlotChangedSignature, FInventoryItem, Item);
@@ -101,14 +104,7 @@ public:
     UFUNCTION(BlueprintPure, Category = "Инвентарь")
     static FString ToString(FInventoryItem Item)
     {
-        FString Ret = "";
-        /*Ret.Append("ItemId=");
-        Ret.Append(FString::FromInt(Item.ItemID));*/
-        Ret.Append("  Slot=");
-        Ret.Append(FString::FromInt(Item.SlotIndex));
-        Ret.Append("  Count=");
-        Ret.Append(FString::FromInt(Item.Count));
-        return Ret;
+        return FString::Printf(TEXT("ItemID: %i, Slot: %i, Count: %i"), Item.ItemID, Item.SlotIndex, Item.Count);
     }
 
 protected:
@@ -116,6 +112,9 @@ protected:
     virtual void BeginPlay() override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Инвентарь | Настройки")
+    int32 MaxCountItem = 35;
+    
 private:
     void RemoveItem(const FInventoryItem& InventorySlot, int32 CountRemove = -1);
     bool DivideItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
@@ -127,8 +126,6 @@ private:
     FInventoryItem* FindItemData(const FDataTableRowHandle& RowDataHandle);
     FInventoryItem* FindFreeSlot();
 
-    UPROPERTY()
-    int32 MaxCountItem = 35;
     
     UPROPERTY()
     TArray<FInventoryItem> InventoryItems;
