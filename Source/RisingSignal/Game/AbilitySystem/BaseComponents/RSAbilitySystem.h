@@ -25,6 +25,12 @@ struct FStateParams
     
     UPROPERTY(EditAnywhere)
     float CurrentValue = 0.0f;
+    
+    UPROPERTY(EditAnywhere)
+    float MaxValue = 100.0f;
+    
+    UPROPERTY(EditAnywhere)
+    float MinValue = 0.0f;
 
     UPROPERTY(EditAnywhere)
     EStateType StateType = EStateType::Health;
@@ -38,21 +44,6 @@ struct FStateParams
 };
 
 #pragma region Delegates
-// Delegate for assignment some health changes, return current health value
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHealthChanged, float, Health);
-
-// Delegate for assignment some stamina changes, return current stamina value
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStaminaChanged, float, Stamina);
-
-// Delegate for assignment some stamina changes, return current hungry value
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHungryChanged, float, Stamina);
-
-// Delegate for assignment some stamina changes, return current temp value
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTempChanged, float, Temp);
-
-// Delegate for assignment some stress changes, return current stress value
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStressChanged, float, Stress);
-
 // Universal delegate for all changed Params
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStateChangedSignature, EStateType, StateType, float, NewValue);
 
@@ -72,30 +63,6 @@ public:
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 #pragma region DeclareDelegate
-    /** Declare delegate @name FHealthChanged
-     */
-    UPROPERTY(BlueprintAssignable)
-    FHealthChanged HealthChanged;
-
-    /** Declare delegate @name StaminaChanged
-     */
-    UPROPERTY(BlueprintAssignable)
-    FStaminaChanged StaminaChanged;
-
-    /** Declare delegate @name HungryChanged
-    */
-    UPROPERTY(BlueprintAssignable)
-    FHungryChanged HungryChanged;
-
-    /** Declare delegate @name TempChanged
-    */
-    UPROPERTY(BlueprintAssignable)
-    FTempChanged TempChanged;
-    
-    /** Declare delegate @name StressChanged
-     */
-    UPROPERTY(BlueprintAssignable)
-    FStressChanged StressChanged;
 
     UPROPERTY(BlueprintAssignable)
     FOnStateChangedSignature OnStateChangedSignature;

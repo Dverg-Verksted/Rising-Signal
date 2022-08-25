@@ -7,6 +7,7 @@
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
+#include "Game/HUD/GameHUD.h"
 #include "GameFramework/GameSession.h"
 #include "Library/RSFunctionLibrary.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -229,6 +230,8 @@ void ARSGamePLayer::InputSwitchShoulderPressed()
 
 void ARSGamePLayer::OpenCloseInventory()
 {
+    if(!InventoryOpenClose.IsBound()) return;
+    InventoryOpenClose.Broadcast();
 }
 
 #pragma endregion

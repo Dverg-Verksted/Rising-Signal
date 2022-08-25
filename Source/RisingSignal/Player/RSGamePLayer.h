@@ -13,6 +13,8 @@ class UCameraComponent;
 class UAlsCameraComponent;
 class URSAbilitySystem;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySignature);
+
 /**
  * @class Own player (^_^)
  */
@@ -126,11 +128,16 @@ public:
 #pragma region Extension
 
 public:
+    
     UPROPERTY(BlueprintReadOnly)
     ARSGamePlayerController* GamePlayerController;
 
+    UPROPERTY(BlueprintAssignable)
+    FOnInventorySignature InventoryOpenClose;
+
 private:
     void OpenCloseInventory();
+    
     UFUNCTION()
     void CheckSomeState(EStateType StateTyp, float Value);
     void RegisterDeath();

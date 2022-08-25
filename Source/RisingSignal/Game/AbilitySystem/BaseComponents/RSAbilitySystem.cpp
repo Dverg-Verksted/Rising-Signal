@@ -37,10 +37,6 @@ void URSAbilitySystem::CheckStateChanges()
             State.ChangedValue = GetHealthChangedValue();
             State.CurrentValue += State.ChangedValue;
             State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
-            if (HealthChanged.IsBound())
-            {
-                HealthChanged.Broadcast(State.CurrentValue);
-            }
             LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Health Value %f"), State.CurrentValue));
         }
         if (State.StateType == EStateType::Stamina)
@@ -48,20 +44,12 @@ void URSAbilitySystem::CheckStateChanges()
             State.ChangedValue = GetStaminaChangedValue();
             State.CurrentValue += State.ChangedValue;
             State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
-            if(StaminaChanged.IsBound())
-            {
-                StaminaChanged.Broadcast(State.CurrentValue);
-            }
             LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Stamina Value %f"), State.CurrentValue));
         }
         if (State.StateType == EStateType::Hungry)
         {
             State.CurrentValue += State.ChangedValue;
             State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
-            if(HungryChanged.IsBound())
-            {
-                HungryChanged.Broadcast(State.CurrentValue);
-            }
             LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Hungry Value %f"), State.CurrentValue));
         }
         
@@ -69,20 +57,12 @@ void URSAbilitySystem::CheckStateChanges()
         {
             State.CurrentValue += State.ChangedValue;
             State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
-            if(TempChanged.IsBound())
-            {
-                TempChanged.Broadcast(State.CurrentValue);
-            }
             LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Temp Value %f"), State.CurrentValue));
         }
         if (State.StateType == EStateType::Stress)
         {
             State.CurrentValue += State.ChangedValue;
             State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
-            if(StressChanged.IsBound())
-            {
-                StressChanged.Broadcast(State.CurrentValue);
-            }
             LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Stress Value %f"), State.CurrentValue));
         }
         if(OnStateChangedSignature.IsBound())
@@ -107,7 +87,7 @@ float URSAbilitySystem::GetStaminaChangedValue()
         // if player walk, make decrease stamina
         if(CurrentPlayerSpeed <= 350)
         {
-            return -5.0f;
+            return 5.0f;
         }
         // if player run, make more decrease stamina
         if(CurrentPlayerSpeed >= 450)
