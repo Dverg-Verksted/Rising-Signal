@@ -140,6 +140,7 @@ private:
     
     UFUNCTION()
     void CheckSomeState(EStateType StateTyp, float Value);
+    UFUNCTION()
     void RegisterDeath();
 
 #pragma endregion Extension
