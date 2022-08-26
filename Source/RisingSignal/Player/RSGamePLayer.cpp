@@ -34,6 +34,8 @@ ARSGamePLayer::ARSGamePLayer()
     AbilitySystem = CreateDefaultSubobject<URSAbilitySystem>("AbilitySystem");
 
     GamePlayerController = Cast<ARSGamePlayerController>(GetController());
+
+    InventoryComponent = CreateDefaultSubobject<URSInventoryComponent>("InventoryComponent");
 }
 
 void ARSGamePLayer::BeginPlay()
@@ -52,6 +54,11 @@ void ARSGamePLayer::Tick(float DeltaSeconds)
 void ARSGamePLayer::CalcCamera(float DeltaTime, FMinimalViewInfo& ViewInfo)
 {
     Super::CalcCamera(DeltaTime, ViewInfo);
+}
+
+URSInventoryComponent* ARSGamePLayer::GetInventoryComponent()
+{
+    return InventoryComponent;
 }
 
 #pragma endregion

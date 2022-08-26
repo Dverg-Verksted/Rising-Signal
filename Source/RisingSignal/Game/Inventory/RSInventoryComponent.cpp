@@ -53,6 +53,11 @@ bool URSInventoryComponent::MoveItem(const FInventoryItem& FirstInventorySlot, c
     {
         return false;
     }
+    if(SecondInventorySlot.SlotIndex == 34)
+    {
+        RemoveItem(FirstInventorySlot, FirstInventorySlot.Count);
+        return true;
+    }
     
     if(FirstInventorySlot.ItemID == SecondInventorySlot.ItemID)
     {
@@ -68,11 +73,6 @@ bool URSInventoryComponent::MoveItem(const FInventoryItem& FirstInventorySlot, c
     if(FirstInventorySlot.ItemID != SecondInventorySlot.ItemID)
     {
         SwapItem(FirstInventorySlot, SecondInventorySlot);
-        return true;
-    }
-    if(SecondInventorySlot.SlotIndex == 34)
-    {
-        RemoveItem(FirstInventorySlot, FirstInventorySlot.Count);
         return true;
     }
 

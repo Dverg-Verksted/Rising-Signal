@@ -6,6 +6,7 @@
 #include "AlsCharacter.h"
 #include "RSGamePlayerController.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
+#include "Game/Inventory/RSInventoryComponent.h"
 #include "RSGamePLayer.generated.h"
 
 class USpringArmComponent;
@@ -47,6 +48,9 @@ public:
 #pragma region Components
 
 public:
+    UFUNCTION(BlueprintGetter)
+    URSInventoryComponent* GetInventoryComponent();
+    
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     URSAbilitySystem* AbilitySystem;
 
@@ -56,6 +60,9 @@ private:
 
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
     UCameraComponent* Camera;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+    URSInventoryComponent* InventoryComponent;
 
 
 #pragma endregion
