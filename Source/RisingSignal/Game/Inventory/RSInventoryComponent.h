@@ -6,7 +6,16 @@
 #include "Components/ActorComponent.h"
 #include "Game/Inventory/RSInventoryItems.h"
 #include "Engine/DataTable.h"
+#include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
 #include "RSInventoryComponent.generated.h"
+
+
+UENUM()
+enum class EItemCategory
+{
+    Resource,
+    Junk
+};
 
 USTRUCT(BlueprintType)
 struct FInventoryItem : public FTableRowBase
@@ -20,6 +29,10 @@ struct FInventoryItem : public FTableRowBase
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь",
         DisplayName="Описание", meta=(ToolTip="Описание предмета", MultiLine=true))
     FText Description;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь",
+        DisplayName="Категория", meta=(ToolTip = "Категория предмета"))
+    EItemCategory ItemCategory = EItemCategory::Resource;
     
     UPROPERTY(BlueprintReadWrite, Category = "Инвентарь",
         DisplayName="ID предмета", meta=(ToolTip = "Идентификатор предмета. Должен быть уникальным числом."))
@@ -49,6 +62,11 @@ struct FInventoryItem : public FTableRowBase
         DisplayName="Макс. количество", meta=(ToolTip = "Максимальное количество предметов в стаке", EditCondition="bStack == true", EditConditionHides))
     int32 MaxCount = 50;
 
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь",
+        DisplayName="Эффекты", meta=(ToolTip = "Эффекты накладываемые на игрока, которые изменяют значения выбранных атрибутов игрока при использовании предмета.",
+        EditCondition="bCanUse", EditConditionHides))
+    TMap<EStateType, float> CharacterAttributesEffects;
+
 
     FInventoryItem() : ImageItem(nullptr) {}
 
@@ -68,11 +86,25 @@ struct FInventoryItem : public FTableRowBase
         this->bStack = Other.bStack;
         this->bCanUse = Other.bCanUse;
         this->MaxCount = Other.MaxCount;
+        this->CharacterAttributesEffects = Other.CharacterAttributesEffects;
+        this->ItemCategory = Other.ItemCategory;
         return *this;
+    }
+
+    bool operator == (const FInventoryItem& Other) const
+    {
+        return this->ItemID == Other.ItemID;
+    }
+
+    bool operator != (const FInventoryItem& Other) const
+    {
+        return this->ItemID != Other.ItemID;
     }
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventorySlotChangedSignature, FInventoryItem, Item);
+
+#define SLOT_REMOVE 34
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class RISINGSIGNAL_API URSInventoryComponent : public UActorComponent
@@ -113,18 +145,19 @@ protected:
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Инвентарь | Настройки")
-    int32 MaxCountItem = 35;
+    int32 MaxCountItem = 34;
     
 private:
     void RemoveItem(const FInventoryItem& InventorySlot, int32 CountRemove = -1);
     bool DivideItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
     bool SwapItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
-    bool CombineItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
+    void CombineItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
     void UpdateSlot(int32 Index, const FInventoryItem& Item, int32 ChangedCount);
 
     void AddStacks(FInventoryItem* Item, int32 Count);
     FInventoryItem* FindItemData(const FDataTableRowHandle& RowDataHandle);
     FInventoryItem* FindFreeSlot();
+    TSoftObjectPtr<URSAbilitySystem> AbilitySystem;
 
     
     UPROPERTY()

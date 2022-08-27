@@ -11,6 +11,7 @@ class ARSGamePLayer;
 UENUM(BlueprintType)
 enum class EStateType : uint8
 {
+    None,
     Health,
     Stamina,
     Stress,
