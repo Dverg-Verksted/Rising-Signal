@@ -2,6 +2,7 @@
 #include "Game/Inventory/RSInventoryComponent.h"
 
 #include "Game/InteractSystem/InteractComponent.h"
+#include "Game/InteractSystem/InteractItemActor.h"
 
 
 FInventoryItem::FInventoryItem(const FInventoryItem* OtherItem)
@@ -36,7 +37,7 @@ TArray<FInventoryItem> URSInventoryComponent::GetItems()
     return InventoryItems;
 }
 
-void URSInventoryComponent::RemoveItem(const FInventoryItem& InventorySlot, int32 CountRemove)
+void URSInventoryComponent::RemoveItem(const FInventoryItem& InventorySlot, int32 CountRemove, bool bItemUsed)
 {
     int32 IndexItem = InventorySlot.SlotIndex;
 
@@ -47,6 +48,11 @@ void URSInventoryComponent::RemoveItem(const FInventoryItem& InventorySlot, int3
     else
     {
         UpdateSlot(IndexItem, InventorySlot, InventorySlot.Count - CountRemove);
+    }
+
+    if(!bItemUsed)
+    {
+        AInteractItemActor::SpawnItem(GetOwner(), InventorySlot, 10.0f, CountRemove);
     }
 }
 
@@ -110,7 +116,7 @@ bool URSInventoryComponent::UseItem(const FInventoryItem& InventorySlot)
             AbilitySystem->ChangeCurrentStateValue(Effect.Key, Effect.Value);
         }
         
-        RemoveItem(InventorySlot, 1);
+        RemoveItem(InventorySlot, 1, true);
         
         return true;
     }

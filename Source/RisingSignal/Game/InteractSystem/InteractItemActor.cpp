@@ -41,7 +41,10 @@ void AInteractItemActor::BeginPlay()
     Super::BeginPlay();
 
     InteractWidget = Cast<UInteractWidget>(this->WidgetComponent->GetWidget());
-    InteractWidget->SetVisibility(ESlateVisibility::Collapsed);
+    if(IsValid(InteractWidget))
+    {
+        InteractWidget->SetVisibility(ESlateVisibility::Collapsed);
+    }
 
     if (InteractData.DataTable)
     {

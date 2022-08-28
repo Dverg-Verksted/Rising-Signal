@@ -114,10 +114,10 @@ class RISINGSIGNAL_API URSInventoryComponent : public UActorComponent
 public:
     URSInventoryComponent();
     
-    UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Инвентарь")
+    UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite)
     FOnInventorySlotChangedSignature OnInventorySlotUpdate;
 
-    UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Инвентарь")
+    UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite)
     FOnInventorySlotChangedSignature OnInventoryItemUse;
 
     UFUNCTION(BlueprintCallable, Category="Инвентарь")
@@ -144,11 +144,11 @@ protected:
     virtual void BeginPlay() override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Инвентарь | Настройки")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Инвентарь | Настройки", DisplayName = "Макс. количество предметов")
     int32 MaxCountItem = 34;
     
 private:
-    void RemoveItem(const FInventoryItem& InventorySlot, int32 CountRemove = -1);
+    void RemoveItem(const FInventoryItem& InventorySlot, int32 CountRemove = -1, bool bItemUsed = false);
     bool DivideItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
     bool SwapItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
     void CombineItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
