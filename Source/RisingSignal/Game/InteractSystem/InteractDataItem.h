@@ -30,7 +30,7 @@ struct FDataInteract : public FTableRowBase
     // @private Name item
     UPROPERTY(EditDefaultsOnly, Category = "Settings Data Item",
         meta = (DisplayName = "Имя предмета", ToolTip = "Укажите имя предмета"))
-    FText NameItem = FText();
+    FText Name = FText();
 
     // @private Description item
     UPROPERTY(EditDefaultsOnly, Category = "Settings Data Item",

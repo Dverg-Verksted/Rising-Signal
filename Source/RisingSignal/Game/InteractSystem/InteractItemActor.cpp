@@ -3,6 +3,7 @@
 #include "Game/InteractSystem/InteractItemActor.h"
 #include "Components/WidgetComponent.h"
 #include "Engine/AssetManager.h"
+#include "Game/Inventory/RSInventoryComponent.h"
 #include "Library/RSFunctionLibrary.h"
 #include "Widgets/InteractWidget.h"
 
@@ -41,6 +42,27 @@ void AInteractItemActor::BeginPlay()
 
     InteractWidget = Cast<UInteractWidget>(this->WidgetComponent->GetWidget());
     InteractWidget->SetVisibility(ESlateVisibility::Collapsed);
+
+    if (InteractData.DataTable)
+    {
+        const FDataInteract* DataInteract = InteractData.DataTable->FindRow<FDataInteract>(InteractData.RowName, "");
+        if (!DataInteract) return;
+
+        if (DataInteract->MeshItem.IsNull())
+        {
+            this->Mesh->SetStaticMesh(nullptr);
+        }
+        else
+        {
+            UStaticMesh* L_Mesh = LoadObject<UStaticMesh>(nullptr, *(DataInteract->MeshItem.ToString()));
+            if (!L_Mesh) return;
+            this->Mesh->SetStaticMesh(L_Mesh);
+        }
+
+        this->TypeItem = DataInteract->TypeItem;
+        this->NameItem = DataInteract->Name;
+        this->DescriptionItem = DataInteract->DescriptionItem;
+    }
 }
 
 #if UE_EDITOR
@@ -74,7 +96,7 @@ void AInteractItemActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyC
         }
 
         this->TypeItem = DataInteract->TypeItem;
-        this->NameItem = DataInteract->NameItem;
+        this->NameItem = DataInteract->Name;
         this->DescriptionItem = DataInteract->DescriptionItem;
     }
 }
@@ -103,4 +125,50 @@ void AInteractItemActor::DestroyInteractWidget()
             InteractWidget->SetVisibility(ESlateVisibility::Collapsed);
         }, InteractWidget->GetEndAnim()->GetEndTime(), false);
     }
+}
+
+void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, float Distance = 100, int32 Count = 1)
+{
+    if (!Spawner) return;
+
+    if (Count < 1) return;
+
+    if (Distance < 1) return;
+
+    FVector SpawnerLocation = Spawner->GetActorLocation();
+    FVector SpawnerRotation = Spawner->GetActorForwardVector();
+
+    FVector ItemSpawnLocation = SpawnerLocation + (SpawnerRotation * Distance);
+
+    FTransform ItemSpawnTransform{ItemSpawnLocation};
+
+    AInteractItemActor* Item = Spawner->GetWorld()->SpawnActorDeferred<AInteractItemActor>(AInteractItemActor::StaticClass(),
+        ItemSpawnTransform);
+    if (Item && Item->InteractData.DataTable)
+    {
+        Item->TypeItem = ETypeItem::InvItem;
+        Item->InteractData.RowName = GetRowNameByItemName(Item->InteractData.DataTable, (InventoryItemRules.Name));
+        Item->ItemCount = Count;
+
+        Item->FinishSpawning(ItemSpawnTransform);
+    }
+}
+
+
+FName AInteractItemActor::GetRowNameByItemName(const UDataTable* DataTable, FText ItemName)
+{
+    if (DataTable)
+    {
+        TMap<FName, uint8*> DTMap = DataTable->GetRowMap();
+
+        for (auto Pair : DTMap)
+        {
+            FDataInteract* ItemStruct = (FDataInteract*)Pair.Value;
+
+            if (ItemStruct->Name.EqualTo(ItemName))
+                return Pair.Key;
+        }
+    }
+
+    return "None";
 }

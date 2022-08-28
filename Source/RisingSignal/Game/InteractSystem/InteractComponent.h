@@ -7,6 +7,7 @@
 #include "Library/RSFunctionLibrary.h"
 #include "InteractComponent.generated.h"
 
+class URSInventoryComponent;
 class UJournalSystem;
 class ARSGamePlayerController;
 class AInteractItemActor;
@@ -69,6 +70,10 @@ private:
     // @private Owner Controller actor
     UPROPERTY()
     ARSGamePlayerController* PlayerController;
+
+    // @private Inventory component
+    UPROPERTY()
+    URSInventoryComponent* InventoryComp;
 
     // @private Pointer on UJournalSystem
     UPROPERTY()

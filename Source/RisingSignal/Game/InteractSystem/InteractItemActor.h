@@ -5,8 +5,10 @@
 #include "CoreMinimal.h"
 #include "InteractDataItem.h"
 #include "Engine/DataTable.h"
+#include "Game/Inventory/RSInventoryComponent.h"
 #include "GameFramework/Actor.h"
 #include "InteractItemActor.generated.h"
+
 
 class UWidgetComponent;
 class UInteractWidget;
@@ -82,6 +84,9 @@ public:
         return FDataInteract();
     };
 
+    UFUNCTION(BlueprintPure, Category = "AInteractItemActor | DataInteractItem")
+    int32 GetItemCount() const { return ItemCount; };
+
 private:
     // @private pointer on InteractItemDataAsset
     UPROPERTY(EditDefaultsOnly, Category = "Settings Interact")
@@ -101,6 +106,12 @@ private:
     UPROPERTY(VisibleInstanceOnly, Category = "Settings Interact", meta = (DisplayName = "Тип предмета"))
     ETypeItem TypeItem = ETypeItem::None;
 
+    // @private Inventory item count
+    UPROPERTY(EditInstanceOnly, Category = "Settings Interact",
+        meta = (DisplayName = "Количество предметов", EditCondition = "TypeItem == ETypeItem::InvItem", EditConditionHides,
+            ClampMin = 0, ClampMax = 100, AllowPrivateAccess))
+    int32 ItemCount = 1;
+
     // @private Name item
     UPROPERTY(VisibleInstanceOnly, Category = "Settings Interact",
         meta = (DisplayName = "Имя предмета"))
@@ -116,6 +127,15 @@ private:
 
     FTimerHandle ResetInteractAnimTimerHandle;
 
+
+#pragma endregion
+
+#pragma region Statics
+public:
+    UFUNCTION(BlueprintCallable)
+    static void SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, float Distance, int32 Count);
+
+    static FName GetRowNameByItemName(const UDataTable* DataTable, FText ItemName);
 
 #pragma endregion
 };

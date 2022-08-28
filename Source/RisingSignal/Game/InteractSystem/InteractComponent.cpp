@@ -49,6 +49,13 @@ void UInteractComponent::BeginPlay()
     }
     PlayerController->OnInteract.AddDynamic(this, &UInteractComponent::RegisterInteractEvent);
 
+    InventoryComp = OwnerPlayer->FindComponentByClass<URSInventoryComponent>();
+    if (!InventoryComp)
+    {
+        LOG_INTERACT(ELogRSVerb::Error, "Inventory Component is nullptr");
+        return;
+    }
+
     JournalSystem = Cast<UJournalSystem>(OwnerPlayer->GetComponentByClass(UJournalSystem::StaticClass()));
     if (!JournalSystem)
     {
@@ -187,8 +194,8 @@ void UInteractComponent::RegisterInteractEvent()
     if (TargetInteractItem)
     {
         RemoveItem(TargetInteractItem);
-        FDataTableRowHandle InteractDT = TargetInteractItem->GetInteractData();
-        FDataInteract* DataInteract = InteractDT.DataTable->FindRow<FDataInteract>(InteractDT.RowName, "");
+        FDataTableRowHandle InteractRowHandle = TargetInteractItem->GetInteractData();
+        FDataInteract* DataInteract = InteractRowHandle.DataTable->FindRow<FDataInteract>(InteractRowHandle.RowName, "");
         if (!DataInteract) return;
 
         if (DataInteract->TypeItem == ETypeItem::StaticItem)
@@ -214,6 +221,12 @@ void UInteractComponent::RegisterInteractEvent()
             case ETypeItem::PhotoItem:
             {
                 SendPhotoData(DataInteract);
+                break;
+            }
+            case ETypeItem::InvItem:
+            {
+                InventoryComp->AddDataItem(DataInteract->RowRuleInvItem, TargetInteractItem->GetItemCount());
+                LOG_RS(ELogRSVerb::Error, InteractRowHandle.RowName.ToString());
                 break;
             }
         }
@@ -293,7 +306,6 @@ void UInteractComponent::StartPickUpAnimation() const
 
     GetWorld()->GetTimerManager().SetTimer(TempHandle, this, &UInteractComponent::PickUpAnimationEnded, 2); // TODO: Fix this workaround
 }
-
 
 void UInteractComponent::PickUpAnimationEnded() const
 {
