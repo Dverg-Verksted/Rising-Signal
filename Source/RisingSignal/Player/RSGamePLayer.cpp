@@ -92,6 +92,11 @@ void ARSGamePLayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
     PlayerInputComponent->BindAction(TEXT("SwitchShoulder"), IE_Pressed, this, &ThisClass::InputSwitchShoulderPressed);
 
     PlayerInputComponent->BindAction(TEXT("Inventory"), IE_Pressed, this, &ARSGamePLayer::OpenCloseInventory);
+
+    PlayerInputComponent->BindAction(TEXT("Journal"), IE_Pressed, this, &ARSGamePLayer::OpenCloseJournal);
+    
+//    PlayerInputComponent->BindAction(TEXT("ActionSlot1"), IE_Pressed, this, );
+
 }
 
 void ARSGamePLayer::InputLookUp(const float Value)
@@ -120,13 +125,18 @@ void ARSGamePLayer::InputSprintPressed()
 {
     // Start the sprint with a slight delay to give the player enough time to start the roll with a double click instead.
 
-    static constexpr auto StartDelay{0.1f};
+    if(canRun)
+    {
+        static constexpr auto StartDelay{0.1f};
 
-    GetWorldTimerManager().SetTimer(SprintStartTimer,
-        FTimerDelegate::CreateWeakLambda(this, [this]
-        {
-            SetDesiredGait(EAlsGait::Sprinting);
-        }), StartDelay, false);
+        GetWorldTimerManager().SetTimer(SprintStartTimer,
+            FTimerDelegate::CreateWeakLambda(this, [this]
+            {
+                SetDesiredGait(EAlsGait::Sprinting);
+            }), StartDelay, false);
+    
+    }
+    
 }
 
 void ARSGamePLayer::InputSprintReleased()
@@ -241,6 +251,12 @@ void ARSGamePLayer::OpenCloseInventory()
     InventoryOpenClose.Broadcast();
 }
 
+void ARSGamePLayer::OpenCloseJournal()
+{
+    if(!JournalOpenClose.IsBound()) return;
+    JournalOpenClose.Broadcast();
+}
+
 #pragma endregion
 
 #pragma region Debug
@@ -254,17 +270,18 @@ void ARSGamePLayer::DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& Debug
 
 #pragma region Extension
 
-void ARSGamePLayer::CheckSomeState(EStateType StateTyp, float Value)
+void ARSGamePLayer::CheckSomeState(EAbilityStatesType StateTyp, float Value)
 {
-    if (StateTyp == EStateType::Stamina)
+    if (StateTyp == EAbilityStatesType::Stamina)
     {
         if (Value <= 20)
         {
-            GetAlsCharacterMovement()->MaxWalkSpeed = 100.0f;
+            canRun = false;
+            InputSprintReleased();
         }
         else
         {
-            GetAlsCharacterMovement()->MaxWalkSpeed = 450.0f;
+            canRun = true;
         }
     }
 }

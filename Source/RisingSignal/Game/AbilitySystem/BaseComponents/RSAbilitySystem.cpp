@@ -23,7 +23,7 @@ void URSAbilitySystem::BeginPlay()
 {
     Super::BeginPlay();
     
-    GetWorld()->GetTimerManager().SetTimer(TStateChange, this, &URSAbilitySystem::CheckStateChanges, 1, true);
+    GetWorld()->GetTimerManager().SetTimer(TStateChange, this, &URSAbilitySystem::CheckStateChanges, TimerChackStateRate, true);
     GamePlayerRef = Cast<ARSGamePLayer>(GetOwner());
     
 }
@@ -32,39 +32,21 @@ void URSAbilitySystem::CheckStateChanges()
 {
     for (auto &State : States)
     {
-        if (State.StateType == EStateType::Health)
+        if (State.StateType == EAbilityStatesType::Health)
         {
             State.ChangedValue = GetHealthChangedValue();
-            State.CurrentValue += State.ChangedValue;
-            State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
-            LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Health Value %f"), State.CurrentValue));
         }
-        if (State.StateType == EStateType::Stamina)
+        else if (State.StateType == EAbilityStatesType::Stamina)
         {
             State.ChangedValue = GetStaminaChangedValue();
-            State.CurrentValue += State.ChangedValue;
-            State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
-            LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Stamina Value %f"), State.CurrentValue));
-        }
-        if (State.StateType == EStateType::Hungry)
-        {
-            State.CurrentValue += State.ChangedValue;
-            State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
-            LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Hungry Value %f"), State.CurrentValue));
         }
         
-        if (State.StateType == EStateType::Temp)
-        {
-            State.CurrentValue += State.ChangedValue;
-            State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
-            LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Temp Value %f"), State.CurrentValue));
-        }
-        if (State.StateType == EStateType::Stress)
-        {
-            State.CurrentValue += State.ChangedValue;
-            State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
-            LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current Stress Value %f"), State.CurrentValue));
-        }
+        State.CurrentValue = FMath::Clamp(State.CurrentValue += State.ChangedValue,State.MinValue,State.MaxValue);
+
+        LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("%f"),State.ChangedValue));
+        
+        //LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current %hhd Value %f"), State.StateType ,State.CurrentValue));
+        
         if(OnStateChangedSignature.IsBound())
         {
             OnStateChangedSignature.Broadcast(State.StateType, State.CurrentValue);
@@ -82,17 +64,17 @@ float URSAbilitySystem::GetStaminaChangedValue()
         // if player stand, make regeneration stamina
         if(CurrentPlayerSpeed <= 0)
         {
-            return 3.0f;
+            return 7.0f * TimerChackStateRate;
         }
         // if player walk, make decrease stamina
-        if(CurrentPlayerSpeed <= 350)
+        if(CurrentPlayerSpeed <= 360)
         {
-            return 5.0f;
+            return 5.0f * TimerChackStateRate;
         }
         // if player run, make more decrease stamina
-        if(CurrentPlayerSpeed >= 450)
+        if(CurrentPlayerSpeed >= 410)
         {
-            return -20.0f;
+            return -7.0f * TimerChackStateRate;
         }
     }
     return 0.0f;
@@ -104,41 +86,42 @@ float URSAbilitySystem::GetHealthChangedValue()
     bool bHealthIsCriticalLevel = false;
     for (auto const &State : States)
     {
-        // that will work, if hungry and temp comes after
-        // may be create one more for before this, and check constraint on
-        // on health in it
-        if(State.StateType == EStateType::Health)
+        if(State.StateType == EAbilityStatesType::Health)
         {
             if (State.CurrentValue <= 20)
             {
                 bHealthIsCriticalLevel = true;
             }
         }
+    }
+    
+    for (auto const &State : States)
+    {
         // check relation with hungry state
-        if(State.StateType == EStateType::Hungry)
+        if(State.StateType == EAbilityStatesType::Hungry)
         {
             // if player is not hungry, make regeneration hp
-            if (State.CurrentValue >= 80.0f)
+            if (State.CurrentValue >= State.AfterIsDebafHungry)
             {
-                ValueOnChangeHealth -= 1;
+                ValueOnChangeHealth -= 1.0f * TimerChackStateRate;
             }
             // if player is hungry, make decrease hp
             if (State.CurrentValue <= 30.0f && bHealthIsCriticalLevel)
             {
-                ValueOnChangeHealth += 1;
+                ValueOnChangeHealth += 1.0f * TimerChackStateRate;
             }
         }
         // check relation with temperature state
-        if(State.StateType == EStateType::Temp)
+        if(State.StateType == EAbilityStatesType::Temp)
         {
-            if (State.CurrentValue >= 80.0f)
+            if (State.CurrentValue >= State.AfterIsDebafTemp)
             {
-                ValueOnChangeHealth -= 5;
+                ValueOnChangeHealth -= 5.0f * TimerChackStateRate;
             }
             // if player is hungry, make decrease hp
             if (State.CurrentValue <= 30.0f && bHealthIsCriticalLevel)
             {
-                ValueOnChangeHealth += 1;
+                ValueOnChangeHealth += 1.0f * TimerChackStateRate;
             }
         }
     }
@@ -153,7 +136,7 @@ void URSAbilitySystem::TickComponent(float DeltaTime, ELevelTick TickType, FActo
     // ...
 }
 
-float URSAbilitySystem::GetCurrentStateValue(EStateType SearchState) const
+float URSAbilitySystem::GetCurrentStateValue(EAbilityStatesType SearchState) const
 {
     for (const auto State : States)
     {
@@ -166,14 +149,14 @@ float URSAbilitySystem::GetCurrentStateValue(EStateType SearchState) const
 }
 
 
-void URSAbilitySystem::ChangeCurrentStateValue(EStateType StateTy, float ChangesValue)
+void URSAbilitySystem::ChangeCurrentStateValue(EAbilityStatesType StateTy, float ChangesValue)
 {
     for (auto &State : States)
     {
         if (State.StateType == StateTy)
         {
             State.CurrentValue += ChangesValue;
-            State.CurrentValue = FMath::Clamp(State.CurrentValue,0.0f,100.0f);
+            State.CurrentValue = FMath::Clamp(State.CurrentValue,State.MinValue,State.MaxValue);
             LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("ChangesValue %f"), ChangesValue));
             return;
         }

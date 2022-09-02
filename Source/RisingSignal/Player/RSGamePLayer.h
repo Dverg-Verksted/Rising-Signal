@@ -14,7 +14,9 @@ class UCameraComponent;
 class UAlsCameraComponent;
 class URSAbilitySystem;
 
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJournalSignature);
 
 /**
  * @class Own player (^_^)
@@ -142,11 +144,20 @@ public:
     UPROPERTY(BlueprintAssignable)
     FOnInventorySignature InventoryOpenClose;
 
+    UPROPERTY(BlueprintAssignable)
+    FOnJournalSignature JournalOpenClose;
+
 private:
+
+    bool canRun = true;
+
     void OpenCloseInventory();
+
+    void OpenCloseJournal();
     
     UFUNCTION()
-    void CheckSomeState(EStateType StateTyp, float Value);
+    void CheckSomeState(EAbilityStatesType StateTyp, float Value);
+    
     UFUNCTION()
     void RegisterDeath();
 

@@ -65,7 +65,7 @@ struct FInventoryItem : public FTableRowBase
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь",
         DisplayName="Эффекты", meta=(ToolTip = "Эффекты накладываемые на игрока, которые изменяют значения выбранных атрибутов игрока при использовании предмета.",
         EditCondition="bCanUse", EditConditionHides))
-    TMap<EStateType, float> CharacterAttributesEffects;
+    TMap<EAbilityStatesType, float> CharacterAttributesEffects;
 
 
     FInventoryItem() : ImageItem(nullptr) {}
