@@ -26,20 +26,22 @@ AActor* URSAIPerceptionComponent::GetClosestEnemy() const
     for (const auto PercieveActor : PercieveActors)
     {
         const auto HealthComponent = PercieveActor->FindComponentByClass<URSHealthComponent>();
-        if (Cast<ARSGamePLayer>(PercieveActor) && HealthComponent && !FMath::IsNearlyZero(HealthComponent->GetCurrentHealth()))       // TODO: Check if enemies and change HealthComponent to AbilitySystem
+        if (Cast<ARSGamePLayer>(PercieveActor) && HealthComponent && !FMath::IsNearlyZero(HealthComponent->GetCurrentHealth()))
+        // TODO: Check if enemies and change HealthComponent to AbilitySystem
         {
             const auto CurrentDistance = (PercieveActor->GetActorLocation() - Pawn->GetActorLocation()).Size();
             if (CurrentDistance < BestDistance)
             {
                 BestDistance = CurrentDistance;
                 BestPawn = PercieveActor;
+                LOG_RS(ELogRSVerb::Display, "New BestPawn = " + BestPawn->GetName());
             }
         }
     }
 
     if (bShowDebugInfo)
     {
-        LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Distance to closest enemy = %f")));
+        LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Distance to closest enemy = %f"), BestDistance));
     }
 
     return BestPawn;

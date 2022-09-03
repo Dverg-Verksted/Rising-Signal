@@ -27,6 +27,14 @@ UInteractComponent::UInteractComponent()
     {
         BoxCollision->SetBoxExtent(SizeBoxCollision);
     }
+
+    static ConstructorHelpers::FObjectFinder<UAnimMontage> PickMontage(
+        TEXT("AnimMontage'/ALS/ALS/RS_Animation/Interact/A_RS_PickupItem_Poses_Montage.A_RS_PickupItem_Poses_Montage'"));
+    GroundPickUpAnimMontage = PickMontage.Object;
+    if (!GroundPickUpAnimMontage)
+    {
+        LOG_RS(ELogRSVerb::Error, "GroundPickUpAnimMontage didn't set!");
+    }
 }
 
 // Called when the game starts
@@ -285,7 +293,7 @@ void UInteractComponent::InitAnimations()
     }
     else
     {
-        LOG_INTERACT(ELogRSVerb::Error, "No PickUpAnimMontage Set!");
+        LOG_INTERACT(ELogRSVerb::Error, "No PickUpAnimMontage Set in InteractComponent!");
     }
 }
 

@@ -1,7 +1,13 @@
 // It is owned by the company Dverg Verksted.
 
 #include "Game/InteractSystem/InteractItemActor.h"
+
+// #include "RSInteractStaticItemBase.h"
 #include "Components/WidgetComponent.h"
+#include "Editor/EditorEngine.h"
+#include "LevelEditor.h"
+#include "Editor.h"
+#include "UnrealEd.h"
 #include "Engine/AssetManager.h"
 #include "Game/Inventory/RSInventoryComponent.h"
 #include "Library/RSFunctionLibrary.h"
@@ -41,7 +47,7 @@ void AInteractItemActor::BeginPlay()
     Super::BeginPlay();
 
     InteractWidget = Cast<UInteractWidget>(this->WidgetComponent->GetWidget());
-    if(IsValid(InteractWidget))
+    if (IsValid(InteractWidget))
     {
         InteractWidget->SetVisibility(ESlateVisibility::Collapsed);
     }
@@ -84,18 +90,47 @@ void AInteractItemActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyC
 
     if (PropertyChangedEvent.Property->GetName() == TEXT("RowName") && InteractData.DataTable)
     {
-        const FDataInteract* DataInteract = InteractData.DataTable->FindRow<FDataInteract>(InteractData.RowName, "");
+        FDataInteract* DataInteract = InteractData.DataTable->FindRow<FDataInteract>(InteractData.RowName, "");
         if (!DataInteract) return;
 
-        if (DataInteract->MeshItem.IsNull())
+        if (DataInteract->TypeItem == ETypeItem::StaticItem)
         {
             this->Mesh->SetStaticMesh(nullptr);
+
+            // FTransform StaticItemActorTransform{GetActorRotation(), GetActorLocation()};
+
+            // ChildStaticItemActor = GetWorld()->SpawnActor<ARSInteractStaticItemBase>(DataInteract->StaticActorClass, StaticItemActorTransform);
+            //
+            // // ChildStaticItemActor = Cast<ARSInteractStaticItemBase>(GEditor->AddActor(GetWorld()->GetCurrentLevel(),
+            // //     DataInteract->StaticActorClass,
+            // //     StaticItemActorTransform));
+            // if (ChildStaticItemActor)
+            // {
+            //     LOG_RS(ELogRSVerb::Display, ChildStaticItemActor->GetName() + " parenting to " + this->GetName());
+            //     // GEditor->ParentActors(this, ChildStaticItemActor, "");
+            //     ChildStaticItemActor->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+            //     LOG_RS(ELogRSVerb::Display, ChildStaticItemActor->GetName() + " successfully parent to " + this->GetName());
+            // }
         }
         else
         {
+            // if (ChildStaticItemActor)
+            // {
+            //     LOG_RS(ELogRSVerb::Display, ChildStaticItemActor->GetName() + " start destroing");
+            //     ChildStaticItemActor->Destroy();
+            //     // GWorld->DestroyActor(ChildStaticItemActor);
+            //
+            //     LOG_RS(ELogRSVerb::Display, ChildStaticItemActor->GetName() + " destroyed");
+            // }
             UStaticMesh* L_Mesh = LoadObject<UStaticMesh>(nullptr, *(DataInteract->MeshItem.ToString()));
-            if (!L_Mesh) return;
-            this->Mesh->SetStaticMesh(L_Mesh);
+            if (L_Mesh)
+            {
+                this->Mesh->SetStaticMesh(L_Mesh);
+            }
+            else
+            {
+                LOG_RS(ELogRSVerb::Error, "StaticMesh for " + this->GetName() + " is nullptr");
+            }
         }
 
         this->TypeItem = DataInteract->TypeItem;

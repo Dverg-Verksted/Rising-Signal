@@ -122,6 +122,9 @@ private:
         meta = (DisplayName = "Описание предмета", MultiLine))
     FText DescriptionItem = FText();
 
+    // UPROPERTY()
+    // ARSInteractStaticItemBase* ChildStaticItemActor = nullptr;
+
     UPROPERTY()
     UInteractWidget* InteractWidget;
 

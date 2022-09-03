@@ -43,7 +43,7 @@ void URSAbilitySystem::CheckStateChanges()
         
         State.CurrentValue = FMath::Clamp(State.CurrentValue += State.ChangedValue,State.MinValue,State.MaxValue);
 
-        LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("%f"),State.ChangedValue));
+        // LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("%f"),State.ChangedValue));
         
         //LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current %hhd Value %f"), State.StateType ,State.CurrentValue));
         
@@ -157,7 +157,7 @@ void URSAbilitySystem::ChangeCurrentStateValue(EAbilityStatesType StateTy, float
         {
             State.CurrentValue += ChangesValue;
             State.CurrentValue = FMath::Clamp(State.CurrentValue,State.MinValue,State.MaxValue);
-            LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("ChangesValue %f"), ChangesValue));
+            // LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("ChangesValue %f"), ChangesValue));
             return;
         }
     }

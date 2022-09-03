@@ -5,6 +5,7 @@
 #include "InteractDataItem.generated.h"
 
 
+class ARSInteractStaticItemBase;
 UENUM(BlueprintType)
 enum class ETypeItem : uint8
 {
@@ -51,6 +52,18 @@ struct FDataInteract : public FTableRowBase
 
 #pragma region StaticItem
 
+    // @private Interval count range
+    // UPROPERTY(EditAnywhere, Category = "Settings Data Item",
+    //     meta = (
+    //         DisplayName = "Предмет",
+    //         ToolTip = "Укажите актор предмета",
+    //         EditCondition = "TypeItem == ETypeItem::StaticItem",
+    //         EditConditionHides
+    //     )
+    // )
+    // TSubclassOf<ARSInteractStaticItemBase> StaticActorClass = nullptr;
+
+
 
 #pragma endregion
 
@@ -72,15 +85,15 @@ struct FDataInteract : public FTableRowBase
     FDataTableRowHandle RowRuleInvItem;
 
     // @private Interval count range
-    UPROPERTY(EditInstanceOnly, Category = "Settings Data Item",
-        meta = (
-            DisplayName = "Количество предметов",
-            ToolTip = "Укажите количество подбираемых предметов",
-            EditCondition = "TypeItem == ETypeItem::InvItem",
-            EditConditionHides
-        )
-    )
-    int32 ItemCount = 1;
+    // UPROPERTY(EditInstanceOnly, Category = "Settings Data Item",
+    //     meta = (
+    //         DisplayName = "Количество предметов",
+    //         ToolTip = "Укажите количество подбираемых предметов",
+    //         EditCondition = "TypeItem == ETypeItem::InvItem",
+    //         EditConditionHides
+    //     )
+    // )
+    // int32 ItemCount = 1;
 
 #pragma endregion
 
