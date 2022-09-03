@@ -4,11 +4,7 @@
 
 // #include "RSInteractStaticItemBase.h"
 #include "Components/WidgetComponent.h"
-#include "Editor/EditorEngine.h"
-#include "LevelEditor.h"
-#include "Editor.h"
-#include "UnrealEd.h"
-#include "Engine/AssetManager.h"
+// #include "Engine/AssetManager.h"
 #include "Game/Inventory/RSInventoryComponent.h"
 #include "Library/RSFunctionLibrary.h"
 #include "Widgets/InteractWidget.h"
