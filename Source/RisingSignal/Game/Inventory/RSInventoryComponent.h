@@ -13,14 +13,17 @@
 UENUM()
 enum class EItemCategory
 {
-    Resource,
-    Junk
+    Resource UMETA(DisplayName = "Ресурс"),
+    Junk UMETA(DisplayName = "Хлам")
 };
 
 USTRUCT(BlueprintType)
 struct FInventoryItem : public FTableRowBase
 {
     GENERATED_BODY()
+
+    UPROPERTY()
+    FName RowName;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь",
         DisplayName="Название", meta=(ToolTip="Название предмета"))
@@ -76,6 +79,7 @@ struct FInventoryItem : public FTableRowBase
 
     FInventoryItem operator = (const FInventoryItem& Other)
     {
+        this->RowName = Other.RowName;
         this->Name = Other.Name;
         this->Description = Other.Description;
         this->SlotIndex = Other.SlotIndex;
@@ -132,7 +136,6 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Инвентарь")
     TArray<FInventoryItem> GetItems();
 
-
     UFUNCTION(BlueprintPure, Category = "Инвентарь")
     static FString ToString(FInventoryItem Item)
     {
@@ -157,8 +160,8 @@ private:
     void AddStacks(FInventoryItem* Item, int32 Count);
     FInventoryItem* FindItemData(const FDataTableRowHandle& RowDataHandle);
     FInventoryItem* FindFreeSlot();
+    
     TSoftObjectPtr<URSAbilitySystem> AbilitySystem;
-
     
     UPROPERTY()
     TArray<FInventoryItem> InventoryItems;

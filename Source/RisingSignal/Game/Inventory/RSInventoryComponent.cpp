@@ -7,6 +7,7 @@
 
 FInventoryItem::FInventoryItem(const FInventoryItem* OtherItem)
 {
+    RowName = OtherItem->RowName;
     Name = OtherItem->Name;
     Description = OtherItem->Description;
     ItemID = OtherItem->ItemID;
@@ -187,6 +188,7 @@ FInventoryItem* URSInventoryComponent::FindItemData(const FDataTableRowHandle& R
     const UDataTable* DataTable = RowDataHandle.DataTable;
     FName RowName = RowDataHandle.RowName;
     FInventoryItem* Item = DataTable->FindRow<FInventoryItem>(RowName, TEXT("Find item data"));
+    Item->RowName = RowName;
     
     TArray<FName> RowNames = DataTable->GetRowNames();
     for(int RowIndex = 0; RowIndex < RowNames.Num(); RowIndex++)
