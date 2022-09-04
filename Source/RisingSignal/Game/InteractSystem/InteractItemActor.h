@@ -71,6 +71,12 @@ public:
      **/
     UFUNCTION(BlueprintPure, Category = "AInteractItemActor | DataInteractItem")
     FDataTableRowHandle GetInteractData() const { return InteractData; };
+
+    /**
+     * Temp function. Will be removed
+     **/
+    UFUNCTION(BlueprintPure, Category = "AInteractItemActor | DataInteractItem")
+    FDataInteract GetItemData() const { return *InteractData.DataTable->FindRow<FDataInteract>(InteractData.RowName, ""); };
     
 private:
 

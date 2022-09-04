@@ -1,10 +1,14 @@
 // It is owned by the company Dverg Verksted.
 
 #include "Game/InteractSystem/InteractComponent.h"
+
+#include "AlsCharacterMovementComponent.h"
 #include "InteractDataItem.h"
 #include "InteractItemActor.h"
+#include "AnimNotifies/RSItemPickUpEndedAnimNotify.h"
 #include "Components/BoxComponent.h"
 #include "Game/JournalSystem/JournalSystem.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Player/RSGamePLayer.h"
 #include "Player/RSGamePlayerController.h"
 
@@ -36,7 +40,7 @@ void UInteractComponent::BeginPlay()
         LOG_INTERACT(ELogRSVerb::Error, "Owner player is nullptr");
         return;
     }
-    
+
     PlayerController = Cast<ARSGamePlayerController>(OwnerPlayer->GetController());
     if (!OwnerPlayer)
     {
@@ -51,17 +55,19 @@ void UInteractComponent::BeginPlay()
         LOG_INTERACT(ELogRSVerb::Error, "Journal System is nullptr");
         return;
     }
-    
+
     if (!BoxCollision)
     {
         LOG_INTERACT(ELogRSVerb::Error, "Box Collision is nullptr");
         return;
     }
-    
+
     BoxCollision->AttachToComponent(OwnerPlayer->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
     BoxCollision->OnComponentBeginOverlap.AddDynamic(this, &UInteractComponent::RegisterBeginOverlapInteractItem);
     BoxCollision->OnComponentEndOverlap.AddDynamic(this, &UInteractComponent::RegisterEndOverlapInteractItem);
     BoxCollision->SetCollisionProfileName("OverlapAll");
+
+    InitAnimations();
 }
 
 void UInteractComponent::Print_Log(ELogRSVerb LogVerb, FString Text, int Line, const char* Function) const
@@ -106,7 +112,7 @@ void UInteractComponent::AddItem(AInteractItemActor* InteractItem)
         LOG_INTERACT(ELogRSVerb::Warning, "Interact item is nullptr");
         return;
     }
-    
+
     ArrInteractItem.AddUnique(InteractItem);
     if (!GetWorld()->GetTimerManager().TimerExists(CheckedInteractItemTimerHandle))
     {
@@ -155,12 +161,12 @@ void UInteractComponent::CheckDistanceToItem()
     {
         LOG_INTERACT(ELogRSVerb::Display, FString::Printf(TEXT("New target item: %s | Distance: %f"),
             *TempTargetItem->GetName(), L_MinDistance));
-        
+
         if (TargetInteractItem)
         {
             TargetInteractItem->DestroyInteractWidget();
         }
-        
+
         TargetInteractItem = TempTargetItem;
         TargetInteractItem->LoadInteractWidget();
     }
@@ -169,24 +175,49 @@ void UInteractComponent::CheckDistanceToItem()
 void UInteractComponent::RegisterInteractEvent()
 {
     LOG_INTERACT(ELogRSVerb::Display, "Pressed button interact");
+
+    const ARSGamePLayer* Player = GetOwner<ARSGamePLayer>();
+    // UAlsCharacterMovementComponent* PlayerALSMovement = Cast<UAlsCharacterMovementComponent>(Player->GetCharacterMovement()); 
+    if (!Player || Player->GetCharacterMovement()->IsFalling()) // TODO: Add check for rolling
+    {
+        LOG_INTERACT(ELogRSVerb::Warning, "Can't interact, Player is Falling");
+        return;
+    }
+
     if (TargetInteractItem)
     {
         RemoveItem(TargetInteractItem);
         FDataTableRowHandle InteractDT = TargetInteractItem->GetInteractData();
         FDataInteract* DataInteract = InteractDT.DataTable->FindRow<FDataInteract>(InteractDT.RowName, "");
         if (!DataInteract) return;
+
+        if (DataInteract->TypeItem == ETypeItem::StaticItem)
+        {
+            // TODO Add and call StartInteractAnimation() function
+            return;
+        }
+
+        StartPickUpAnimation();
+
         switch (DataInteract->TypeItem)
         {
             case ETypeItem::NoteItem:
+            {
                 SendNoteData(DataInteract);
                 break;
+            }
             case ETypeItem::AudioItem:
+            {
                 SendAudioData(DataInteract);
                 break;
+            }
             case ETypeItem::PhotoItem:
+            {
                 SendPhotoData(DataInteract);
                 break;
+            }
         }
+
         TargetInteractItem->Destroy();
     }
 }
@@ -197,7 +228,7 @@ void UInteractComponent::SendNoteData(const FDataInteract* DataInteract) const
     {
         return;
     }
-    
+
     FInteractItemNote InteractItemNote;
     InteractItemNote.NoteDate = DataInteract->NoteDate;
     InteractItemNote.NoteDescription = DataInteract->NoteDescription;
@@ -222,6 +253,57 @@ void UInteractComponent::SendPhotoData(const FDataInteract* DataInteract) const
     InteractItemPhoto.PhotoMap = DataInteract->PhotoMap;
     InteractItemPhoto.JournalPhoto = DataInteract->JournalPhoto;
     JournalSystem->AddPhotoItem(InteractItemPhoto);
+}
+
+void UInteractComponent::InitAnimations()
+{
+    if (GroundPickUpAnimMontage)
+    {
+        const auto NotifyEvents = GroundPickUpAnimMontage->Notifies;
+        for (const auto NotifyEvent : NotifyEvents)
+        {
+            const auto PickUpEndedNotify = Cast<URSItemPickUpEndedAnimNotify>(NotifyEvent.Notify);
+            if (PickUpEndedNotify)
+            {
+                PickUpEndedNotify->OnNotifiedInteract.AddUObject(this, &UInteractComponent::PickUpAnimationEnded);
+                break;
+            }
+        }
+    }
+    else
+    {
+        LOG_INTERACT(ELogRSVerb::Error, "No PickUpAnimMontage Set!");
+    }
+}
+
+void UInteractComponent::StartPickUpAnimation() const
+{
+    if (!OwnerPlayer || !PlayerController)
+    {
+        LOG_INTERACT(ELogRSVerb::Error, "Owner player or PlayerController is nullptr");
+        return;
+    }
+
+    OwnerPlayer->DisableInput(PlayerController);
+
+    OwnerPlayer->PlayAnimMontage(GroundPickUpAnimMontage);
+
+    // some workaround
+    FTimerHandle TempHandle;
+
+    GetWorld()->GetTimerManager().SetTimer(TempHandle, this, &UInteractComponent::PickUpAnimationEnded, 2); // TODO: Fix this workaround
+}
+
+
+void UInteractComponent::PickUpAnimationEnded() const
+{
+    if (!OwnerPlayer || !PlayerController)
+    {
+        LOG_INTERACT(ELogRSVerb::Error, "Owner player or PlayerController is nullptr");
+        return;
+    }
+
+    OwnerPlayer->EnableInput(PlayerController);
 }
 
 #if WITH_EDITOR

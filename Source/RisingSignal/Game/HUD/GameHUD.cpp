@@ -9,11 +9,14 @@ void AGameHUD::DrawHUD()
 
     if (EnableDebugHUD)
     {
-        AddText(TEXT("Test function AddText"), FText::FromString("This AddText"));
-        AddFloat(TEXT("Test function AddFloat"), 1.488f);
-        AddInt(TEXT("Test function AddInt"), 228);
-        AddBool(TEXT("Test function AddBool"), false);
-        AddBool(TEXT("Test function AddBool"), true);
+        // Example for debug screen messages
+        // AddText(TEXT("Test function AddText"), FText::FromString("This AddText"));
+        // AddFloat(TEXT("Test function AddFloat"), 1.488f);
+        // AddInt(TEXT("Test function AddInt"), 228);
+        // AddBool(TEXT("Test function AddBool"), false);
+        // AddBool(TEXT("Test function AddBool"), true);
+        AddText(TEXT("Inventory"), FText::FromString("Press I - Show Inventory"));
+        AddText(TEXT("Journal"), FText::FromString("Press J - Show Journal"));
     }
 }
 

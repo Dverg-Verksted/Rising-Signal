@@ -3,19 +3,30 @@
 #include "Player/RSGamePLayer.h"
 #include "AlsCameraComponent.h"
 #include "Components/InputComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
+#include "GameFramework/GameSession.h"
 
 #pragma region Default
 
 ARSGamePLayer::ARSGamePLayer()
 {
+    
     AlsCamera = CreateDefaultSubobject<UAlsCameraComponent>(TEXT("AlsCamera"));
     AlsCamera->SetupAttachment(GetMesh());
     AlsCamera->SetRelativeRotation_Direct({0.0f, 90.0f, 0.0f});
+
+    AbilitySystem = CreateDefaultSubobject<URSAbilitySystem>("AbilitySystem");
+    AbilitySystem->OnDeath.AddDynamic(this, &ARSGamePLayer::OnDeath);
+    
 }
 
 void ARSGamePLayer::BeginPlay()
 {
     Super::BeginPlay();
+    
+    GamePlayerController = Cast<ARSGamePlayerController>(GetController());
+    
 }
 
 void ARSGamePLayer::Tick(float DeltaSeconds)
@@ -220,3 +231,12 @@ void ARSGamePLayer::DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& Debug
 }
 
 #pragma endregion
+
+#pragma region Extension
+
+void ARSGamePLayer::OnDeath()
+{
+    // some death logic for player
+}
+
+#pragma endregion Extension
