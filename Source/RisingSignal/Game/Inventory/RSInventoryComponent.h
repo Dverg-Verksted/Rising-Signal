@@ -14,7 +14,10 @@ UENUM()
 enum class EItemCategory
 {
     Resource UMETA(DisplayName = "Ресурс"),
-    Junk UMETA(DisplayName = "Хлам")
+    Junk UMETA(DisplayName = "Хлам"),
+    Weapon UMETA(DisplayName = "Оружие"),
+    Food UMETA(DisplayName = "Еда"),
+    Tools UMETA(DisplayName = "Инструменты")
 };
 
 USTRUCT(BlueprintType)
