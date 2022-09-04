@@ -26,4 +26,7 @@ void AGameHUD::BeginPlay()
 
     this->GamePlayer = Cast<ARSGamePLayer>(GetOwningPlayerController()->GetPawn());
     check(this->GamePlayer);
+
+    
+    
 }

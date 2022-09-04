@@ -6,6 +6,7 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Game/AI/Components/RSAIPerceptionComponent.h"
+#include "Library/RSFunctionLibrary.h"
 
 URSFindEnemyService::URSFindEnemyService()
 {
@@ -21,6 +22,7 @@ void URSFindEnemyService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* Nod
         const auto PerceptionComponent = Controller->FindComponentByClass<URSAIPerceptionComponent>();
         if (PerceptionComponent)
         {
+            LOG_RS(ELogRSVerb::Warning, "Found PercComp");
             Blackboard->SetValueAsObject(EnemyActorKey.SelectedKeyName, PerceptionComponent->GetClosestEnemy());
         }
     }

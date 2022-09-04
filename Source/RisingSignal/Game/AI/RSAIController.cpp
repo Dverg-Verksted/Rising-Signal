@@ -4,6 +4,7 @@
 #include "Game/AI/RSAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/RSAIPerceptionComponent.h"
+#include "Library/RSFunctionLibrary.h"
 
 ARSAIController::ARSAIController()
 {
@@ -21,5 +22,7 @@ void ARSAIController::Tick(float DeltaSeconds)
 AActor* ARSAIController::GetActorToFocusOn() const
 {
     if (!GetBlackboardComponent()) return nullptr;
+
+    LOG_RS(ELogRSVerb::Warning, "Found BlackBoardComp");
     return Cast<AActor>(GetBlackboardComponent()->GetValueAsObject(FocusOnKeyName));
 }
