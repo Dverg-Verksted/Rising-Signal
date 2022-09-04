@@ -4,27 +4,18 @@
 #include "Engine/DataTable.h"
 #include "InteractDataItem.generated.h"
 
-USTRUCT(BlueprintType)
-struct FCelRange
-{
-    GENERATED_BODY()
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "1", ClampMax = "2000"))
-    int32 Min = 1;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "1", ClampMax = "2000"))
-    int32 Max = 50;
-};
-
+class ARSInteractStaticItemBase;
 UENUM(BlueprintType)
 enum class ETypeItem : uint8
 {
     None,
-    StaticItem  UMETA(DisplayName = "Статичный предмет"),
+    StaticItem UMETA(DisplayName = "Статичный предмет"),
     MovableItem UMETA(DisplayName = "Перемещаемый предмет"),
-    InvItem     UMETA(DisplayName = "Инвентарный предмет"),
-    NoteItem    UMETA(DisplayName = "Записка"),
-    AudioItem   UMETA(DisplayName = "Аудио"),
-    PhotoItem   UMETA(DisplayName = "Фото")
+    InvItem UMETA(DisplayName = "Инвентарный предмет"),
+    NoteItem UMETA(DisplayName = "Записка"),
+    AudioItem UMETA(DisplayName = "Аудио"),
+    PhotoItem UMETA(DisplayName = "Фото")
 };
 
 USTRUCT(BlueprintType)
@@ -33,13 +24,14 @@ struct FDataInteract : public FTableRowBase
     GENERATED_BODY()
 
     // @private Type item
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Data Item", meta = (DisplayName = "Тип предмета", ToolTip = "Укажите тип предмета"))
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Data Item",
+        meta = (DisplayName = "Тип предмета", ToolTip = "Укажите тип предмета"))
     ETypeItem TypeItem = ETypeItem::StaticItem;
 
     // @private Name item
     UPROPERTY(EditDefaultsOnly, Category = "Settings Data Item",
         meta = (DisplayName = "Имя предмета", ToolTip = "Укажите имя предмета"))
-    FText NameItem = FText();
+    FText Name = FText();
 
     // @private Description item
     UPROPERTY(EditDefaultsOnly, Category = "Settings Data Item",
@@ -48,10 +40,28 @@ struct FDataInteract : public FTableRowBase
 
     // @private Static mesh item path
     UPROPERTY(EditDefaultsOnly, Category = "Settings Data Item",
-        meta = (AllowedClasses = "StaticMesh", DisplayName = "Мэш предмета", ToolTip = "Укажите статик мэш предмета"))
+        meta = (
+            AllowedClasses = "StaticMesh",
+            DisplayName = "Мэш предмета",
+            ToolTip = "Укажите статик мэш предмета",
+            EditCondition = "TypeItem != ETypeItem::StaticItem",
+            EditConditionHides
+        )
+    )
     FSoftObjectPath MeshItem;
 
 #pragma region StaticItem
+
+    // @private Interval count range
+    // UPROPERTY(EditAnywhere, Category = "Settings Data Item",
+    //     meta = (
+    //         DisplayName = "Предмет",
+    //         ToolTip = "Укажите актор предмета",
+    //         EditCondition = "TypeItem == ETypeItem::StaticItem",
+    //         EditConditionHides
+    //     )
+    // )
+    // TSubclassOf<ARSInteractStaticItemBase> StaticActorClass = nullptr;
 
 
 
@@ -65,16 +75,25 @@ struct FDataInteract : public FTableRowBase
 
     // @private Interval count range
     UPROPERTY(EditDefaultsOnly, Category = "Settings Data Item",
-        meta = (DisplayName = "Правила предметов", ToolTip = "Укажите таблицу и строку данной таблиц правил по передачи их в инвентарь",
-            EditCondition = "TypeItem == ETypeItem::InvItem", EditConditionHides))
+        meta = (
+            DisplayName = "Правила предметов",
+            ToolTip = "Укажите таблицу и строку данной таблицы правил по передачи их в инвентарь",
+            EditCondition = "TypeItem == ETypeItem::InvItem",
+            EditConditionHides
+        )
+    )
     FDataTableRowHandle RowRuleInvItem;
 
     // @private Interval count range
-    UPROPERTY(EditDefaultsOnly, Category = "Settings Data Item",
-        meta = (DisplayName = "Интервал количества предметов", ToolTip =
-            "Укажите диапозон количество предметов от которого будет выбрано случайное число для передачи в инвентарь",
-            EditCondition = "TypeItem == ETypeItem::InvItem", EditConditionHides))
-    FCelRange IntervalCount{1, 50};
+    // UPROPERTY(EditInstanceOnly, Category = "Settings Data Item",
+    //     meta = (
+    //         DisplayName = "Количество предметов",
+    //         ToolTip = "Укажите количество подбираемых предметов",
+    //         EditCondition = "TypeItem == ETypeItem::InvItem",
+    //         EditConditionHides
+    //     )
+    // )
+    // int32 ItemCount = 1;
 
 #pragma endregion
 

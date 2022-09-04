@@ -103,6 +103,8 @@ private:
 public:
 	AAlsCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+    UAlsCharacterMovementComponent* GetAlsCharacterMovement(){return AlsCharacterMovement;}
+
 #if WITH_EDITOR
 	virtual bool CanEditChange(const FProperty* Property) const override;
 #endif

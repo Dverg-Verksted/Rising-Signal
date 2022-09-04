@@ -6,6 +6,7 @@
 #include "RSGamePlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInteractSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGamePausedSignature);
 
 /**
  *
@@ -29,6 +30,9 @@ public:
 
     UPROPERTY(BlueprintAssignable, Category = "ARSGamePlayerController | Signature")
     FOnInteractSignature OnInteract;
+    
+    UPROPERTY(BlueprintAssignable, Category = "ARSGamePlayerController | Signature")
+    FOnInteractSignature OnGamePaused;
 
 #pragma endregion
 
@@ -36,6 +40,8 @@ public:
 
     UFUNCTION()
     void InputActionInteract();
+
+    void PauseGame();
 
 #pragma endregion 
 };

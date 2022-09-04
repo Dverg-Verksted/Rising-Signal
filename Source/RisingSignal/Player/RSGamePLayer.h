@@ -6,10 +6,17 @@
 #include "AlsCharacter.h"
 #include "RSGamePlayerController.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
+#include "Game/Inventory/RSInventoryComponent.h"
 #include "RSGamePLayer.generated.h"
 
+class USpringArmComponent;
+class UCameraComponent;
 class UAlsCameraComponent;
 class URSAbilitySystem;
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJournalSignature);
 
 /**
  * @class Own player (^_^)
@@ -22,7 +29,6 @@ class RISINGSIGNAL_API ARSGamePLayer : public AAlsCharacter
 #pragma region Default
 
 public:
-
     // Constructor
     ARSGamePLayer();
 
@@ -43,12 +49,23 @@ public:
 
 #pragma region Components
 
-private:
-    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
-    UAlsCameraComponent* AlsCamera;
-
-    UPROPERTY(EditDefaultsOnly)
+public:
+    UFUNCTION(BlueprintGetter)
+    URSInventoryComponent* GetInventoryComponent();
+    
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     URSAbilitySystem* AbilitySystem;
+
+private:
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+    USpringArmComponent* SpringArm;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+    UCameraComponent* Camera;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+    URSInventoryComponent* InventoryComponent;
+
 
 #pragma endregion
 
@@ -70,14 +87,12 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character | PlayerInput",
         Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "deg"))
     float LookRightRate{90.0f};
-    
+
 protected:
-    
     /** Allows a Pawn to set up custom input bindings. Called upon possession by a PlayerController, using the InputComponent created by CreatePlayerInputComponent(). */
     virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 private:
-    
     FTimerHandle SprintStartTimer;
 
     void InputLookUp(float Value);
@@ -122,14 +137,29 @@ public:
 #pragma region Extension
 
 public:
-
-    UPROPERTY()
+    
+    UPROPERTY(BlueprintReadOnly)
     ARSGamePlayerController* GamePlayerController;
-    
+
+    UPROPERTY(BlueprintAssignable)
+    FOnInventorySignature InventoryOpenClose;
+
+    UPROPERTY(BlueprintAssignable)
+    FOnJournalSignature JournalOpenClose;
+
 private:
+
+    bool canRun = true;
+
+    void OpenCloseInventory();
+
+    void OpenCloseJournal();
     
-    void OnDeath();
+    UFUNCTION()
+    void CheckSomeState(EAbilityStatesType StateTyp, float Value);
+    
+    UFUNCTION()
+    void RegisterDeath();
 
 #pragma endregion Extension
-    
 };

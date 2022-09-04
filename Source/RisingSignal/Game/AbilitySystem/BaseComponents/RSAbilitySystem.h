@@ -9,8 +9,9 @@
 class ARSGamePLayer;
 
 UENUM(BlueprintType)
-enum class EStateType : uint8
+enum class EAbilityStatesType : uint8
 {
+    None,
     Health,
     Stamina,
     Stress,
@@ -23,38 +24,35 @@ struct FStateParams
 {
     GENERATED_USTRUCT_BODY()
     
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditDefaultsOnly)
     float CurrentValue = 0.0f;
+    
+    UPROPERTY(EditDefaultsOnly)
+    float MaxValue = 100.0f;
+    
+    UPROPERTY(EditDefaultsOnly)
+    float MinValue = 0.0f;
 
-    UPROPERTY(EditAnywhere)
-    EStateType StateType = EStateType::Health;
+    UPROPERTY(EditDefaultsOnly)
+    EAbilityStatesType StateType = EAbilityStatesType::Health;
 
+    UPROPERTY(EditDefaultsOnly, meta = (EditCondition = "StateType == EAbilityStatesType::Hungry", EditConditionHides))
+    float AfterIsDebafHungry = 0.0f;
+
+    UPROPERTY(EditDefaultsOnly, meta = (EditCondition = "StateType == EAbilityStatesType::Temp", EditConditionHides))
+    float AfterIsDebafTemp = 0.0f;
+    
     // How much changes state per second
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditDefaultsOnly)
     float ChangedValue = 0.0f;
     
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditDefaultsOnly)
     float TimeActive = 0.0f;
 };
 
 #pragma region Delegates
-// Delegate for assignment some health changes, return current health value
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHealthChanged, float, Health);
-
-// Delegate for assignment some stamina changes, return current stamina value
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStaminaChanged, float, Stamina);
-
-// Delegate for assignment some stamina changes, return current hungry value
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHungryChanged, float, Stamina);
-
-// Delegate for assignment some stamina changes, return current temp value
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTempChanged, float, Temp);
-
-// Delegate for assignment some stress changes, return current stress value
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStressChanged, float, Stress);
-
 // Universal delegate for all changed Params
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStateChangedSignature, EStateType, StateType, float, NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStateChangedSignature, EAbilityStatesType, StateType, float, NewValue);
 
 // Delegate for assignment death event
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathSignature);
@@ -72,30 +70,6 @@ public:
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 #pragma region DeclareDelegate
-    /** Declare delegate @name FHealthChanged
-     */
-    UPROPERTY(BlueprintAssignable)
-    FHealthChanged HealthChanged;
-
-    /** Declare delegate @name StaminaChanged
-     */
-    UPROPERTY(BlueprintAssignable)
-    FStaminaChanged StaminaChanged;
-
-    /** Declare delegate @name HungryChanged
-    */
-    UPROPERTY(BlueprintAssignable)
-    FHungryChanged HungryChanged;
-
-    /** Declare delegate @name TempChanged
-    */
-    UPROPERTY(BlueprintAssignable)
-    FTempChanged TempChanged;
-    
-    /** Declare delegate @name StressChanged
-     */
-    UPROPERTY(BlueprintAssignable)
-    FStressChanged StressChanged;
 
     UPROPERTY(BlueprintAssignable)
     FOnStateChangedSignature OnStateChangedSignature;
@@ -110,7 +84,7 @@ public:
 #pragma region Getters
     // Getter for return current any state in TArray States
     UFUNCTION(BlueprintCallable, BlueprintPure)
-    float GetCurrentStateValue(EStateType SearchState) const;
+    float GetCurrentStateValue(EAbilityStatesType SearchState) const;
     
     UFUNCTION(BlueprintCallable, BlueprintPure)
     bool GetIsDead() const {return  bIsDead;}
@@ -122,7 +96,7 @@ public:
      * if damage (decrease state value) should send parameter with minus
      */
     UFUNCTION(BlueprintCallable)
-    void ChangeCurrentStateValue(EStateType StateTy,float ChangesValue);
+    void ChangeCurrentStateValue(EAbilityStatesType StateTy,float ChangesValue);
     
 protected:
     // Called when the game starts
@@ -137,6 +111,7 @@ private:
     UFUNCTION()
     float GetStaminaChangedValue();
 
+    //
     UFUNCTION()
     float GetHealthChangedValue();
     
@@ -152,5 +127,8 @@ private:
     
     UPROPERTY(VisibleDefaultsOnly, Category = "Ability states")
     bool bIsDead = false;
+
+    UPROPERTY(EditDefaultsOnly, Category= "Ability states")
+    float TimerChackStateRate = 0.1f;
     
 };
