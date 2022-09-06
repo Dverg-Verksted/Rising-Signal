@@ -69,17 +69,12 @@ bool URSInventoryComponent::MoveItem(const FInventoryItem& FirstInventorySlot, c
         return true;
     }
     
-    if(FirstInventorySlot.ItemID == SecondInventorySlot.ItemID)
+    if(FirstInventorySlot.ItemID == SecondInventorySlot.ItemID && FirstInventorySlot.SlotIndex != SecondInventorySlot.SlotIndex && FirstInventorySlot.bStack)
     {
-        if(FirstInventorySlot.bStack)
-        {
-            CombineItem(FirstInventorySlot, SecondInventorySlot);
-        }
-        else
-        {
-            return false;
-        }
+        CombineItem(FirstInventorySlot, SecondInventorySlot);
+        return true;
     }
+    
     if(FirstInventorySlot.ItemID != SecondInventorySlot.ItemID)
     {
         SwapItem(FirstInventorySlot, SecondInventorySlot);
@@ -110,7 +105,7 @@ void URSInventoryComponent::CombineItem(
 
 bool URSInventoryComponent::UseItem(const FInventoryItem& InventorySlot)
 {
-    if (InventorySlot.bCanUse)
+    if (InventorySlot.bCanUse && InventorySlot.SlotIndex != SLOT_REMOVE)
     {
         for(auto& Effect : InventorySlot.CharacterAttributesEffects)
         {
