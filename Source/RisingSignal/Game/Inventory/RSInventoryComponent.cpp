@@ -7,7 +7,7 @@
 
 FInventoryItem::FInventoryItem(const FInventoryItem* OtherItem)
 {
-    RowName = OtherItem->RowName;
+    InteractRowName = OtherItem->InteractRowName;
     Name = OtherItem->Name;
     Description = OtherItem->Description;
     ItemID = OtherItem->ItemID;
@@ -53,7 +53,7 @@ void URSInventoryComponent::RemoveItem(const FInventoryItem& InventorySlot, int3
 
     if(!bItemUsed)
     {
-        AInteractItemActor::SpawnItem(GetOwner(), InventorySlot, 100.0f, CountRemove);
+        AInteractItemActor::SpawnItem(GetOwner(), InventorySlot,  CountRemove);
     }
 }
 
@@ -119,9 +119,10 @@ bool URSInventoryComponent::UseItem(const FInventoryItem& InventorySlot)
     return false;
 }
 
-void URSInventoryComponent::AddDataItem(const FDataTableRowHandle& RowDataHandle, int32 Count)
+void URSInventoryComponent::AddDataItem(const FDataTableRowHandle& RowDataHandle, FName DTInteractRowName, int32 Count)
 {
     FInventoryItem* ItemToAdd = FindItemData(RowDataHandle);
+    ItemToAdd->InteractRowName = DTInteractRowName;
     int32 CurrentCountItem = Count;
     if(!ItemToAdd->bStack)
     {
@@ -183,8 +184,7 @@ FInventoryItem* URSInventoryComponent::FindItemData(const FDataTableRowHandle& R
     const UDataTable* DataTable = RowDataHandle.DataTable;
     FName RowName = RowDataHandle.RowName;
     FInventoryItem* Item = DataTable->FindRow<FInventoryItem>(RowName, TEXT("Find item data"));
-    Item->RowName = RowName;
-    
+
     TArray<FName> RowNames = DataTable->GetRowNames();
     for(int RowIndex = 0; RowIndex < RowNames.Num(); RowIndex++)
     {

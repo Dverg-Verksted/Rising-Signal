@@ -25,9 +25,6 @@ struct FInventoryItem : public FTableRowBase
 {
     GENERATED_BODY()
 
-    UPROPERTY()
-    FName RowName;
-
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь",
         DisplayName="Название", meta=(ToolTip="Название предмета"))
     FText Name;
@@ -73,6 +70,8 @@ struct FInventoryItem : public FTableRowBase
         EditCondition="bCanUse", EditConditionHides))
     TMap<EAbilityStatesType, float> CharacterAttributesEffects;
 
+    UPROPERTY()
+    FName InteractRowName;
 
     FInventoryItem() : ImageItem(nullptr) {}
 
@@ -82,7 +81,7 @@ struct FInventoryItem : public FTableRowBase
 
     FInventoryItem operator = (const FInventoryItem& Other)
     {
-        this->RowName = Other.RowName;
+        this->InteractRowName = Other.InteractRowName;
         this->Name = Other.Name;
         this->Description = Other.Description;
         this->SlotIndex = Other.SlotIndex;
@@ -128,7 +127,7 @@ public:
     FOnInventorySlotChangedSignature OnInventoryItemUse;
 
     UFUNCTION(BlueprintCallable, Category="Инвентарь")
-    void AddDataItem(const FDataTableRowHandle& RowDataHandle, int32 Count);
+    void AddDataItem(const FDataTableRowHandle& RowDataHandle, FName DTInteractRowName, int32 Count);
 
     UFUNCTION(BlueprintCallable, Category = "Инвентарь")
     bool MoveItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
