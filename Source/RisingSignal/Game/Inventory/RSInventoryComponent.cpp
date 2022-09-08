@@ -1,7 +1,8 @@
 
 #include "Game/Inventory/RSInventoryComponent.h"
 
-#include "Game/InteractSystem/InteractComponent.h"
+//#include "RSEquipmentComponent.h"
+#include "RSEquipmentComponent.h"
 #include "Game/InteractSystem/InteractItemActor.h"
 
 
@@ -12,6 +13,7 @@ FInventoryItem::FInventoryItem(const FInventoryItem* OtherItem)
     Description = OtherItem->Description;
     ItemID = OtherItem->ItemID;
     ImageItem = OtherItem->ImageItem;
+    bCanEquip = OtherItem->bCanEquip;
     bCanCraft = OtherItem->bCanCraft;
     bStack = OtherItem->bStack;
     bCanUse = OtherItem->bCanUse;
@@ -63,6 +65,28 @@ bool URSInventoryComponent::MoveItem(const FInventoryItem& FirstInventorySlot, c
     {
         return false;
     }
+
+    if(FirstInventorySlot.SlotIndex > 34)
+    {
+        if(SecondInventorySlot.SlotIndex > 34)
+        {
+            EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex - 35);
+            EquipmentComponent->UnEquipItemFromSlot(FirstInventorySlot);
+            return true;
+        }
+        EquipmentComponent->UnEquipItemFromSlot(FirstInventorySlot);
+        UpdateSlot(SecondInventorySlot.SlotIndex, FirstInventorySlot, FirstInventorySlot.Count);
+        return true;
+    }
+    
+    if(SecondInventorySlot.SlotIndex > 34 && FirstInventorySlot.bCanEquip)
+    {
+        EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex - 35);
+        RemoveItem(FirstInventorySlot, FirstInventorySlot.Count, true);
+        return true;
+    }
+
+    
     if(SecondInventorySlot.SlotIndex == SLOT_REMOVE)
     {
         RemoveItem(FirstInventorySlot, FirstInventorySlot.Count);
@@ -210,6 +234,7 @@ void URSInventoryComponent::BeginPlay()
     Super::BeginPlay();
 
     AbilitySystem = GetOwner()->FindComponentByClass<URSAbilitySystem>();
+    EquipmentComponent = GetOwner()->FindComponentByClass<URSEquipmentComponent>();
     // ToDo Load Inventory
 }
 

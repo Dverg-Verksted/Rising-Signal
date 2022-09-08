@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Game/Inventory/RSInventoryItems.h"
 #include "Engine/DataTable.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
 #include "RSInventoryComponent.generated.h"
 
+
+class URSEquipmentComponent;
 
 UENUM()
 enum class EItemCategory
@@ -52,17 +53,23 @@ struct FInventoryItem : public FTableRowBase
         DisplayName = "Изображение", meta=(ToolTip = "Изображение, которое будет отображаться в слотах инвентаря"))
     UTexture2D* ImageItem;
 
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь", DisplayName="Можно использовать в крафте?")
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь", DisplayName="Можно снарядить?")
+    bool bCanEquip = false;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
+        DisplayName="Можно использовать в крафте?", meta=(EditCondition = "!bCanEquip", EditConditionHides))
     bool bCanCraft = false;
     
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь", DisplayName="Стакается предмет?")
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
+        DisplayName="Стакается предмет?", meta=(EditCondition = "!bCanEquip", EditConditionHides))
     bool bStack = true;
     
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь", DisplayName = "Можно использовать?")
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
+        DisplayName = "Можно использовать?", meta=(EditCondition = "!bCanEquip", EditConditionHides))
     bool bCanUse = false;
     
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
-        DisplayName="Макс. количество", meta=(ToolTip = "Максимальное количество предметов в стаке", EditCondition="bStack == true", EditConditionHides))
+        DisplayName="Макс. количество", meta=(ToolTip = "Максимальное количество предметов в стаке", EditCondition="bStack", EditConditionHides))
     int32 MaxCount = 50;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь",
@@ -88,6 +95,7 @@ struct FInventoryItem : public FTableRowBase
         this->Count = Other.Count;
         this->ItemID = Other.ItemID;
         this->ImageItem = Other.ImageItem;
+        this->bCanEquip = Other.bCanEquip;
         this->bCanCraft = Other.bCanCraft;
         this->bStack = Other.bStack;
         this->bCanUse = Other.bCanUse;
@@ -164,6 +172,7 @@ private:
     FInventoryItem* FindFreeSlot();
     
     TSoftObjectPtr<URSAbilitySystem> AbilitySystem;
+    TSoftObjectPtr<URSEquipmentComponent> EquipmentComponent;
     
     UPROPERTY()
     TArray<FInventoryItem> InventoryItems;
