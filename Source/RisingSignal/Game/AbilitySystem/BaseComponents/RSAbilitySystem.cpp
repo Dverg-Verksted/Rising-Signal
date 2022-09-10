@@ -64,17 +64,17 @@ float URSAbilitySystem::GetStaminaChangedValue()
         // if player stand, make regeneration stamina
         if(CurrentPlayerSpeed <= 0)
         {
-            return 7.0f * TimerChackStateRate;
+            return ValueStaminaPlStay * TimerChackStateRate;
         }
         // if player walk, make decrease stamina
         if(CurrentPlayerSpeed <= 360)
         {
-            return 5.0f * TimerChackStateRate;
+            return ValueStaminaPlWalk * TimerChackStateRate;
         }
         // if player run, make more decrease stamina
         if(CurrentPlayerSpeed >= 410)
         {
-            return -7.0f * TimerChackStateRate;
+            return ValueStaminaPlRun * TimerChackStateRate;
         }
     }
     return 0.0f;
@@ -103,12 +103,12 @@ float URSAbilitySystem::GetHealthChangedValue()
             // if player is not hungry, make regeneration hp
             if (State.CurrentValue >= State.AfterIsDebafHungry)
             {
-                ValueOnChangeHealth -= 1.0f * TimerChackStateRate;
+                ValueOnChangeHealth -= State.ChangedValue * TimerChackStateRate;
             }
             // if player is hungry, make decrease hp
             if (State.CurrentValue <= 30.0f && bHealthIsCriticalLevel)
             {
-                ValueOnChangeHealth += 1.0f * TimerChackStateRate;
+                ValueOnChangeHealth += State.ChangedValue * TimerChackStateRate;
             }
         }
         // check relation with temperature state
@@ -116,12 +116,12 @@ float URSAbilitySystem::GetHealthChangedValue()
         {
             if (State.CurrentValue >= State.AfterIsDebafTemp)
             {
-                ValueOnChangeHealth -= 5.0f * TimerChackStateRate;
+                ValueOnChangeHealth -= State.ChangedValue * TimerChackStateRate;
             }
             // if player is hungry, make decrease hp
             if (State.CurrentValue <= 30.0f && bHealthIsCriticalLevel)
             {
-                ValueOnChangeHealth += 1.0f * TimerChackStateRate;
+                ValueOnChangeHealth += State.ChangedValue * TimerChackStateRate;
             }
         }
     }
@@ -149,13 +149,13 @@ float URSAbilitySystem::GetCurrentStateValue(EAbilityStatesType SearchState) con
 }
 
 
-void URSAbilitySystem::ChangeCurrentStateValue(EAbilityStatesType StateTy, float ChangesValue)
+void URSAbilitySystem::ChangeCurrentStateValue(EAbilityStatesType StateTy, float AddValue)
 {
     for (auto &State : States)
     {
         if (State.StateType == StateTy)
         {
-            State.CurrentValue += ChangesValue;
+            State.CurrentValue += AddValue;
             State.CurrentValue = FMath::Clamp(State.CurrentValue,State.MinValue,State.MaxValue);
             // LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("ChangesValue %f"), ChangesValue));
             return;
