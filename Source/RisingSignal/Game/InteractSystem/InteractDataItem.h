@@ -30,12 +30,14 @@ struct FDataInteract : public FTableRowBase
 
     // @private Name item
     UPROPERTY(EditDefaultsOnly, Category = "Settings Data Item",
-        meta = (DisplayName = "Имя предмета", ToolTip = "Укажите имя предмета"))
+        meta = (DisplayName = "Имя предмета", ToolTip = "Укажите имя предмета", EditCondition = "TypeItem != ETypeItem::InvItem",
+            EditConditionHides))
     FText Name = FText();
 
     // @private Description item
     UPROPERTY(EditDefaultsOnly, Category = "Settings Data Item",
-        meta = (DisplayName = "Описание предмета", MultiLine, ToolTip = "Опишите предмет"))
+        meta = (DisplayName = "Описание предмета", MultiLine, ToolTip = "Опишите предмет", EditCondition = "TypeItem != ETypeItem::InvItem",
+            EditConditionHides))
     FText DescriptionItem = FText();
 
     // @private Static mesh item path
@@ -50,6 +52,26 @@ struct FDataInteract : public FTableRowBase
     )
     FSoftObjectPath MeshItem;
 
+    // @private InteractText
+    UPROPERTY(EditDefaultsOnly, Category = "Settings Data Item",
+        meta = (
+            DisplayName = "Использовать уникальный текст взаимодействия",
+            ToolTip = "Если включено, текст будет браться из соответствующего поля. Если выключено - будет отображаться имя предмета"
+        )
+    )
+    bool bCustomInteractText = false;
+
+    // @private InteractText
+    UPROPERTY(EditDefaultsOnly, Category = "Settings Data Item",
+        meta = (
+            DisplayName = "Текст взаимодействия",
+            ToolTip = "Введите текст, который будет отображаться при взаимодействии",
+            EditCondition = "bCustomInteractText",
+            EditConditionHides
+        )
+    )
+    FText InteractText;
+
 #pragma region StaticItem
 
     // @private Interval count range
@@ -62,7 +84,6 @@ struct FDataInteract : public FTableRowBase
     //     )
     // )
     // TSubclassOf<ARSInteractStaticItemBase> StaticActorClass = nullptr;
-
 
 
 #pragma endregion

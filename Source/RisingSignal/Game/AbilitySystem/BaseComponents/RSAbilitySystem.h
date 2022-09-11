@@ -24,30 +24,28 @@ struct FStateParams
 {
     GENERATED_USTRUCT_BODY()
     
-    UPROPERTY(EditDefaultsOnly)
+    UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Значение по умолчанию на старте"))
     float CurrentValue = 0.0f;
     
-    UPROPERTY(EditDefaultsOnly)
+    UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Максимальное значение параметра"))
     float MaxValue = 100.0f;
     
-    UPROPERTY(EditDefaultsOnly)
+    UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Минимальное значение параметра"))
     float MinValue = 0.0f;
 
-    UPROPERTY(EditDefaultsOnly)
+    UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Тип параметра"))
     EAbilityStatesType StateType = EAbilityStatesType::Health;
 
-    UPROPERTY(EditDefaultsOnly, meta = (EditCondition = "StateType == EAbilityStatesType::Hungry", EditConditionHides))
+    UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Значение, после которого голод будет убавлять здоровье", EditCondition = "StateType == EAbilityStatesType::Hungry", EditConditionHides))
     float AfterIsDebafHungry = 0.0f;
 
-    UPROPERTY(EditDefaultsOnly, meta = (EditCondition = "StateType == EAbilityStatesType::Temp", EditConditionHides))
+    UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Значение, после которого замерзание будет убавлять здоровье", EditCondition = "StateType == EAbilityStatesType::Temp", EditConditionHides))
     float AfterIsDebafTemp = 0.0f;
     
     // How much changes state per second
-    UPROPERTY(EditDefaultsOnly)
+    UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Значение, на которое будет изменяться значение параметра при восстановлении или убавлении"))
     float ChangedValue = 0.0f;
     
-    UPROPERTY(EditDefaultsOnly)
-    float TimeActive = 0.0f;
 };
 
 #pragma region Delegates
@@ -96,7 +94,7 @@ public:
      * if damage (decrease state value) should send parameter with minus
      */
     UFUNCTION(BlueprintCallable)
-    void ChangeCurrentStateValue(EAbilityStatesType StateTy,float ChangesValue);
+    void ChangeCurrentStateValue(EAbilityStatesType StateTy,float AddValue);
     
 protected:
     // Called when the game starts
@@ -124,7 +122,16 @@ private:
 
     UPROPERTY()
     ARSGamePLayer* GamePlayerRef;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", meta = (ToolTip = "На сколько изменяется выносливость, если игрок стоит"))
+    float ValueStaminaPlStay = 7.0f;
     
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", meta = (ToolTip = "На сколько изменяется выносливость, если игрок идет"))
+    float ValueStaminaPlWalk = 5.0f;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", meta = (ToolTip = "На сколько изменяется выносливость, если игрок бежит"))
+    float ValueStaminaPlRun = -7.0f;
+
     UPROPERTY(VisibleDefaultsOnly, Category = "Ability states")
     bool bIsDead = false;
 

@@ -6,13 +6,14 @@
 #include "AlsCharacter.h"
 #include "RSGamePlayerController.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
-#include "Game/Inventory/RSInventoryComponent.h"
 #include "RSGamePLayer.generated.h"
 
 class USpringArmComponent;
 class UCameraComponent;
 class UAlsCameraComponent;
 class URSAbilitySystem;
+class URSInventoryComponent;
+class URSEquipmentComponent;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySignature);
@@ -52,6 +53,9 @@ public:
 public:
     UFUNCTION(BlueprintGetter)
     URSInventoryComponent* GetInventoryComponent();
+
+    UFUNCTION(BlueprintGetter)
+    URSEquipmentComponent* GetEquipmentComponent();
     
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     URSAbilitySystem* AbilitySystem;
@@ -65,6 +69,9 @@ private:
 
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
     URSInventoryComponent* InventoryComponent;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+    URSEquipmentComponent* EquipmentComponent;
 
 
 #pragma endregion
@@ -124,6 +131,14 @@ private:
     void InputViewModePressed();
 
     void InputSwitchShoulderPressed();
+
+    void InputActionSlot1();
+
+    void InputActionSlot2();
+
+    void InputActionSlot3();
+
+    void InputActionSlot4();
 
 #pragma endregion
 

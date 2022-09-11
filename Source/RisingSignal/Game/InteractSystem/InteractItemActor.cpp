@@ -21,12 +21,15 @@ AInteractItemActor::AInteractItemActor()
     this->Mesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("Mesh component"));
     SetRootComponent(this->Mesh);
 
-    this->WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(FName("3D Widget component"));
-    this->WidgetComponent->SetupAttachment(this->Mesh);
-
     static ConstructorHelpers::FClassFinder<UInteractWidget> UnitSelector(
         TEXT("/Game/RisingSignal/Core/HUD/UI_UserHUD/Widgets/WBP_InteractText"));
     SubInteractWidget = UnitSelector.Class;
+
+    this->WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(FName("3D Widget component"));
+    this->WidgetComponent->SetupAttachment(this->Mesh);
+    this->WidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+    this->WidgetComponent->SetDrawAtDesiredSize(true);
+    this->WidgetComponent->SetWidgetClass(SubInteractWidget);
 
     static ConstructorHelpers::FObjectFinder<UDataTable> InteractItemDT(
         TEXT("DataTable'/Game/RisingSignal/Core/InteractItems/DT_DataInteract.DT_DataInteract'"));
@@ -35,6 +38,8 @@ AInteractItemActor::AInteractItemActor()
     {
         InteractData.DataTable = DataTableInteractItem;
     }
+
+    // LOG_RS(ELogRSVerb::Warning, "Constructed " + GetName());
 }
 
 // Called when the game starts or when spawned
@@ -47,27 +52,12 @@ void AInteractItemActor::BeginPlay()
     {
         InteractWidget->SetVisibility(ESlateVisibility::Collapsed);
     }
-
-    if (InteractData.DataTable)
+    else
     {
-        const FDataInteract* DataInteract = InteractData.DataTable->FindRow<FDataInteract>(InteractData.RowName, "");
-        if (!DataInteract) return;
-
-        if (DataInteract->MeshItem.IsNull())
-        {
-            this->Mesh->SetStaticMesh(nullptr);
-        }
-        else
-        {
-            UStaticMesh* L_Mesh = LoadObject<UStaticMesh>(nullptr, *(DataInteract->MeshItem.ToString()));
-            if (!L_Mesh) return;
-            this->Mesh->SetStaticMesh(L_Mesh);
-        }
-
-        this->TypeItem = DataInteract->TypeItem;
-        this->NameItem = DataInteract->Name;
-        this->DescriptionItem = DataInteract->DescriptionItem;
+        LOG_RS(ELogRSVerb::Error, GetName() + "Has no InteractWidget");
     }
+
+    InitDataInteract(InteractData);
 }
 
 #if UE_EDITOR
@@ -82,9 +72,9 @@ void AInteractItemActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyC
         return;
     }
 
-    LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Name changed property: %s"), *PropertyChangedEvent.Property->GetName()));
+    // LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Name changed property: %s"), *PropertyChangedEvent.Property->GetName()));
 
-    if (PropertyChangedEvent.Property->GetName() == TEXT("RowName") && InteractData.DataTable)
+    if (PropertyChangedEvent.Property->GetName() == TEXT("RowName"))
     {
         FDataInteract* DataInteract = InteractData.DataTable->FindRow<FDataInteract>(InteractData.RowName, "");
         if (!DataInteract) return;
@@ -141,7 +131,7 @@ void AInteractItemActor::LoadInteractWidget()
 {
     if (InteractWidget)
     {
-        LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Name iteract actor: %s | Load interact Widget"), *GetName()));
+        // LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Name interact actor: %s | Load interact Widget"), *GetName()));
         GetWorldTimerManager().ClearTimer(ResetInteractAnimTimerHandle);
         InteractWidget->SetVisibility(ESlateVisibility::Visible);
         this->InteractWidget->StartAnimation();
@@ -152,7 +142,7 @@ void AInteractItemActor::DestroyInteractWidget()
 {
     if (InteractWidget)
     {
-        LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Name iteract actor: %s | Destroy interact Widget"), *GetName()));
+        // LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Name interact actor: %s | Destroy interact Widget"), *GetName()));
         InteractWidget->EndAnimation();
         GetWorldTimerManager().SetTimer(ResetInteractAnimTimerHandle, [&]()
         {
@@ -161,7 +151,62 @@ void AInteractItemActor::DestroyInteractWidget()
     }
 }
 
-void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, float Distance = 100, int32 Count = 1)
+void AInteractItemActor::InitDataInteract(FDataTableRowHandle NewInteractData)
+{
+    if (NewInteractData.DataTable)
+    {
+        const FDataInteract* DataInteract = NewInteractData.DataTable->FindRow<FDataInteract>(NewInteractData.RowName, "");
+        if (!DataInteract) return;
+
+        if (DataInteract->MeshItem.IsNull())
+        {
+            this->Mesh->SetStaticMesh(nullptr);
+        }
+        else
+        {
+            UStaticMesh* L_Mesh = LoadObject<UStaticMesh>(nullptr, *(DataInteract->MeshItem.ToString()));
+            if (!L_Mesh) return;
+            this->Mesh->SetStaticMesh(L_Mesh);
+        }
+
+        this->TypeItem = DataInteract->TypeItem;
+
+        if (DataInteract->TypeItem == ETypeItem::InvItem)
+        {
+            const FInventoryItem* DataInventory = DataInteract->RowRuleInvItem.DataTable->FindRow<FInventoryItem>(
+                DataInteract->RowRuleInvItem.RowName, "");
+            if (DataInventory)
+            {
+                this->NameItem = DataInventory->Name;
+                this->DescriptionItem = DataInventory->Description;
+            }
+            else
+            {
+                LOG_RS(ELogRSVerb::Error, "Inventory RowHandle didn't set for " + GetName());
+            }
+        }
+        else
+        {
+            this->NameItem = DataInteract->Name;
+            this->DescriptionItem = DataInteract->DescriptionItem;
+        }
+
+        if(this->bCustomInteractText)
+        {
+            InteractWidget->SetText(this->InteractText);
+        }
+        else if (DataInteract->bCustomInteractText)
+        {
+            InteractWidget->SetText(DataInteract->InteractText);
+        }
+        else
+        {
+            InteractWidget->SetText(this->NameItem);
+        }
+    }
+}
+
+void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count, float Distance)
 {
     if (!Spawner) return;
 
@@ -176,16 +221,27 @@ void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItem
 
     FTransform ItemSpawnTransform{ItemSpawnLocation};
 
-    AInteractItemActor* Item = Spawner->GetWorld()->SpawnActorDeferred<AInteractItemActor>(AInteractItemActor::StaticClass(),
-        ItemSpawnTransform);
+    AInteractItemActor* Item = Spawner->GetWorld()->SpawnActor<AInteractItemActor>(AInteractItemActor::StaticClass(), ItemSpawnTransform);
     if (Item && Item->InteractData.DataTable)
     {
         Item->TypeItem = ETypeItem::InvItem;
-        Item->InteractData.RowName = GetRowNameByItemName(Item->InteractData.DataTable, (InventoryItemRules.Name));
+        FDataTableRowHandle NewDTRowHandle;
+        NewDTRowHandle.DataTable = Item->InteractData.DataTable;
+        NewDTRowHandle.RowName = InventoryItemRules.InteractRowName;
+        Item->InitDataInteract(NewDTRowHandle);
+        Item->InteractData.RowName = InventoryItemRules.InteractRowName;
         Item->ItemCount = Count;
-
-        Item->FinishSpawning(ItemSpawnTransform);
     }
+    // AInteractItemActor* Item = Spawner->GetWorld()->SpawnActorDeferred<AInteractItemActor>(AInteractItemActor::StaticClass(),
+    //     ItemSpawnTransform);
+    // if (Item && Item->InteractData.DataTable)
+    // {
+    //     Item->TypeItem = ETypeItem::InvItem;
+    //     Item->InteractData.RowName = GetRowNameByItemName(Item->InteractData.DataTable, (InventoryItemRules.Name));
+    //     Item->ItemCount = Count;
+    //
+    //     Item->FinishSpawning(ItemSpawnTransform);
+    // }
 }
 
 

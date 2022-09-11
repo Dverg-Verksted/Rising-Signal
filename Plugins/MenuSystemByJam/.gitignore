@@ -1,0 +1,11 @@
+# IDE files
+/.vs
+/.idea
+/*.sln
+
+#Trash
+/Intermediate/*
+/Binaries/*
+
+# Built data for maps
+*_BuiltData.uasset
