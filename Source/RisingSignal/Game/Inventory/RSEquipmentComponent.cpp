@@ -15,7 +15,7 @@ void URSEquipmentComponent::EquipItemInSlot(const FInventoryItem& Item, int32 In
 
 void URSEquipmentComponent::UnEquipItemFromSlot(const FInventoryItem& Item)
 {
-    int32 Index = Item.SlotIndex - 35;
+    int32 Index = Item.SlotIndex;
     EquipmentSlots[Index] = FInventoryItem();
     UpdateEquipmentSlot(Index, EquipmentSlots[Index]);
 }
@@ -37,7 +37,7 @@ void URSEquipmentComponent::TakeInHands(int32 Index)
 void URSEquipmentComponent::UpdateEquipmentSlot(int32 Index, const FInventoryItem& Item)
 {
     FInventoryItem CurrentItem = Item;
-    CurrentItem.SlotIndex = Index + 35;
+    CurrentItem.SlotIndex = Index;
     EquipmentSlots[Index] = CurrentItem;
     
     OnEquipmentSlotChanged.Broadcast(EquipmentSlots[Index]);

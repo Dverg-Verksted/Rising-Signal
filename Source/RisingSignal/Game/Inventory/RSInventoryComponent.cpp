@@ -12,6 +12,7 @@ FInventoryItem::FInventoryItem(const FInventoryItem* OtherItem)
     Name = OtherItem->Name;
     Description = OtherItem->Description;
     ItemID = OtherItem->ItemID;
+    TypeComponent = OtherItem->TypeComponent;
     ImageItem = OtherItem->ImageItem;
     bCanEquip = OtherItem->bCanEquip;
     bCanCraft = OtherItem->bCanCraft;
@@ -61,16 +62,32 @@ void URSInventoryComponent::RemoveItem(const FInventoryItem& InventorySlot, int3
 
 bool URSInventoryComponent::MoveItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot)
 {
-    if(FirstInventorySlot.ItemID == INDEX_NONE)
+    if(FirstInventorySlot.TypeComponent == ETypeComponent::Inventory && SecondInventorySlot.TypeComponent == ETypeComponent::Inventory)
     {
-        return false;
+        if(SecondInventorySlot.SlotIndex == SLOT_REMOVE)
+        {
+            RemoveItem(FirstInventorySlot, FirstInventorySlot.Count);
+            return true;
+        }
+    
+        if(FirstInventorySlot.ItemID == SecondInventorySlot.ItemID && FirstInventorySlot.SlotIndex != SecondInventorySlot.SlotIndex && FirstInventorySlot.bStack)
+        {
+            CombineItem(FirstInventorySlot, SecondInventorySlot);
+            return true;
+        }
+    
+        if(FirstInventorySlot.ItemID != SecondInventorySlot.ItemID)
+        {
+            SwapItem(FirstInventorySlot, SecondInventorySlot);
+            return true;
+        }
     }
 
-    if(FirstInventorySlot.SlotIndex > 34)
+    if(FirstInventorySlot.TypeComponent == ETypeComponent::Equipment)
     {
-        if(SecondInventorySlot.SlotIndex > 34)
+        if(SecondInventorySlot.TypeComponent == ETypeComponent::Equipment)
         {
-            EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex - 35);
+            EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex);
             EquipmentComponent->UnEquipItemFromSlot(FirstInventorySlot);
             return true;
         }
@@ -79,29 +96,10 @@ bool URSInventoryComponent::MoveItem(const FInventoryItem& FirstInventorySlot, c
         return true;
     }
     
-    if(SecondInventorySlot.SlotIndex > 34 && FirstInventorySlot.bCanEquip)
+    if(SecondInventorySlot.TypeComponent == ETypeComponent::Equipment && FirstInventorySlot.bCanEquip)
     {
         EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex - 35);
         RemoveItem(FirstInventorySlot, FirstInventorySlot.Count, true);
-        return true;
-    }
-
-    
-    if(SecondInventorySlot.SlotIndex == SLOT_REMOVE)
-    {
-        RemoveItem(FirstInventorySlot, FirstInventorySlot.Count);
-        return true;
-    }
-    
-    if(FirstInventorySlot.ItemID == SecondInventorySlot.ItemID && FirstInventorySlot.SlotIndex != SecondInventorySlot.SlotIndex && FirstInventorySlot.bStack)
-    {
-        CombineItem(FirstInventorySlot, SecondInventorySlot);
-        return true;
-    }
-    
-    if(FirstInventorySlot.ItemID != SecondInventorySlot.ItemID)
-    {
-        SwapItem(FirstInventorySlot, SecondInventorySlot);
         return true;
     }
 
@@ -129,7 +127,7 @@ void URSInventoryComponent::CombineItem(
 
 bool URSInventoryComponent::UseItem(const FInventoryItem& InventorySlot)
 {
-    if (InventorySlot.bCanUse && InventorySlot.SlotIndex != SLOT_REMOVE)
+    if (InventorySlot.bCanUse && InventorySlot.ItemID != -1)
     {
         for(auto& Effect : InventorySlot.CharacterAttributesEffects)
         {

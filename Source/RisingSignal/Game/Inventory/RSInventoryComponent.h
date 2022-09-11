@@ -21,6 +21,14 @@ enum class EItemCategory
     Tools UMETA(DisplayName = "Инструменты")
 };
 
+UENUM(BlueprintType)
+enum class ETypeComponent : uint8
+{
+    Inventory,
+    Equipment,
+    Craft
+};
+
 USTRUCT(BlueprintType)
 struct FInventoryItem : public FTableRowBase
 {
@@ -45,6 +53,10 @@ struct FInventoryItem : public FTableRowBase
     UPROPERTY(BlueprintReadWrite, Category = "Инвентарь",
         DisplayName="Индекс слота", meta=(ToolTip = "Параметр редактировать не нужно. По умолчанию значение всегда -1"))
     int32 SlotIndex = -1;
+
+    UPROPERTY(BlueprintReadWrite, Category="Инвентарь",
+        DisplayName="Тип компонента", meta=(ToolTip = "Тип компонента, к которому будет принадлежать данный слот"))
+    ETypeComponent TypeComponent = ETypeComponent::Inventory;
     
     UPROPERTY(BlueprintReadWrite, Category = "Инвентарь", DisplayName = "Количество")
     int32 Count = 0;
@@ -94,6 +106,7 @@ struct FInventoryItem : public FTableRowBase
         this->SlotIndex = Other.SlotIndex;
         this->Count = Other.Count;
         this->ItemID = Other.ItemID;
+        this->TypeComponent = TypeComponent;
         this->ImageItem = Other.ImageItem;
         this->bCanEquip = Other.bCanEquip;
         this->bCanCraft = Other.bCanCraft;
