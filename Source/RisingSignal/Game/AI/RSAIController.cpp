@@ -23,6 +23,5 @@ AActor* ARSAIController::GetActorToFocusOn() const
 {
     if (!GetBlackboardComponent()) return nullptr;
 
-    LOG_RS(ELogRSVerb::Warning, "Found BlackBoardComp");
     return Cast<AActor>(GetBlackboardComponent()->GetValueAsObject(FocusOnKeyName));
 }

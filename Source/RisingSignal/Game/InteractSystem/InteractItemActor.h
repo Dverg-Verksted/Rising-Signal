@@ -84,6 +84,7 @@ public:
         return FDataInteract();
     };
 
+
     UFUNCTION(BlueprintPure, Category = "AInteractItemActor | DataInteractItem")
     int32 GetItemCount() const { return ItemCount; };
 
@@ -122,6 +123,26 @@ private:
         meta = (DisplayName = "Описание предмета", MultiLine))
     FText DescriptionItem = FText();
 
+    // @private InteractText
+    UPROPERTY(EditInstanceOnly, Category = "Settings Interact",
+        meta = (
+            DisplayName = "Использовать уникальный для этого объекта текст взаимодействия",
+            ToolTip = "Если включено, текст будет браться из соответствующего поля. Если выключено - будет отображаться имя предмета. Приоритет - наивысший."
+        )
+    )
+    bool bCustomInteractText = false;
+
+    // @private InteractText
+    UPROPERTY(EditAnywhere, Category = "Settings Interact",
+        meta = (
+            DisplayName = "Текст взаимодействия",
+            ToolTip = "Введите текст, который будет отображаться при взаимодействии",
+            EditCondition = "bCustomInteractText",
+            EditConditionHides
+        )
+    )
+    FText InteractText;
+
     // UPROPERTY()
     // ARSInteractStaticItemBase* ChildStaticItemActor = nullptr;
 
@@ -130,13 +151,14 @@ private:
 
     FTimerHandle ResetInteractAnimTimerHandle;
 
+    void InitDataInteract(FDataTableRowHandle NewInteractData);
 
 #pragma endregion
 
 #pragma region Statics
 public:
     UFUNCTION(BlueprintCallable)
-    static void SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, float Distance, int32 Count);
+    static void SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count = 1, float Distance = 150.0f);
 
     static FName GetRowNameByItemName(const UDataTable* DataTable, FText ItemName);
 

@@ -1,17 +1,20 @@
 
 #include "Game/Inventory/RSInventoryComponent.h"
 
-#include "Game/InteractSystem/InteractComponent.h"
+//#include "RSEquipmentComponent.h"
+#include "RSEquipmentComponent.h"
 #include "Game/InteractSystem/InteractItemActor.h"
 
 
 FInventoryItem::FInventoryItem(const FInventoryItem* OtherItem)
 {
-    RowName = OtherItem->RowName;
+    InteractRowName = OtherItem->InteractRowName;
     Name = OtherItem->Name;
     Description = OtherItem->Description;
     ItemID = OtherItem->ItemID;
+    TypeComponent = OtherItem->TypeComponent;
     ImageItem = OtherItem->ImageItem;
+    bCanEquip = OtherItem->bCanEquip;
     bCanCraft = OtherItem->bCanCraft;
     bStack = OtherItem->bStack;
     bCanUse = OtherItem->bCanUse;
@@ -53,36 +56,50 @@ void URSInventoryComponent::RemoveItem(const FInventoryItem& InventorySlot, int3
 
     if(!bItemUsed)
     {
-        AInteractItemActor::SpawnItem(GetOwner(), InventorySlot, 100.0f, CountRemove);
+        AInteractItemActor::SpawnItem(GetOwner(), InventorySlot,  CountRemove);
     }
 }
 
 bool URSInventoryComponent::MoveItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot)
 {
-    if(FirstInventorySlot.ItemID == INDEX_NONE)
+    if(FirstInventorySlot.TypeComponent == ETypeComponent::Inventory && SecondInventorySlot.TypeComponent == ETypeComponent::Inventory)
     {
-        return false;
+        if(SecondInventorySlot.SlotIndex == SLOT_REMOVE)
+        {
+            RemoveItem(FirstInventorySlot, FirstInventorySlot.Count);
+            return true;
+        }
+    
+        if(FirstInventorySlot.ItemID == SecondInventorySlot.ItemID && FirstInventorySlot.SlotIndex != SecondInventorySlot.SlotIndex && FirstInventorySlot.bStack)
+        {
+            CombineItem(FirstInventorySlot, SecondInventorySlot);
+            return true;
+        }
+    
+        if(FirstInventorySlot.ItemID != SecondInventorySlot.ItemID)
+        {
+            SwapItem(FirstInventorySlot, SecondInventorySlot);
+            return true;
+        }
     }
-    if(SecondInventorySlot.SlotIndex == SLOT_REMOVE)
+
+    if(FirstInventorySlot.TypeComponent == ETypeComponent::Equipment)
     {
-        RemoveItem(FirstInventorySlot, FirstInventorySlot.Count);
+        if(SecondInventorySlot.TypeComponent == ETypeComponent::Equipment)
+        {
+            EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex);
+            EquipmentComponent->UnEquipItemFromSlot(FirstInventorySlot);
+            return true;
+        }
+        EquipmentComponent->UnEquipItemFromSlot(FirstInventorySlot);
+        UpdateSlot(SecondInventorySlot.SlotIndex, FirstInventorySlot, FirstInventorySlot.Count);
         return true;
     }
     
-    if(FirstInventorySlot.ItemID == SecondInventorySlot.ItemID)
+    if(SecondInventorySlot.TypeComponent == ETypeComponent::Equipment && FirstInventorySlot.bCanEquip)
     {
-        if(FirstInventorySlot.bStack)
-        {
-            CombineItem(FirstInventorySlot, SecondInventorySlot);
-        }
-        else
-        {
-            return false;
-        }
-    }
-    if(FirstInventorySlot.ItemID != SecondInventorySlot.ItemID)
-    {
-        SwapItem(FirstInventorySlot, SecondInventorySlot);
+        EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex - 35);
+        RemoveItem(FirstInventorySlot, FirstInventorySlot.Count, true);
         return true;
     }
 
@@ -110,7 +127,7 @@ void URSInventoryComponent::CombineItem(
 
 bool URSInventoryComponent::UseItem(const FInventoryItem& InventorySlot)
 {
-    if (InventorySlot.bCanUse)
+    if (InventorySlot.bCanUse && InventorySlot.ItemID != -1)
     {
         for(auto& Effect : InventorySlot.CharacterAttributesEffects)
         {
@@ -124,9 +141,10 @@ bool URSInventoryComponent::UseItem(const FInventoryItem& InventorySlot)
     return false;
 }
 
-void URSInventoryComponent::AddDataItem(const FDataTableRowHandle& RowDataHandle, int32 Count)
+void URSInventoryComponent::AddDataItem(const FDataTableRowHandle& RowDataHandle, FName DTInteractRowName, int32 Count)
 {
     FInventoryItem* ItemToAdd = FindItemData(RowDataHandle);
+    ItemToAdd->InteractRowName = DTInteractRowName;
     int32 CurrentCountItem = Count;
     if(!ItemToAdd->bStack)
     {
@@ -188,8 +206,7 @@ FInventoryItem* URSInventoryComponent::FindItemData(const FDataTableRowHandle& R
     const UDataTable* DataTable = RowDataHandle.DataTable;
     FName RowName = RowDataHandle.RowName;
     FInventoryItem* Item = DataTable->FindRow<FInventoryItem>(RowName, TEXT("Find item data"));
-    Item->RowName = RowName;
-    
+
     TArray<FName> RowNames = DataTable->GetRowNames();
     for(int RowIndex = 0; RowIndex < RowNames.Num(); RowIndex++)
     {
@@ -215,6 +232,7 @@ void URSInventoryComponent::BeginPlay()
     Super::BeginPlay();
 
     AbilitySystem = GetOwner()->FindComponentByClass<URSAbilitySystem>();
+    EquipmentComponent = GetOwner()->FindComponentByClass<URSEquipmentComponent>();
     // ToDo Load Inventory
 }
 

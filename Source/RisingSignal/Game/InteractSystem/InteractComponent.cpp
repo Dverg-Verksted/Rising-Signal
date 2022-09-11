@@ -233,8 +233,8 @@ void UInteractComponent::RegisterInteractEvent()
             }
             case ETypeItem::InvItem:
             {
-                InventoryComp->AddDataItem(DataInteract->RowRuleInvItem, TargetInteractItem->GetItemCount());
-                LOG_RS(ELogRSVerb::Error, InteractRowHandle.RowName.ToString());
+                InventoryComp->AddDataItem(DataInteract->RowRuleInvItem, InteractRowHandle.RowName, TargetInteractItem->GetItemCount());
+                // LOG_RS(ELogRSVerb::Error, InteractRowHandle.RowName.ToString());
                 break;
             }
         }

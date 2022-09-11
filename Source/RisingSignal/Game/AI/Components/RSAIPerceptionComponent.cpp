@@ -25,8 +25,8 @@ AActor* URSAIPerceptionComponent::GetClosestEnemy() const
     AActor* BestPawn = nullptr;
     for (const auto PercieveActor : PercieveActors)
     {
-        const auto HealthComponent = PercieveActor->FindComponentByClass<URSHealthComponent>();
-        if (Cast<ARSGamePLayer>(PercieveActor) && HealthComponent && !FMath::IsNearlyZero(HealthComponent->GetCurrentHealth()))
+        const auto AbilityComponent = PercieveActor->FindComponentByClass<URSAbilitySystem>();
+        if (Cast<ACharacter>(PercieveActor) && AbilityComponent && !AbilityComponent->GetIsDead())
         // TODO: Check if enemies and change HealthComponent to AbilitySystem
         {
             const auto CurrentDistance = (PercieveActor->GetActorLocation() - Pawn->GetActorLocation()).Size();
@@ -34,7 +34,7 @@ AActor* URSAIPerceptionComponent::GetClosestEnemy() const
             {
                 BestDistance = CurrentDistance;
                 BestPawn = PercieveActor;
-                LOG_RS(ELogRSVerb::Display, "New BestPawn = " + BestPawn->GetName());
+                // LOG_RS(ELogRSVerb::Display, "New BestPawn = " + BestPawn->GetName());
             }
         }
     }
@@ -43,6 +43,8 @@ AActor* URSAIPerceptionComponent::GetClosestEnemy() const
     {
         LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Distance to closest enemy = %f"), BestDistance));
     }
+
+    // LOG_RS(ELogRSVerb::Display, "BestPawn Set");
 
     return BestPawn;
 }

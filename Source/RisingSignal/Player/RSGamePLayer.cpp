@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
 #include "Game/HUD/GameHUD.h"
+#include "Game/Inventory/RSEquipmentComponent.h"
 #include "GameFramework/GameSession.h"
 #include "Library/RSFunctionLibrary.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -36,6 +37,7 @@ ARSGamePLayer::ARSGamePLayer()
     GamePlayerController = Cast<ARSGamePlayerController>(GetController());
 
     InventoryComponent = CreateDefaultSubobject<URSInventoryComponent>("InventoryComponent");
+    EquipmentComponent = CreateDefaultSubobject<URSEquipmentComponent>("EquipmentComponent");
 }
 
 void ARSGamePLayer::BeginPlay()
@@ -59,6 +61,11 @@ void ARSGamePLayer::CalcCamera(float DeltaTime, FMinimalViewInfo& ViewInfo)
 URSInventoryComponent* ARSGamePLayer::GetInventoryComponent()
 {
     return InventoryComponent;
+}
+
+URSEquipmentComponent* ARSGamePLayer::GetEquipmentComponent()
+{
+    return EquipmentComponent;
 }
 
 #pragma endregion
@@ -95,7 +102,10 @@ void ARSGamePLayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
     PlayerInputComponent->BindAction(TEXT("Journal"), IE_Pressed, this, &ARSGamePLayer::OpenCloseJournal);
     
-//    PlayerInputComponent->BindAction(TEXT("ActionSlot1"), IE_Pressed, this, );
+    PlayerInputComponent->BindAction(TEXT("ActionSlot1"), IE_Pressed, this, &ARSGamePLayer::InputActionSlot1);
+    PlayerInputComponent->BindAction(TEXT("ActionSlot2"), IE_Pressed, this, &ARSGamePLayer::InputActionSlot2);
+    PlayerInputComponent->BindAction(TEXT("ActionSlot3"), IE_Pressed, this, &ARSGamePLayer::InputActionSlot3);
+    PlayerInputComponent->BindAction(TEXT("ActionSlot4"), IE_Pressed, this, &ARSGamePLayer::InputActionSlot4);
 
 }
 
@@ -243,6 +253,26 @@ void ARSGamePLayer::InputViewModePressed()
 void ARSGamePLayer::InputSwitchShoulderPressed()
 {
     // AlsCamera->SetRightShoulder(!AlsCamera->IsRightShoulder());
+}
+
+void ARSGamePLayer::InputActionSlot1()
+{
+    EquipmentComponent->TakeInHands(0);
+}
+
+void ARSGamePLayer::InputActionSlot2()
+{
+    EquipmentComponent->TakeInHands(1);
+}
+
+void ARSGamePLayer::InputActionSlot3()
+{
+    EquipmentComponent->TakeInHands(2);
+}
+
+void ARSGamePLayer::InputActionSlot4()
+{
+    EquipmentComponent->TakeInHands(3);
 }
 
 void ARSGamePLayer::OpenCloseInventory()
