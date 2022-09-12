@@ -77,13 +77,13 @@ struct FDataInteract : public FTableRowBase
     // @private StaticActorClass
     UPROPERTY(EditAnywhere, Category = "Settings Data Item",
         meta = (
-            DisplayName = "Предмет",
+            DisplayName = "Актор предмета",
             ToolTip = "Укажите актор предмета",
             EditCondition = "TypeItem == ETypeItem::StaticItem",
             EditConditionHides
         )
     )
-    TSubclassOf<ARSInteractStaticItemBase> StaticActorClass = nullptr;
+    TSoftClassPtr<ARSInteractStaticItemBase> StaticActorClassPtr = nullptr;
 
 
 #pragma endregion

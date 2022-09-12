@@ -90,7 +90,11 @@ void AInteractItemActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyC
 
             FTransform StaticItemActorTransform{GetActorRotation(), GetActorLocation()};
 
-            ChildStaticItemActor = GetWorld()->SpawnActor<ARSInteractStaticItemBase>(DataInteract->StaticActorClass,
+            // LoadClass<>() DataInteract->StaticActorClassPtr->
+            UClass* StaticActorClass = LoadClass<ARSInteractStaticItemBase>(nullptr,
+                *DataInteract->StaticActorClassPtr.ToSoftObjectPath().ToString());
+
+            ChildStaticItemActor = GetWorld()->SpawnActor<ARSInteractStaticItemBase>(StaticActorClass,
                 StaticItemActorTransform);
 
             if (ChildStaticItemActor)
@@ -110,7 +114,7 @@ void AInteractItemActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyC
 
                 // LOG_RS(ELogRSVerb::Display, ChildStaticItemActor->GetName() + " destroyed");
             }
-            
+
             UStaticMesh* L_Mesh = LoadObject<UStaticMesh>(nullptr, *(DataInteract->MeshItem.ToString()));
             if (L_Mesh)
             {
