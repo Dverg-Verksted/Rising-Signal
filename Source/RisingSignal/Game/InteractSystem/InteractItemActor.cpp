@@ -153,7 +153,7 @@ void AInteractItemActor::DestroyInteractWidget()
 
 void AInteractItemActor::InitDataInteract(FDataTableRowHandle NewInteractData)
 {
-    if (NewInteractData.DataTable)
+    if (NewInteractData.DataTable && NewInteractData.RowName != "")
     {
         const FDataInteract* DataInteract = NewInteractData.DataTable->FindRow<FDataInteract>(NewInteractData.RowName, "");
         if (!DataInteract) return;
@@ -171,7 +171,9 @@ void AInteractItemActor::InitDataInteract(FDataTableRowHandle NewInteractData)
 
         this->TypeItem = DataInteract->TypeItem;
 
-        if (DataInteract->TypeItem == ETypeItem::InvItem)
+        if (DataInteract->TypeItem == ETypeItem::InvItem &&
+            DataInteract->RowRuleInvItem.DataTable &&
+            DataInteract->RowRuleInvItem.RowName != "")
         {
             const FInventoryItem* DataInventory = DataInteract->RowRuleInvItem.DataTable->FindRow<FInventoryItem>(
                 DataInteract->RowRuleInvItem.RowName, "");
@@ -191,7 +193,7 @@ void AInteractItemActor::InitDataInteract(FDataTableRowHandle NewInteractData)
             this->DescriptionItem = DataInteract->DescriptionItem;
         }
 
-        if(this->bCustomInteractText)
+        if (this->bCustomInteractText)
         {
             InteractWidget->SetText(this->InteractText);
         }

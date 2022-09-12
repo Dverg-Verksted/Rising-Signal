@@ -1,4 +1,4 @@
-// It is owned by the company Dverg Verksted.
+﻿// It is owned by the company Dverg Verksted.
 
 #pragma once
 
@@ -139,9 +139,10 @@ private:
     UFUNCTION(BlueprintCallable, Category = "UInteractComponent | AnimMontages")
     void SetGroundPickUpAnimMontage(UAnimMontage* NewAnimMontage) { GroundPickUpAnimMontage = NewAnimMontage; }
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animations", meta= (AllowPrivateAccess = true))
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animations", DisplayName = "Аниммонтаж подъема с земли",
+        meta= (AllowPrivateAccess = true, ToolTip = "Укажите аниммонтаж, который должен проигрываться при подъеме предмета с земли"))
     UAnimMontage* GroundPickUpAnimMontage;
-
+    
     void InitAnimations();
 
     void StartPickUpAnimation() const;
