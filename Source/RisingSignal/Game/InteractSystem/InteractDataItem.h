@@ -74,16 +74,16 @@ struct FDataInteract : public FTableRowBase
 
 #pragma region StaticItem
 
-    // @private Interval count range
-    // UPROPERTY(EditAnywhere, Category = "Settings Data Item",
-    //     meta = (
-    //         DisplayName = "Предмет",
-    //         ToolTip = "Укажите актор предмета",
-    //         EditCondition = "TypeItem == ETypeItem::StaticItem",
-    //         EditConditionHides
-    //     )
-    // )
-    // TSubclassOf<ARSInteractStaticItemBase> StaticActorClass = nullptr;
+    // @private StaticActorClass
+    UPROPERTY(EditAnywhere, Category = "Settings Data Item",
+        meta = (
+            DisplayName = "Предмет",
+            ToolTip = "Укажите актор предмета",
+            EditCondition = "TypeItem == ETypeItem::StaticItem",
+            EditConditionHides
+        )
+    )
+    TSubclassOf<ARSInteractStaticItemBase> StaticActorClass = nullptr;
 
 
 #pragma endregion

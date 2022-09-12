@@ -2,7 +2,7 @@
 
 #include "Game/InteractSystem/InteractItemActor.h"
 
-// #include "RSInteractStaticItemBase.h"
+#include "RSInteractStaticItemBase.h"
 #include "Components/WidgetComponent.h"
 // #include "Engine/AssetManager.h"
 #include "Game/Inventory/RSInventoryComponent.h"
@@ -60,6 +60,11 @@ void AInteractItemActor::BeginPlay()
     InitDataInteract(InteractData);
 }
 
+void AInteractItemActor::PostLoad()
+{
+    Super::PostLoad();
+}
+
 #if UE_EDITOR
 
 void AInteractItemActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -83,31 +88,29 @@ void AInteractItemActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyC
         {
             this->Mesh->SetStaticMesh(nullptr);
 
-            // FTransform StaticItemActorTransform{GetActorRotation(), GetActorLocation()};
+            FTransform StaticItemActorTransform{GetActorRotation(), GetActorLocation()};
 
-            // ChildStaticItemActor = GetWorld()->SpawnActor<ARSInteractStaticItemBase>(DataInteract->StaticActorClass, StaticItemActorTransform);
-            //
-            // // ChildStaticItemActor = Cast<ARSInteractStaticItemBase>(GEditor->AddActor(GetWorld()->GetCurrentLevel(),
-            // //     DataInteract->StaticActorClass,
-            // //     StaticItemActorTransform));
-            // if (ChildStaticItemActor)
-            // {
-            //     LOG_RS(ELogRSVerb::Display, ChildStaticItemActor->GetName() + " parenting to " + this->GetName());
-            //     // GEditor->ParentActors(this, ChildStaticItemActor, "");
-            //     ChildStaticItemActor->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-            //     LOG_RS(ELogRSVerb::Display, ChildStaticItemActor->GetName() + " successfully parent to " + this->GetName());
-            // }
+            ChildStaticItemActor = GetWorld()->SpawnActor<ARSInteractStaticItemBase>(DataInteract->StaticActorClass,
+                StaticItemActorTransform);
+
+            if (ChildStaticItemActor)
+            {
+                // LOG_RS(ELogRSVerb::Display, ChildStaticItemActor->GetName() + " parenting to " + this->GetName());
+
+                ChildStaticItemActor->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+                // LOG_RS(ELogRSVerb::Display, ChildStaticItemActor->GetName() + " successfully parent to " + this->GetName());
+            }
         }
         else
         {
-            // if (ChildStaticItemActor)
-            // {
-            //     LOG_RS(ELogRSVerb::Display, ChildStaticItemActor->GetName() + " start destroing");
-            //     ChildStaticItemActor->Destroy();
-            //     // GWorld->DestroyActor(ChildStaticItemActor);
-            //
-            //     LOG_RS(ELogRSVerb::Display, ChildStaticItemActor->GetName() + " destroyed");
-            // }
+            if (ChildStaticItemActor)
+            {
+                // LOG_RS(ELogRSVerb::Display, ChildStaticItemActor->GetName() + " start destroing");
+                ChildStaticItemActor->Destroy();
+
+                // LOG_RS(ELogRSVerb::Display, ChildStaticItemActor->GetName() + " destroyed");
+            }
+            
             UStaticMesh* L_Mesh = LoadObject<UStaticMesh>(nullptr, *(DataInteract->MeshItem.ToString()));
             if (L_Mesh)
             {

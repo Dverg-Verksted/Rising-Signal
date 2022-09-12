@@ -28,6 +28,8 @@ protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
+    virtual void PostLoad() override;
+
 #if UE_EDITOR
 
     // Called when changed property
@@ -127,7 +129,8 @@ private:
     UPROPERTY(EditInstanceOnly, Category = "Settings Interact",
         meta = (
             DisplayName = "Использовать уникальный для этого объекта текст взаимодействия",
-            ToolTip = "Если включено, текст будет браться из соответствующего поля. Если выключено - будет отображаться имя предмета. Приоритет - наивысший."
+            ToolTip =
+            "Если включено, текст будет браться из соответствующего поля. Если выключено - будет отображаться имя предмета. Приоритет - наивысший."
         )
     )
     bool bCustomInteractText = false;
@@ -143,8 +146,8 @@ private:
     )
     FText InteractText;
 
-    // UPROPERTY()
-    // ARSInteractStaticItemBase* ChildStaticItemActor = nullptr;
+    UPROPERTY()
+    ARSInteractStaticItemBase* ChildStaticItemActor = nullptr;
 
     UPROPERTY()
     UInteractWidget* InteractWidget;
