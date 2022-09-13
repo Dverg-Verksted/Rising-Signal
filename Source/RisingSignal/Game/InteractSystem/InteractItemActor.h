@@ -10,6 +10,7 @@
 #include "InteractItemActor.generated.h"
 
 
+class USphereComponent;
 class UWidgetComponent;
 class UInteractWidget;
 UCLASS(HideCategories = ("Variable", "Transform", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
@@ -41,14 +42,21 @@ protected:
 
 #pragma region Components
 
+    UPROPERTY(EditInstanceOnly, Category = "Components")
+    float CollisionRadius = 100.0f;
+
 private:
     // @private Mesh component
-    UPROPERTY(EditDefaultsOnly, Category = "Components")
+    UPROPERTY(VisibleAnywhere, Category = "Components")
     UStaticMeshComponent* Mesh;
 
     // @private 3D Widget component
-    UPROPERTY(EditDefaultsOnly, Category = "Components")
+    UPROPERTY(VisibleAnywhere, Category = "Components")
     UWidgetComponent* WidgetComponent;
+
+    // @private SphereCollisionComponent
+    UPROPERTY(VisibleAnywhere, Category = "Components")
+    USphereComponent* SphereCollision;
 
 #pragma endregion
 
@@ -81,14 +89,20 @@ public:
     FDataInteract GetItemData() const
     {
         if (InteractData.DataTable && InteractData.RowName != "None")
-            return *InteractData.DataTable->FindRow<FDataInteract>(InteractData.RowName, "");
+        {
+            FDataInteract* CurrentInteractData = InteractData.DataTable->FindRow<FDataInteract>(InteractData.RowName, "");
+            if (CurrentInteractData) return *CurrentInteractData;
+        }
 
         return FDataInteract();
     };
 
 
     UFUNCTION(BlueprintPure, Category = "AInteractItemActor | DataInteractItem")
-    int32 GetItemCount() const { return ItemCount; };
+    int32 GetItemCount() const { return ItemCount; }
+
+    UFUNCTION(BlueprintPure, Category = "AInteractItemActor | DataInteractItem")
+    ARSInteractStaticItemBase* GetChildStaticActor() const { return ChildStaticItemActor; }
 
 private:
     // @private pointer on InteractItemDataAsset
@@ -154,7 +168,7 @@ private:
 
     FTimerHandle ResetInteractAnimTimerHandle;
 
-    void InitDataInteract(FDataTableRowHandle NewInteractData);
+    void InitDataInteract(const FDataTableRowHandle NewInteractData, const bool bInitWidgetText = false);
 
 #pragma endregion
 

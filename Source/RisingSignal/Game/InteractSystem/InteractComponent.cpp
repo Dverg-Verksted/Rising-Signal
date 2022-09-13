@@ -5,6 +5,7 @@
 #include "AlsCharacterMovementComponent.h"
 #include "InteractDataItem.h"
 #include "InteractItemActor.h"
+#include "RSInteractStaticItemBase.h"
 #include "AnimNotifies/RSItemPickUpEndedAnimNotify.h"
 #include "Components/BoxComponent.h"
 #include "Game/JournalSystem/JournalSystem.h"
@@ -206,14 +207,6 @@ void UInteractComponent::RegisterInteractEvent()
         FDataInteract* DataInteract = InteractRowHandle.DataTable->FindRow<FDataInteract>(InteractRowHandle.RowName, "");
         if (!DataInteract) return;
 
-        if (DataInteract->TypeItem == ETypeItem::StaticItem)
-        {
-            // TODO Add and call StartInteractAnimation() function
-            return;
-        }
-
-        StartPickUpAnimation();
-
         switch (DataInteract->TypeItem)
         {
             case ETypeItem::NoteItem:
@@ -238,8 +231,19 @@ void UInteractComponent::RegisterInteractEvent()
                 // LOG_RS(ELogRSVerb::Error, InteractRowHandle.RowName.ToString());
                 break;
             }
+            case ETypeItem::StaticItem:
+            {
+                if (ARSInteractStaticItemBase* ChildStaticActor = TargetInteractItem->GetChildStaticActor())
+                {
+                    ChildStaticActor->Interact(OwnerPlayer);
+                }
+
+                return;
+                break;
+            }
         }
 
+        StartPickUpAnimation();
         TargetInteractItem->Destroy();
     }
 }
@@ -306,14 +310,15 @@ void UInteractComponent::StartPickUpAnimation() const
         return;
     }
 
-    OwnerPlayer->DisableInput(PlayerController);
+    OwnerPlayer->GetCharacterMovement()->DisableMovement();
+
 
     OwnerPlayer->PlayAnimMontage(GroundPickUpAnimMontage);
 
-    // some workaround
-    FTimerHandle TempHandle;
-
-    GetWorld()->GetTimerManager().SetTimer(TempHandle, this, &UInteractComponent::PickUpAnimationEnded, 2); // TODO: Fix this workaround
+    // // some workaround
+    // FTimerHandle TempHandle;
+    //
+    // GetWorld()->GetTimerManager().SetTimer(TempHandle, this, &UInteractComponent::PickUpAnimationEnded, 2); // TODO: Fix this workaround
 }
 
 void UInteractComponent::PickUpAnimationEnded() const
@@ -324,7 +329,7 @@ void UInteractComponent::PickUpAnimationEnded() const
         return;
     }
 
-    OwnerPlayer->EnableInput(PlayerController);
+    OwnerPlayer->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
 #if WITH_EDITOR

@@ -28,6 +28,7 @@ ARSGamePLayer::ARSGamePLayer()
     SpringArm->bInheritRoll = false;
     SpringArm->bInheritYaw = false;
     SpringArm->TargetArmLength = 700.0f;
+    SpringArm->bDoCollisionTest = false;
 
     Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
     Camera->SetupAttachment(SpringArm);
