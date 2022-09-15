@@ -151,6 +151,8 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
         }
         else
         {
+            // AttachedMap = GetWorld();
+            
             UStaticMesh* L_Mesh = LoadObject<UStaticMesh>(nullptr, *(DataInteract->MeshItem.ToString()));
             if (L_Mesh)
             {

@@ -72,6 +72,8 @@ struct FDataInteract : public FTableRowBase
     )
     FText InteractText;
 
+
+
 #pragma region StaticItem
 
     // @private StaticActorClass
@@ -105,29 +107,12 @@ struct FDataInteract : public FTableRowBase
     )
     FDataTableRowHandle RowRuleInvItem;
 
-    // @private Interval count range
-    // UPROPERTY(EditInstanceOnly, Category = "Settings Data Item",
-    //     meta = (
-    //         DisplayName = "Количество предметов",
-    //         ToolTip = "Укажите количество подбираемых предметов",
-    //         EditCondition = "TypeItem == ETypeItem::InvItem",
-    //         EditConditionHides
-    //     )
-    // )
-    // int32 ItemCount = 1;
-
 #pragma endregion
 
 #pragma region NoteItem
 
     // @private Note entity
     FPrimaryAssetType JournalNoteType;
-
-    // @private Note map Description
-    UPROPERTY(EditAnywhere, Category="Settings Data Item",
-        meta = (AllowedClasses= "World", EditCondition = "TypeItem == ETypeItem::NoteItem",
-            EditConditionHides))
-    FSoftObjectPath NoteMap;
 
     // @private Note Header
     UPROPERTY(EditAnywhere, Category = "Settings Data Item",
@@ -155,10 +140,6 @@ struct FDataInteract : public FTableRowBase
     // @private Audio entity
     FPrimaryAssetType JournalAudioType;
 
-    UPROPERTY(EditAnywhere, Category="Settings Data Item",
-        meta = (AllowedClasses= "World", EditCondition = "TypeItem == ETypeItem::AudioItem", EditConditionHides))
-    FSoftObjectPath AudioMap;
-
     // @private Audio Header
     UPROPERTY(EditAnywhere, Category = "Settings Data Item",
         meta = (DisplayName = "Заголовок журнала аудиозаписи", ToolTip = "Заголовок журнала аудиозаписи", EditCondition =
@@ -176,10 +157,6 @@ struct FDataInteract : public FTableRowBase
 
     // @private Photo entity
     FPrimaryAssetType JournalPhotoType;
-
-    UPROPERTY(EditAnywhere, Category="Settings Data Item",
-        meta = (AllowedClasses= "World", EditCondition = "TypeItem == ETypeItem::PhotoItem", EditConditionHides))
-    FSoftObjectPath PhotoMap;
 
     // @private Photo Header
     UPROPERTY(EditAnywhere, Category = "Settings Data Item",

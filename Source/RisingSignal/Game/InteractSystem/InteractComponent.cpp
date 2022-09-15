@@ -259,7 +259,7 @@ void UInteractComponent::SendNoteData(const FDataInteract* DataInteract) const
     InteractItemNote.NoteDate = DataInteract->NoteDate;
     InteractItemNote.NoteDescription = DataInteract->NoteDescription;
     InteractItemNote.NoteHeader = DataInteract->NoteHeader;
-    InteractItemNote.NoteMap = DataInteract->NoteMap;
+    InteractItemNote.NoteMap = GetWorld();
     JournalSystem->AddNoteItem(InteractItemNote);
 }
 
@@ -267,7 +267,7 @@ void UInteractComponent::SendAudioData(const FDataInteract* DataInteract) const
 {
     FInteractItemAudio InteractItemAudio;
     InteractItemAudio.AudioHeader = DataInteract->AudioHeader;
-    InteractItemAudio.AudioMap = DataInteract->AudioMap;
+    InteractItemAudio.AudioMap = GetWorld();
     InteractItemAudio.JournalAudio = DataInteract->JournalAudio;
     JournalSystem->AddAudioItem(InteractItemAudio);
 }
@@ -276,7 +276,7 @@ void UInteractComponent::SendPhotoData(const FDataInteract* DataInteract) const
 {
     FInteractItemPhoto InteractItemPhoto;
     InteractItemPhoto.PhotoHeader = DataInteract->PhotoHeader;
-    InteractItemPhoto.PhotoMap = DataInteract->PhotoMap;
+    InteractItemPhoto.PhotoMap = GetWorld();
     InteractItemPhoto.JournalPhoto = DataInteract->JournalPhoto;
     JournalSystem->AddPhotoItem(InteractItemPhoto);
 }
