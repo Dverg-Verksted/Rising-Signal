@@ -4,7 +4,7 @@
 #include "Game/AI/RSAICharacter.h"
 
 #include "RSAIController.h"
-#include "Game/AbilitySystem/ActorsComponents/RSHealthComponent.h"
+// #include "Game/AbilitySystem/ActorsComponents/RSHealthComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Library/RSFunctionLibrary.h"
 
@@ -17,7 +17,7 @@ ARSAICharacter::ARSAICharacter()
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
     AIControllerClass = ARSAIController::StaticClass();
 
-    HealthComponent = CreateDefaultSubobject<URSHealthComponent>(TEXT("HealthComponent"));
+    // HealthComponent = CreateDefaultSubobject<URSHealthComponent>(TEXT("HealthComponent"));
 
     GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }

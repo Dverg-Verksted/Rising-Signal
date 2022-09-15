@@ -4,7 +4,7 @@
 #include "Game/AI/Components/RSAIPerceptionComponent.h"
 
 #include "AIController.h"
-#include "Game/AbilitySystem/ActorsComponents/RSHealthComponent.h"
+//#include "Game/AbilitySystem/ActorsComponents/RSHealthComponent.h"
 #include "Library/RSFunctionLibrary.h"
 #include "Perception/AISense_Sight.h"
 #include "Player/RSGamePLayer.h"
