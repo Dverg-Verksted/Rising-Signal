@@ -106,7 +106,7 @@ struct FInventoryItem : public FTableRowBase
         this->SlotIndex = Other.SlotIndex;
         this->Count = Other.Count;
         this->ItemID = Other.ItemID;
-        this->TypeComponent = TypeComponent;
+        this->TypeComponent = Other.TypeComponent;
         this->ImageItem = Other.ImageItem;
         this->bCanEquip = Other.bCanEquip;
         this->bCanCraft = Other.bCanCraft;
