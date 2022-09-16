@@ -169,6 +169,8 @@ public:
     UPROPERTY(BlueprintAssignable)
     FOnJournalSignature JournalOpenClose;
 
+    virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 private:
 
     bool canRun = true;
@@ -182,6 +184,8 @@ private:
     
     UFUNCTION()
     void RegisterDeath();
+
+   
 
 #pragma endregion Extension
 };

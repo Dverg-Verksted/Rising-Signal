@@ -12,9 +12,7 @@
 // Sets default values for this component's properties
 URSAbilitySystem::URSAbilitySystem()
 {
-    // Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-    // off to improve performance if you don't need them.
-    PrimaryComponentTick.bCanEverTick = true;
+    PrimaryComponentTick.bCanEverTick = false;
     
 }
 
@@ -64,17 +62,17 @@ float URSAbilitySystem::GetStaminaChangedValue()
         // if player stand, make regeneration stamina
         if(CurrentPlayerSpeed <= 0)
         {
-            return ValueStaminaPlStay * TimerChackStateRate;
+            return ValueStaminaActorStay * TimerChackStateRate;
         }
         // if player walk, make decrease stamina
         if(CurrentPlayerSpeed <= 360)
         {
-            return ValueStaminaPlWalk * TimerChackStateRate;
+            return ValueStaminaActorWalk * TimerChackStateRate;
         }
         // if player run, make more decrease stamina
         if(CurrentPlayerSpeed >= 410)
         {
-            return ValueStaminaPlRun * TimerChackStateRate;
+            return ValueStaminaActorRun * TimerChackStateRate;
         }
     }
     return 0.0f;
@@ -128,6 +126,17 @@ float URSAbilitySystem::GetHealthChangedValue()
     return ValueOnChangeHealth;
 }
 
+void URSAbilitySystem::SetChangeValue(EAbilityStatesType AbilityStateType, float ChangedValueModifier)
+{
+    for (auto &State : States)
+    {
+        if(State.StateType == AbilityStateType)
+        {
+            State.ChangedValue *= ChangedValueModifier;
+        }
+    }
+}
+
 // Called every frame
 void URSAbilitySystem::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -161,5 +170,18 @@ void URSAbilitySystem::ChangeCurrentStateValue(EAbilityStatesType StateTy, float
             return;
         }
     }
+}
+
+FStateParams URSAbilitySystem::GetState(EAbilityStatesType AbilityStateType)
+{
+    for (auto &State : States)
+    {
+        if (State.StateType == AbilityStateType)
+        {
+            return State;
+        }
+    }
+    FStateParams TempParam;
+    return TempParam;
 }
 

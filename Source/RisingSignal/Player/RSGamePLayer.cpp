@@ -328,4 +328,12 @@ void ARSGamePLayer::RegisterDeath()
     // some death logic for player
 }
 
+float ARSGamePLayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+    AbilitySystem->ChangeCurrentStateValue(EAbilityStatesType::Health, -1 * DamageAmount);
+    
+    
+    return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
 #pragma endregion Extension
