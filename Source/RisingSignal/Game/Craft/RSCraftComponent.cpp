@@ -33,12 +33,10 @@ void URSCraftComponent::RemoveItemFromSlot(const FInventoryItem& Item)
 
 void URSCraftComponent::BeginPlay()
 {
-	Super::BeginPlay();
-    
+    Super::BeginPlay();
 }
 
 void URSCraftComponent::UpdateCraftSlot(int32 Index)
 {
     OnCraftSlotChanged.Broadcast(CraftingItems[Index]);
 }
-

@@ -32,14 +32,13 @@ struct FRecipeItem : public FTableRowBase
     FDataTableRowHandle OutputItem;
 };
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class RISINGSIGNAL_API URSCraftComponent : public UActorComponent
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-public:	
-	
-	URSCraftComponent();
+public:
+    URSCraftComponent();
 
     UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite)
     FOnSlotChangedSignature OnCraftSlotChanged;
@@ -48,18 +47,14 @@ public:
     void RemoveItemFromSlot(const FInventoryItem& Item);
 
 protected:
-	
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Настройки крафта")
-	int32 MaxCraftingSlots;
+    int32 MaxCraftingSlots;
 
 private:
-
     void UpdateCraftSlot(int32 Index);
 
     UPROPERTY()
     TArray<FInventoryItem> CraftingItems;
-
-		
 };

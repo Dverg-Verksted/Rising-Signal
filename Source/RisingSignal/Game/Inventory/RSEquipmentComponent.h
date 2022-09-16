@@ -9,13 +9,13 @@
 
 #define MAX_SLOTS 4
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class RISINGSIGNAL_API URSEquipmentComponent : public UActorComponent
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-public:	
-	URSEquipmentComponent();
+public:
+    URSEquipmentComponent();
 
     UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite)
     FOnSlotChangedSignature OnEquipmentSlotChanged;
@@ -26,15 +26,11 @@ public:
     void TakeInHands(int32 Index);
 
 protected:
-
     UPROPERTY()
     TMap<int32, FInventoryItem> EquipmentSlots;
 
 private:
-
     void UpdateEquipmentSlot(int32 Index, const FInventoryItem& Item);
-    
-    int32 CurrentItemInHand;
 
-		
+    int32 CurrentItemInHand;
 };

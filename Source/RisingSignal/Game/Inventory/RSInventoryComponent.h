@@ -46,11 +46,11 @@ struct FInventoryItem : public FTableRowBase
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь",
         DisplayName="Категория", meta=(ToolTip = "Категория предмета"))
     EItemCategory ItemCategory = EItemCategory::Resource;
-    
+
     UPROPERTY(BlueprintReadWrite, Category = "Инвентарь",
         DisplayName="ID предмета", meta=(ToolTip = "Идентификатор предмета. Должен быть уникальным числом."))
     int32 ItemID = -1;
-    
+
     UPROPERTY(BlueprintReadWrite, Category = "Инвентарь",
         DisplayName="Индекс слота", meta=(ToolTip = "Параметр редактировать не нужно. По умолчанию значение всегда -1"))
     int32 SlotIndex = -1;
@@ -58,10 +58,10 @@ struct FInventoryItem : public FTableRowBase
     UPROPERTY(BlueprintReadWrite, Category="Инвентарь",
         DisplayName="Тип компонента", meta=(ToolTip = "Тип компонента, к которому будет принадлежать данный слот"))
     ETypeComponent TypeComponent = ETypeComponent::Inventory;
-    
+
     UPROPERTY(BlueprintReadWrite, Category = "Инвентарь", DisplayName = "Количество")
     int32 Count = 0;
-    
+
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
         DisplayName = "Изображение", meta=(ToolTip = "Изображение, которое будет отображаться в слотах инвентаря"))
     UTexture2D* ImageItem;
@@ -72,34 +72,40 @@ struct FInventoryItem : public FTableRowBase
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
         DisplayName="Можно использовать в крафте?", meta=(EditCondition = "!bCanEquip", EditConditionHides))
     bool bCanCraft = false;
-    
+
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
         DisplayName="Стакается предмет?", meta=(EditCondition = "!bCanEquip", EditConditionHides))
     bool bStack = true;
-    
+
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
         DisplayName = "Можно использовать?", meta=(EditCondition = "!bCanEquip", EditConditionHides))
     bool bCanUse = false;
-    
+
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
-        DisplayName="Макс. количество", meta=(ToolTip = "Максимальное количество предметов в стаке", EditCondition="bStack", EditConditionHides))
+        DisplayName="Макс. количество",
+        meta=(ToolTip = "Максимальное количество предметов в стаке", EditCondition="bStack", EditConditionHides))
     int32 MaxCount = 50;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь",
-        DisplayName="Эффекты", meta=(ToolTip = "Эффекты накладываемые на игрока, которые изменяют значения выбранных атрибутов игрока при использовании предмета.",
-        EditCondition="bCanUse", EditConditionHides))
+        DisplayName="Эффекты",
+        meta=(ToolTip = "Эффекты накладываемые на игрока, которые изменяют значения выбранных атрибутов игрока при использовании предмета.",
+            EditCondition="bCanUse", EditConditionHides))
     TMap<EAbilityStatesType, float> CharacterAttributesEffects;
 
     UPROPERTY()
     FName InteractRowName;
 
-    FInventoryItem() : ImageItem(nullptr) {}
+    FInventoryItem()
+        : ImageItem(nullptr)
+    {
+    }
 
-    FInventoryItem(int i) : ImageItem(nullptr) { SlotIndex = i; }
+    FInventoryItem(int i)
+        : ImageItem(nullptr) { SlotIndex = i; }
 
     FInventoryItem(const FInventoryItem* OtherItem);
 
-    FInventoryItem operator = (const FInventoryItem& Other)
+    FInventoryItem operator =(const FInventoryItem& Other)
     {
         this->InteractRowName = Other.InteractRowName;
         this->Name = Other.Name;
@@ -119,12 +125,12 @@ struct FInventoryItem : public FTableRowBase
         return *this;
     }
 
-    bool operator == (const FInventoryItem& Other) const
+    bool operator ==(const FInventoryItem& Other) const
     {
         return this->ItemID == Other.ItemID;
     }
 
-    bool operator != (const FInventoryItem& Other) const
+    bool operator !=(const FInventoryItem& Other) const
     {
         return this->ItemID != Other.ItemID;
     }
@@ -141,7 +147,7 @@ class RISINGSIGNAL_API URSInventoryComponent : public UActorComponent
 
 public:
     URSInventoryComponent();
-    
+
     UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite)
     FOnSlotChangedSignature OnInventorySlotUpdate;
 
@@ -156,7 +162,7 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Инвентарь")
     bool UseItem(const FInventoryItem& InventorySlot);
-    
+
     UFUNCTION(BlueprintCallable, Category = "Инвентарь")
     TArray<FInventoryItem> GetItems();
 
@@ -173,22 +179,25 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Инвентарь | Настройки", DisplayName = "Макс. количество предметов")
     int32 MaxCountItem = 34;
-    
+
 private:
     void RemoveItem(const FInventoryItem& InventorySlot, int32 CountRemove = -1, bool bItemUsed = false);
-    bool DivideItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
     bool SwapItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
     void CombineItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
     void UpdateSlot(int32 Index, const FInventoryItem& Item, int32 ChangedCount);
 
+    bool MoveItemInventory(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
+    bool MoveItemEquipment(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
+    bool MoveItemCraft(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
+
     void AddStacks(FInventoryItem* Item, int32 Count);
     FInventoryItem* FindItemData(const FDataTableRowHandle& RowDataHandle);
     FInventoryItem* FindFreeSlot();
-    
+
     TSoftObjectPtr<URSAbilitySystem> AbilitySystem;
     TSoftObjectPtr<URSEquipmentComponent> EquipmentComponent;
     TSoftObjectPtr<URSCraftComponent> CraftComponent;
-    
+
     UPROPERTY()
     TArray<FInventoryItem> InventoryItems;
 };

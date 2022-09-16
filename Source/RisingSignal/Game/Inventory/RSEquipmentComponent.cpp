@@ -5,13 +5,13 @@
 
 URSEquipmentComponent::URSEquipmentComponent()
 {
-	if(EquipmentSlots.Num() < MAX_SLOTS)
-	{
-	    for(int i = 0; i < MAX_SLOTS; i++)
-	    {
-	        EquipmentSlots.Add(i, FInventoryItem());
-	    }
-	}
+    if (EquipmentSlots.Num() < MAX_SLOTS)
+    {
+        for (int i = 0; i < MAX_SLOTS; i++)
+        {
+            EquipmentSlots.Add(i, FInventoryItem());
+        }
+    }
 }
 
 void URSEquipmentComponent::EquipItemInSlot(const FInventoryItem& Item, int32 Index)
@@ -30,9 +30,10 @@ void URSEquipmentComponent::TakeInHands(int32 Index)
 {
     CurrentItemInHand = Index;
 
-    if(EquipmentSlots[CurrentItemInHand].ItemID != -1)
+    if (EquipmentSlots[CurrentItemInHand].ItemID != -1)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::Printf(TEXT("Current item in hands is %s"), *EquipmentSlots[CurrentItemInHand].Name.ToString()));
+        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red,
+            FString::Printf(TEXT("Current item in hands is %s"), *EquipmentSlots[CurrentItemInHand].Name.ToString()));
     }
     else
     {
@@ -46,8 +47,6 @@ void URSEquipmentComponent::UpdateEquipmentSlot(int32 Index, const FInventoryIte
     CurrentItem.SlotIndex = Index;
     CurrentItem.TypeComponent = ETypeComponent::Equipment;
     EquipmentSlots[Index] = CurrentItem;
-    
+
     OnEquipmentSlotChanged.Broadcast(EquipmentSlots[Index]);
 }
-
-
