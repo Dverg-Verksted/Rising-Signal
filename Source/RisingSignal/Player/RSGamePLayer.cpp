@@ -39,6 +39,7 @@ ARSGamePLayer::ARSGamePLayer()
 
     InventoryComponent = CreateDefaultSubobject<URSInventoryComponent>("InventoryComponent");
     EquipmentComponent = CreateDefaultSubobject<URSEquipmentComponent>("EquipmentComponent");
+    CraftComponent = CreateDefaultSubobject<URSCraftComponent>("CraftComponent");
 }
 
 void ARSGamePLayer::BeginPlay()
@@ -67,6 +68,11 @@ URSInventoryComponent* ARSGamePLayer::GetInventoryComponent()
 URSEquipmentComponent* ARSGamePLayer::GetEquipmentComponent()
 {
     return EquipmentComponent;
+}
+
+URSCraftComponent* ARSGamePLayer::GetCraftComponent()
+{
+    return CraftComponent;
 }
 
 #pragma endregion

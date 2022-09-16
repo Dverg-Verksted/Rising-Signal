@@ -10,6 +10,7 @@
 
 
 class URSEquipmentComponent;
+class URSCraftComponent;
 
 UENUM()
 enum class EItemCategory
@@ -129,7 +130,7 @@ struct FInventoryItem : public FTableRowBase
     }
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventorySlotChangedSignature, FInventoryItem, Item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSlotChangedSignature, FInventoryItem, Item);
 
 #define SLOT_REMOVE 34
 
@@ -142,10 +143,10 @@ public:
     URSInventoryComponent();
     
     UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite)
-    FOnInventorySlotChangedSignature OnInventorySlotUpdate;
+    FOnSlotChangedSignature OnInventorySlotUpdate;
 
     UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite)
-    FOnInventorySlotChangedSignature OnInventoryItemUse;
+    FOnSlotChangedSignature OnInventoryItemUse;
 
     UFUNCTION(BlueprintCallable, Category="Инвентарь")
     void AddDataItem(const FDataTableRowHandle& RowDataHandle, FName DTInteractRowName, int32 Count);
@@ -186,6 +187,7 @@ private:
     
     TSoftObjectPtr<URSAbilitySystem> AbilitySystem;
     TSoftObjectPtr<URSEquipmentComponent> EquipmentComponent;
+    TSoftObjectPtr<URSCraftComponent> CraftComponent;
     
     UPROPERTY()
     TArray<FInventoryItem> InventoryItems;

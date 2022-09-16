@@ -5,7 +5,13 @@
 
 URSEquipmentComponent::URSEquipmentComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	if(EquipmentSlots.Num() < MAX_SLOTS)
+	{
+	    for(int i = 0; i < MAX_SLOTS; i++)
+	    {
+	        EquipmentSlots.Add(i, FInventoryItem());
+	    }
+	}
 }
 
 void URSEquipmentComponent::EquipItemInSlot(const FInventoryItem& Item, int32 Index)
@@ -38,6 +44,7 @@ void URSEquipmentComponent::UpdateEquipmentSlot(int32 Index, const FInventoryIte
 {
     FInventoryItem CurrentItem = Item;
     CurrentItem.SlotIndex = Index;
+    CurrentItem.TypeComponent = ETypeComponent::Equipment;
     EquipmentSlots[Index] = CurrentItem;
     
     OnEquipmentSlotChanged.Broadcast(EquipmentSlots[Index]);

@@ -41,12 +41,25 @@ public:
 	
 	URSCraftComponent();
 
+    UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite)
+    FOnSlotChangedSignature OnCraftSlotChanged;
+
+    void AddItemInSlot(const FInventoryItem& Item, int32 Index);
+    void RemoveItemFromSlot(const FInventoryItem& Item);
+
 protected:
 	
 	virtual void BeginPlay() override;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Настройки крафта")
 	int32 MaxCraftingSlots;
+
+private:
+
+    void UpdateCraftSlot(int32 Index);
+
+    UPROPERTY()
+    TArray<FInventoryItem> CraftingItems;
 
 		
 };
