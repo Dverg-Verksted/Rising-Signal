@@ -8,6 +8,8 @@
 #include "Game/Inventory/RSInventoryComponent.h"
 #include "RSCraftComponent.generated.h"
 
+#define OUTPUT_SLOT 6
+
 USTRUCT(BlueprintType)
 struct FCraftItem
 {

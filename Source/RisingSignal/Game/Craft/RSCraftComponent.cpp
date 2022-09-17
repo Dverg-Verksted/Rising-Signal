@@ -27,6 +27,7 @@ void URSCraftComponent::RemoveItemFromSlot(const FInventoryItem& Item)
 {
     int32 SlotIndex = Item.SlotIndex;
     CraftingItems[SlotIndex] = FInventoryItem(SlotIndex);
+    CraftingItems[SlotIndex].TypeComponent = ETypeComponent::Craft;
     UpdateCraftSlot(SlotIndex);
 }
 
