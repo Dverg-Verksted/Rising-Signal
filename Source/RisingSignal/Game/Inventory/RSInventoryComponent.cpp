@@ -146,6 +146,7 @@ void URSInventoryComponent::UpdateSlot(int32 Index, const FInventoryItem& Item, 
     CurrentItem.SlotIndex = Index;
     CurrentItem.Count = ChangedCount;
     InventoryItems[Index] = CurrentItem;
+    InventoryItems[Index].TypeComponent = ETypeComponent::Inventory;
 
     OnInventorySlotUpdate.Broadcast(InventoryItems[Index]);
 }

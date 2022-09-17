@@ -50,7 +50,7 @@ protected:
     virtual void BeginPlay() override;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Настройки крафта")
-    int32 MaxCraftingSlots;
+    int32 MaxCraftingSlots = 7;
 
 private:
     void UpdateCraftSlot(int32 Index);
