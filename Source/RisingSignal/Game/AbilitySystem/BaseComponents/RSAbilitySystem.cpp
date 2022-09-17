@@ -137,14 +137,6 @@ void URSAbilitySystem::SetChangeValue(EAbilityStatesType AbilityStateType, float
     }
 }
 
-// Called every frame
-void URSAbilitySystem::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-    Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-    // ...
-}
-
 float URSAbilitySystem::GetCurrentStateValue(EAbilityStatesType SearchState) const
 {
     for (const auto State : States)

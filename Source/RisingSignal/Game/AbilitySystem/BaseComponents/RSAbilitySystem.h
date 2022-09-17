@@ -64,9 +64,11 @@ class RISINGSIGNAL_API URSAbilitySystem : public UActorComponent
 public:
     // Sets default values for this component's properties
     URSAbilitySystem();
-    
-    virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+    //
+    UFUNCTION()
+    void SetChangeValue(EAbilityStatesType AbilityStateType, float ChangedValueModifier);
+    
 #pragma region DeclareDelegate
 
     UPROPERTY(BlueprintAssignable)
@@ -115,9 +117,6 @@ private:
     //
     UFUNCTION()
     float GetHealthChangedValue();
-
-    UFUNCTION(BlueprintCallable)
-    void SetChangeValue(EAbilityStatesType AbilityStateType, float ChangedValueModifier);
     
     FTimerHandle TStateChange;
 
