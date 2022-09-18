@@ -176,9 +176,13 @@ bool URSInventoryComponent::MoveItemInventory(const FInventoryItem& FirstInvento
     }
     if (SecondInventorySlot.TypeComponent == ETypeComponent::Equipment)
     {
-        EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex);
-        RemoveItem(FirstInventorySlot, FirstInventorySlot.Count, true);
-        return true;
+        if(SecondInventorySlot.ItemID == INDEX_NONE)
+        {
+            EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex);
+            RemoveItem(FirstInventorySlot, FirstInventorySlot.Count, true);
+            return true;
+        }
+        return false;
     }
     if (SecondInventorySlot.TypeComponent == ETypeComponent::Craft)
     {
@@ -222,14 +226,14 @@ bool URSInventoryComponent::MoveItemEquipment(const FInventoryItem& FirstInvento
     {
         if (SecondInventorySlot.ItemID != INDEX_NONE)
         {
-            EquipmentComponent->UnEquipItemFromSlot(FirstInventorySlot);
             EquipmentComponent->EquipItemInSlot(SecondInventorySlot, FirstInventorySlot.SlotIndex);
-            EquipmentComponent->UnEquipItemFromSlot(SecondInventorySlot);
+            EquipmentComponent->UnEquipItemFromSlot(FirstInventorySlot);
             EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex);
+            EquipmentComponent->UnEquipItemFromSlot(SecondInventorySlot);
             return true;
         }
+        EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex);
         EquipmentComponent->UnEquipItemFromSlot(FirstInventorySlot);
-        EquipmentComponent->EquipItemInSlot(SecondInventorySlot, FirstInventorySlot.SlotIndex);
         return true;
     }
 
@@ -238,7 +242,7 @@ bool URSInventoryComponent::MoveItemEquipment(const FInventoryItem& FirstInvento
 
 bool URSInventoryComponent::MoveItemCraft(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot)
 {
-    if (SecondInventorySlot.SlotIndex == OUTPUT_SLOT)
+    if (SecondInventorySlot.SlotIndex == OUTPUT_SLOT && SecondInventorySlot.TypeComponent == ETypeComponent::Equipment)
     {
         return false;
     }
