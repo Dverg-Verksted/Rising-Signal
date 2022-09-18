@@ -28,6 +28,7 @@ ARSGamePLayer::ARSGamePLayer()
     SpringArm->bInheritRoll = false;
     SpringArm->bInheritYaw = false;
     SpringArm->TargetArmLength = 700.0f;
+    SpringArm->bDoCollisionTest = false;
 
     Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
     Camera->SetupAttachment(SpringArm);
@@ -38,6 +39,7 @@ ARSGamePLayer::ARSGamePLayer()
 
     InventoryComponent = CreateDefaultSubobject<URSInventoryComponent>("InventoryComponent");
     EquipmentComponent = CreateDefaultSubobject<URSEquipmentComponent>("EquipmentComponent");
+    CraftComponent = CreateDefaultSubobject<URSCraftComponent>("CraftComponent");
 }
 
 void ARSGamePLayer::BeginPlay()
@@ -66,6 +68,11 @@ URSInventoryComponent* ARSGamePLayer::GetInventoryComponent()
 URSEquipmentComponent* ARSGamePLayer::GetEquipmentComponent()
 {
     return EquipmentComponent;
+}
+
+URSCraftComponent* ARSGamePLayer::GetCraftComponent()
+{
+    return CraftComponent;
 }
 
 #pragma endregion
@@ -319,6 +326,14 @@ void ARSGamePLayer::CheckSomeState(EAbilityStatesType StateTyp, float Value)
 void ARSGamePLayer::RegisterDeath()
 {
     // some death logic for player
+}
+
+float ARSGamePLayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+    AbilitySystem->ChangeCurrentStateValue(EAbilityStatesType::Health, -1 * DamageAmount);
+    
+    
+    return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
 #pragma endregion Extension

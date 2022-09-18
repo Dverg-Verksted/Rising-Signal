@@ -42,7 +42,7 @@ struct FStateParams
     UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Значение, после которого замерзание будет убавлять здоровье", EditCondition = "StateType == EAbilityStatesType::Temp", EditConditionHides))
     float AfterIsDebafTemp = 0.0f;
     
-    // How much changes state per second
+    // How much changes state per time
     UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Значение, на которое будет изменяться значение параметра при восстановлении или убавлении"))
     float ChangedValue = 0.0f;
     
@@ -64,9 +64,11 @@ class RISINGSIGNAL_API URSAbilitySystem : public UActorComponent
 public:
     // Sets default values for this component's properties
     URSAbilitySystem();
-    
-    virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+    //
+    UFUNCTION()
+    void SetChangeValue(EAbilityStatesType AbilityStateType, float ChangedValueModifier);
+    
 #pragma region DeclareDelegate
 
     UPROPERTY(BlueprintAssignable)
@@ -95,6 +97,9 @@ public:
      */
     UFUNCTION(BlueprintCallable)
     void ChangeCurrentStateValue(EAbilityStatesType StateTy,float AddValue);
+
+    UFUNCTION(BlueprintCallable)
+    FStateParams GetState(EAbilityStatesType AbilityStateType);
     
 protected:
     // Called when the game starts
@@ -124,13 +129,13 @@ private:
     ARSGamePLayer* GamePlayerRef;
 
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", meta = (ToolTip = "На сколько изменяется выносливость, если игрок стоит"))
-    float ValueStaminaPlStay = 7.0f;
+    float ValueStaminaActorStay = 7.0f;
     
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", meta = (ToolTip = "На сколько изменяется выносливость, если игрок идет"))
-    float ValueStaminaPlWalk = 5.0f;
+    float ValueStaminaActorWalk = 5.0f;
 
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", meta = (ToolTip = "На сколько изменяется выносливость, если игрок бежит"))
-    float ValueStaminaPlRun = -7.0f;
+    float ValueStaminaActorRun = -7.0f;
 
     UPROPERTY(VisibleDefaultsOnly, Category = "Ability states")
     bool bIsDead = false;
