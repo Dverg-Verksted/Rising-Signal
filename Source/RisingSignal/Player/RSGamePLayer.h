@@ -6,6 +6,7 @@
 #include "AlsCharacter.h"
 #include "RSGamePlayerController.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
+#include "Game/Craft/RSCraftComponent.h"
 #include "RSGamePLayer.generated.h"
 
 class USpringArmComponent;
@@ -56,6 +57,9 @@ public:
 
     UFUNCTION(BlueprintGetter)
     URSEquipmentComponent* GetEquipmentComponent();
+
+    UFUNCTION(BlueprintGetter)
+    URSCraftComponent* GetCraftComponent();
     
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     URSAbilitySystem* AbilitySystem;
@@ -72,6 +76,9 @@ private:
 
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
     URSEquipmentComponent* EquipmentComponent;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+    URSCraftComponent* CraftComponent;
 
 
 #pragma endregion
@@ -162,6 +169,8 @@ public:
     UPROPERTY(BlueprintAssignable)
     FOnJournalSignature JournalOpenClose;
 
+    virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 private:
 
     bool canRun = true;
@@ -175,6 +184,8 @@ private:
     
     UFUNCTION()
     void RegisterDeath();
+
+   
 
 #pragma endregion Extension
 };
