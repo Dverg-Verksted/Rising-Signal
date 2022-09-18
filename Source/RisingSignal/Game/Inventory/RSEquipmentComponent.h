@@ -10,7 +10,7 @@
 #define MAX_SLOTS 4
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class RISINGSIGNAL_API URSEquipmentComponent : public UActorComponent
+class RISINGSIGNAL_API URSEquipmentComponent : public UActorComponent, public IInventoryInterface
 {
     GENERATED_BODY()
 
@@ -21,7 +21,11 @@ public:
     FOnSlotChangedSignature OnEquipmentSlotChanged;
 
     void EquipItemInSlot(const FInventoryItem& Item, int32 Index);
-    void UnEquipItemFromSlot(const FInventoryItem& Item);
+
+    virtual void RemoveItem(const FInventoryItem& Item) override;
+    virtual void UpdateSlot(int32 Index) override;
+    virtual bool SwapItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot) override;
+    virtual void CombineItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot) override;
 
     void TakeInHands(int32 Index);
 
@@ -30,7 +34,6 @@ protected:
     TMap<int32, FInventoryItem> EquipmentSlots;
 
 private:
-    void UpdateEquipmentSlot(int32 Index, const FInventoryItem& Item);
 
     int32 CurrentItemInHand;
 };

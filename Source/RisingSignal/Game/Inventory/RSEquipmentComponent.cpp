@@ -3,6 +3,8 @@
 
 #include "Game/Inventory/RSEquipmentComponent.h"
 
+#include "Library/RSFunctionLibrary.h"
+
 URSEquipmentComponent::URSEquipmentComponent()
 {
     if (EquipmentSlots.Num() < MAX_SLOTS)
@@ -16,21 +18,64 @@ URSEquipmentComponent::URSEquipmentComponent()
 
 void URSEquipmentComponent::EquipItemInSlot(const FInventoryItem& Item, int32 Index)
 {
-    UpdateEquipmentSlot(Index, Item);
+    FInventoryItem CurrentItem = Item;
+    CurrentItem.SlotIndex = Index;
+    CurrentItem.TypeComponent = ETypeComponent::Equipment;
+    EquipmentSlots[Index] = CurrentItem;
+    UpdateSlot(Index);
 }
 
-void URSEquipmentComponent::UnEquipItemFromSlot(const FInventoryItem& Item)
+void URSEquipmentComponent::RemoveItem(const FInventoryItem& Item)
 {
-    int32 Index = Item.SlotIndex;
-    EquipmentSlots[Index] = FInventoryItem();
-    UpdateEquipmentSlot(Index, EquipmentSlots[Index]);
+    int32 SlotIndex = Item.SlotIndex;
+    EquipmentSlots[SlotIndex] = FInventoryItem(SlotIndex);
+    EquipmentSlots[SlotIndex].TypeComponent = ETypeComponent::Equipment;
+    UpdateSlot(SlotIndex);
+}
+
+void URSEquipmentComponent::UpdateSlot(int32 Index)
+{
+    OnEquipmentSlotChanged.Broadcast(EquipmentSlots[Index]);
+}
+
+bool URSEquipmentComponent::SwapItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot)
+{
+    EquipmentSlots[FirstInventorySlot.SlotIndex] = SecondInventorySlot;
+    EquipmentSlots[FirstInventorySlot.SlotIndex].SlotIndex = FirstInventorySlot.SlotIndex;
+    EquipmentSlots[SecondInventorySlot.SlotIndex] = FirstInventorySlot;
+    EquipmentSlots[SecondInventorySlot.SlotIndex].SlotIndex = SecondInventorySlot.SlotIndex; 
+    UpdateSlot(FirstInventorySlot.SlotIndex);
+    UpdateSlot(SecondInventorySlot.SlotIndex);
+    
+    return true;
+}
+
+void URSEquipmentComponent::CombineItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot)
+{
+    const int32 FirstIndexSlot = FirstInventorySlot.SlotIndex;
+    const int32 SecondIndexSlot = SecondInventorySlot.SlotIndex;
+    int32 RemainingCount = 0;
+
+    if (FirstInventorySlot.Count + SecondInventorySlot.Count > SecondInventorySlot.MaxCount)
+    {
+        RemainingCount = FirstInventorySlot.Count + SecondInventorySlot.Count - FirstInventorySlot.MaxCount;
+        EquipmentSlots[SecondIndexSlot].Count = SecondInventorySlot.MaxCount;
+        EquipmentSlots[FirstIndexSlot].Count = RemainingCount;
+        UpdateSlot(SecondIndexSlot);
+        UpdateSlot(FirstIndexSlot);
+        return;
+    }
+
+    EquipmentSlots[SecondIndexSlot].Count = FirstInventorySlot.Count + SecondInventorySlot.Count;
+    UpdateSlot(SecondIndexSlot);
+    RemoveItem(EquipmentSlots[FirstIndexSlot]);
 }
 
 void URSEquipmentComponent::TakeInHands(int32 Index)
 {
     CurrentItemInHand = Index;
 
-    if (EquipmentSlots[CurrentItemInHand].ItemID != -1)
+    if (EquipmentSlots[CurrentItemInHand].InteractRowName != NAME_None)
     {
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red,
             FString::Printf(TEXT("Current item in hands is %s"), *EquipmentSlots[CurrentItemInHand].Name.ToString()));
@@ -39,14 +84,4 @@ void URSEquipmentComponent::TakeInHands(int32 Index)
     {
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::Printf(TEXT("Current slot is empty")));
     }
-}
-
-void URSEquipmentComponent::UpdateEquipmentSlot(int32 Index, const FInventoryItem& Item)
-{
-    FInventoryItem CurrentItem = Item;
-    CurrentItem.SlotIndex = Index;
-    CurrentItem.TypeComponent = ETypeComponent::Equipment;
-    EquipmentSlots[Index] = CurrentItem;
-
-    OnEquipmentSlotChanged.Broadcast(EquipmentSlots[Index]);
 }

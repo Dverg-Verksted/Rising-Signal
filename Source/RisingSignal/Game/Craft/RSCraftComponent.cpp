@@ -20,15 +20,25 @@ void URSCraftComponent::AddItemInSlot(const FInventoryItem& Item, int32 Index)
     CraftingItems[Index].Count = 1;
     CraftingItems[Index].SlotIndex = Index;
     CraftingItems[Index].TypeComponent = ETypeComponent::Craft;
-    UpdateCraftSlot(Index);
+    UpdateSlot(Index);
 }
 
-void URSCraftComponent::RemoveItemFromSlot(const FInventoryItem& Item)
+void URSCraftComponent::RemoveItem(const FInventoryItem& Item)
 {
     int32 SlotIndex = Item.SlotIndex;
     CraftingItems[SlotIndex] = FInventoryItem(SlotIndex);
     CraftingItems[SlotIndex].TypeComponent = ETypeComponent::Craft;
-    UpdateCraftSlot(SlotIndex);
+    UpdateSlot(SlotIndex);
+}
+
+void URSCraftComponent::SetCampfireNearBy(bool NewValue)
+{
+    bIsCampfireNearBy = NewValue;
+}
+
+void URSCraftComponent::SetWorkbenchNearBy(bool NewValue)
+{
+    bIsWorkbenchNearBy = NewValue;
 }
 
 
@@ -37,7 +47,18 @@ void URSCraftComponent::BeginPlay()
     Super::BeginPlay();
 }
 
-void URSCraftComponent::UpdateCraftSlot(int32 Index)
+void URSCraftComponent::UpdateSlot(int32 Index)
 {
     OnCraftSlotChanged.Broadcast(CraftingItems[Index]);
+}
+
+bool URSCraftComponent::SwapItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot)
+{
+    CraftingItems[FirstInventorySlot.SlotIndex] = SecondInventorySlot;
+    CraftingItems[FirstInventorySlot.SlotIndex].SlotIndex = FirstInventorySlot.SlotIndex;
+    CraftingItems[SecondInventorySlot.SlotIndex] = FirstInventorySlot;
+    CraftingItems[SecondInventorySlot.SlotIndex].SlotIndex = SecondInventorySlot.SlotIndex;
+    UpdateSlot(SecondInventorySlot.SlotIndex);
+    UpdateSlot(FirstInventorySlot.SlotIndex);
+    return true;
 }

@@ -69,7 +69,7 @@ bool FAddStickOneItemStackable::RunTest(const FString& Parameters)
     FTimerHandle TimerHandle;
     World->GetTimerManager().SetTimer(TimerHandle, [=]()
     {
-        InventoryComponent->AddDataItem(DataTableRowHandle, "", 1);
+        InventoryComponent->AddDataItem(DataTableRowHandle, "stick", 1);
     }, 1.0f, false);
 
 
@@ -101,7 +101,7 @@ bool FAddFewStickItemsCount5Stackable::RunTest(const FString& Parameters)
         FTimerHandle TimerHandle;
         World->GetTimerManager().SetTimer(TimerHandle, [=]()
         {
-            InventoryComponent->AddDataItem(DataTableRowHandle, "", 5);
+            InventoryComponent->AddDataItem(DataTableRowHandle, "stick", 5);
         }, 1.0f, false);
     }
 
@@ -194,7 +194,7 @@ bool FAddBottleOneItemNonStackable::RunTest(const FString& Parameters)
     FTimerHandle TimerHandle;
     World->GetTimerManager().SetTimer(TimerHandle, [=]()
     {
-        InventoryComponent->AddDataItem(DataTableRowHandle, "",  1);
+        InventoryComponent->AddDataItem(DataTableRowHandle, "m_food_bottle_of_water",  1);
     }, 1.0f, false);
 
 
@@ -226,7 +226,7 @@ bool FAddBottleFewItemsNonStackable::RunTest(const FString& Parameters)
         FTimerHandle TimerHandle;
         World->GetTimerManager().SetTimer(TimerHandle, [=]()
         {
-            InventoryComponent->AddDataItem(DataTableRowHandle, "", 5);
+            InventoryComponent->AddDataItem(DataTableRowHandle, "m_food_bottle_of_water", 5);
         }, 1.0f, false);
     }
 
@@ -256,7 +256,7 @@ bool FAddBottleAndUseItem::RunTest(const FString& Parameters)
     FTimerHandle TimerHandle;
     World->GetTimerManager().SetTimer(TimerHandle, [=]()
     {
-        InventoryComponent->AddDataItem(DataTableRowHandle, "", 1);
+        InventoryComponent->AddDataItem(DataTableRowHandle, "m_food_bottle_of_water", 1);
         TArray<FInventoryItem> Items;
         Items = InventoryComponent->GetItems();
         InventoryComponent->UseItem(Items[0]);
