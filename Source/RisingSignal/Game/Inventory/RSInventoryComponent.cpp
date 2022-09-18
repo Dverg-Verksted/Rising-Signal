@@ -1,8 +1,6 @@
-
 #include "Game/Inventory/RSInventoryComponent.h"
-
-//#include "RSEquipmentComponent.h"
 #include "RSEquipmentComponent.h"
+#include "Game/Craft/RSCraftComponent.h"
 #include "Game/InteractSystem/InteractItemActor.h"
 
 
@@ -11,7 +9,7 @@ FInventoryItem::FInventoryItem(const FInventoryItem* OtherItem)
     InteractRowName = OtherItem->InteractRowName;
     Name = OtherItem->Name;
     Description = OtherItem->Description;
-    ItemID = OtherItem->ItemID;
+    CostDurability = OtherItem->CostDurability;
     TypeComponent = OtherItem->TypeComponent;
     ImageItem = OtherItem->ImageItem;
     bCanEquip = OtherItem->bCanEquip;
@@ -21,6 +19,7 @@ FInventoryItem::FInventoryItem(const FInventoryItem* OtherItem)
     MaxCount = OtherItem->MaxCount;
     CharacterAttributesEffects = OtherItem->CharacterAttributesEffects;
     ItemCategory = OtherItem->ItemCategory;
+    ItemsDurability = OtherItem->ItemsDurability;
 }
 
 URSInventoryComponent::URSInventoryComponent()
@@ -45,7 +44,7 @@ void URSInventoryComponent::RemoveItem(const FInventoryItem& InventorySlot, int3
 {
     int32 IndexItem = InventorySlot.SlotIndex;
 
-    if(InventorySlot.Count - CountRemove <= 0)
+    if (InventorySlot.Count - CountRemove <= 0)
     {
         UpdateSlot(IndexItem, FInventoryItem(), 0);
     }
@@ -54,53 +53,28 @@ void URSInventoryComponent::RemoveItem(const FInventoryItem& InventorySlot, int3
         UpdateSlot(IndexItem, InventorySlot, InventorySlot.Count - CountRemove);
     }
 
-    if(!bItemUsed)
+    if (!bItemUsed)
     {
-        AInteractItemActor::SpawnItem(GetOwner(), InventorySlot,  CountRemove);
+        AInteractItemActor::SpawnItem(GetOwner(), InventorySlot, CountRemove);
     }
 }
 
 bool URSInventoryComponent::MoveItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot)
 {
-    if(FirstInventorySlot.TypeComponent == ETypeComponent::Inventory && SecondInventorySlot.TypeComponent == ETypeComponent::Inventory)
+    switch (FirstInventorySlot.TypeComponent)
     {
-        if(SecondInventorySlot.SlotIndex == SLOT_REMOVE)
+        case ETypeComponent::Inventory:
         {
-            RemoveItem(FirstInventorySlot, FirstInventorySlot.Count);
-            return true;
+            return MoveItemInventory(FirstInventorySlot, SecondInventorySlot);
         }
-    
-        if(FirstInventorySlot.ItemID == SecondInventorySlot.ItemID && FirstInventorySlot.SlotIndex != SecondInventorySlot.SlotIndex && FirstInventorySlot.bStack)
+        case ETypeComponent::Craft:
         {
-            CombineItem(FirstInventorySlot, SecondInventorySlot);
-            return true;
+            return MoveItemCraft(FirstInventorySlot, SecondInventorySlot);
         }
-    
-        if(FirstInventorySlot.ItemID != SecondInventorySlot.ItemID)
+        case ETypeComponent::Equipment:
         {
-            SwapItem(FirstInventorySlot, SecondInventorySlot);
-            return true;
+            return MoveItemEquipment(FirstInventorySlot, SecondInventorySlot);
         }
-    }
-
-    if(FirstInventorySlot.TypeComponent == ETypeComponent::Equipment)
-    {
-        if(SecondInventorySlot.TypeComponent == ETypeComponent::Equipment)
-        {
-            EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex);
-            EquipmentComponent->UnEquipItemFromSlot(FirstInventorySlot);
-            return true;
-        }
-        EquipmentComponent->UnEquipItemFromSlot(FirstInventorySlot);
-        UpdateSlot(SecondInventorySlot.SlotIndex, FirstInventorySlot, FirstInventorySlot.Count);
-        return true;
-    }
-    
-    if(SecondInventorySlot.TypeComponent == ETypeComponent::Equipment && FirstInventorySlot.bCanEquip)
-    {
-        EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex - 35);
-        RemoveItem(FirstInventorySlot, FirstInventorySlot.Count, true);
-        return true;
     }
 
     return false;
@@ -112,30 +86,30 @@ void URSInventoryComponent::CombineItem(
     const int32 FirstIndexSlot = FirstInventorySlot.SlotIndex;
     const int32 SecondIndexSlot = SecondInventorySlot.SlotIndex;
     int32 RemainingCount = 0;
-    
-    if(FirstInventorySlot.Count + SecondInventorySlot.Count > SecondInventorySlot.MaxCount)
+
+    if (FirstInventorySlot.Count + SecondInventorySlot.Count > SecondInventorySlot.MaxCount)
     {
         RemainingCount = FirstInventorySlot.Count + SecondInventorySlot.Count - FirstInventorySlot.MaxCount;
         UpdateSlot(SecondIndexSlot, SecondInventorySlot, SecondInventorySlot.MaxCount);
         UpdateSlot(FirstIndexSlot, FirstInventorySlot, RemainingCount);
         return;
     }
-    
+
     UpdateSlot(SecondIndexSlot, SecondInventorySlot, SecondInventorySlot.Count + FirstInventorySlot.Count);
     UpdateSlot(FirstIndexSlot, FInventoryItem(), RemainingCount);
 }
 
 bool URSInventoryComponent::UseItem(const FInventoryItem& InventorySlot)
 {
-    if (InventorySlot.bCanUse && InventorySlot.ItemID != -1)
+    if (InventorySlot.bCanUse && InventorySlot.InteractRowName != NAME_None)
     {
-        for(auto& Effect : InventorySlot.CharacterAttributesEffects)
+        for (auto& Effect : InventorySlot.CharacterAttributesEffects)
         {
             AbilitySystem->ChangeCurrentStateValue(Effect.Key, Effect.Value);
         }
-        
+
         RemoveItem(InventorySlot, 1, true);
-        
+
         return true;
     }
     return false;
@@ -146,12 +120,12 @@ void URSInventoryComponent::AddDataItem(const FDataTableRowHandle& RowDataHandle
     FInventoryItem* ItemToAdd = FindItemData(RowDataHandle);
     ItemToAdd->InteractRowName = DTInteractRowName;
     int32 CurrentCountItem = Count;
-    if(!ItemToAdd->bStack)
+    if (!ItemToAdd->bStack)
     {
         CurrentCountItem = 1;
     }
 
-    if(CurrentCountItem > ItemToAdd->MaxCount)
+    if (CurrentCountItem > ItemToAdd->MaxCount)
     {
         AddStacks(ItemToAdd, CurrentCountItem);
         return;
@@ -159,36 +133,172 @@ void URSInventoryComponent::AddDataItem(const FDataTableRowHandle& RowDataHandle
 
     FInventoryItem* FreeSlot = FindFreeSlot();
 
-    if(FreeSlot == nullptr)
+    if (FreeSlot == nullptr)
     {
         return;
     }
-    
+
     UpdateSlot(FreeSlot->SlotIndex, ItemToAdd, CurrentCountItem);
 }
 
-void URSInventoryComponent::UpdateSlot(int32 Index, const FInventoryItem& Item, int32 ChangedCount)
+void URSInventoryComponent::UpdateSlot(int32 Index, const FInventoryItem& Item, int32 Count)
 {
     FInventoryItem CurrentItem = Item;
     CurrentItem.SlotIndex = Index;
-    CurrentItem.Count = ChangedCount;
+    CurrentItem.Count = Count;
     InventoryItems[Index] = CurrentItem;
-    
+    InventoryItems[Index].TypeComponent = ETypeComponent::Inventory;
+
     OnInventorySlotUpdate.Broadcast(InventoryItems[Index]);
+}
+
+bool URSInventoryComponent::MoveItemInventory(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot)
+{
+    if (SecondInventorySlot.TypeComponent == ETypeComponent::Inventory)
+    {
+        if (SecondInventorySlot.SlotIndex == SLOT_REMOVE)
+        {
+            RemoveItem(FirstInventorySlot, FirstInventorySlot.Count);
+            return true;
+        }
+
+        if (FirstInventorySlot.InteractRowName == SecondInventorySlot.InteractRowName && FirstInventorySlot.SlotIndex != SecondInventorySlot.SlotIndex &&
+            FirstInventorySlot.bStack)
+        {
+            CombineItem(FirstInventorySlot, SecondInventorySlot);
+            return true;
+        }
+
+        if (FirstInventorySlot.InteractRowName != SecondInventorySlot.InteractRowName || SecondInventorySlot.InteractRowName == NAME_None)
+        {
+            SwapItem(FirstInventorySlot, SecondInventorySlot);
+            return true;
+        }
+        return false;
+    }
+    if (SecondInventorySlot.TypeComponent == ETypeComponent::Equipment)
+    {
+        if(SecondInventorySlot.InteractRowName == NAME_None)
+        {
+            EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex);
+            RemoveItem(FirstInventorySlot, FirstInventorySlot.Count, true);
+            return true;
+        }
+        return false;
+    }
+    if (SecondInventorySlot.TypeComponent == ETypeComponent::Craft)
+    {
+        if (SecondInventorySlot.SlotIndex == OUTPUT_SLOT)
+        {
+            return false;
+        }
+        CraftComponent->AddItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex);
+        RemoveItem(FirstInventorySlot, 1, true);
+        return true;
+    }
+
+    return false;
+}
+
+bool URSInventoryComponent::MoveItemEquipment(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot)
+{
+    if (SecondInventorySlot.TypeComponent == ETypeComponent::Inventory)
+    {
+        if (SecondInventorySlot.InteractRowName == NAME_None)
+        {
+            EquipmentComponent->RemoveItem(FirstInventorySlot);
+            UpdateSlot(SecondInventorySlot.SlotIndex, FirstInventorySlot, FirstInventorySlot.Count);
+            return true;
+        }
+        if (SecondInventorySlot.InteractRowName != NAME_None)
+        {
+            EquipmentComponent->RemoveItem(FirstInventorySlot);
+            EquipmentComponent->EquipItemInSlot(SecondInventorySlot, FirstInventorySlot.SlotIndex);
+            UpdateSlot(SecondInventorySlot.SlotIndex, FirstInventorySlot, FirstInventorySlot.Count);
+            return true;
+        }
+
+        return false;
+    }
+    if (SecondInventorySlot.TypeComponent == ETypeComponent::Craft)
+    {
+        return false;
+    }
+    if (SecondInventorySlot.TypeComponent == ETypeComponent::Equipment)
+    {
+        if (SecondInventorySlot.InteractRowName != NAME_None)
+        {
+            if(SecondInventorySlot.InteractRowName == FirstInventorySlot.InteractRowName && FirstInventorySlot.bStack)
+            {
+                EquipmentComponent->CombineItem(FirstInventorySlot, SecondInventorySlot);
+                return true;
+            }
+            EquipmentComponent->SwapItem(FirstInventorySlot, SecondInventorySlot);
+            return true;
+        }
+        EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex);
+        EquipmentComponent->RemoveItem(FirstInventorySlot);
+        return true;
+    }
+
+    return false;
+}
+
+bool URSInventoryComponent::MoveItemCraft(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot)
+{
+    if (SecondInventorySlot.SlotIndex == OUTPUT_SLOT && SecondInventorySlot.TypeComponent == ETypeComponent::Craft)
+    {
+        return false;
+    }
+    if (SecondInventorySlot.TypeComponent == ETypeComponent::Inventory)
+    {
+        if (SecondInventorySlot.InteractRowName != NAME_None || SecondInventorySlot.SlotIndex == SLOT_REMOVE)
+        {
+            return false;
+        }
+
+        CraftComponent->RemoveItem(FirstInventorySlot);
+        UpdateSlot(SecondInventorySlot.SlotIndex, FirstInventorySlot, FirstInventorySlot.Count);
+        return true;
+    }
+    if (SecondInventorySlot.TypeComponent == ETypeComponent::Equipment)
+    {
+        if (SecondInventorySlot.InteractRowName == NAME_None)
+        {
+            EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex);
+            CraftComponent->RemoveItem(FirstInventorySlot);
+            return true;
+        }
+        return false;
+    }
+    if (SecondInventorySlot.TypeComponent == ETypeComponent::Craft)
+    {
+        if(SecondInventorySlot.InteractRowName != NAME_None)
+        {
+            CraftComponent->SwapItem(FirstInventorySlot, SecondInventorySlot);
+            return true;
+        }
+        
+        CraftComponent->AddItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex);
+        CraftComponent->RemoveItem(FirstInventorySlot);
+        return true;
+    }
+
+    return false;
 }
 
 void URSInventoryComponent::AddStacks(FInventoryItem* Item, int32 Count)
 {
     int32 CurrentItemCount = Count;
-    while(CurrentItemCount > 0)
+    while (CurrentItemCount > 0)
     {
         FInventoryItem* FreeSlot = FindFreeSlot();
-        if(FreeSlot == nullptr)
+        if (FreeSlot == nullptr)
         {
             return;
         }
 
-        if(CurrentItemCount > Item->MaxCount)
+        if (CurrentItemCount > Item->MaxCount)
         {
             CurrentItemCount -= Item->MaxCount;
             UpdateSlot(FreeSlot->SlotIndex, Item, Item->MaxCount);
@@ -207,24 +317,12 @@ FInventoryItem* URSInventoryComponent::FindItemData(const FDataTableRowHandle& R
     FName RowName = RowDataHandle.RowName;
     FInventoryItem* Item = DataTable->FindRow<FInventoryItem>(RowName, TEXT("Find item data"));
 
-    TArray<FName> RowNames = DataTable->GetRowNames();
-    for(int RowIndex = 0; RowIndex < RowNames.Num(); RowIndex++)
-    {
-        if(RowNames[RowIndex] == RowName)
-        {
-            // Index in Data Table starts at 1, so need increment RowIndex for exact match to index in Data Table.
-            ++RowIndex;
-            
-            Item->ItemID = RowIndex;
-        }
-    }
-
     return Item;
 }
 
 FInventoryItem* URSInventoryComponent::FindFreeSlot()
 {
-    return InventoryItems.FindByPredicate([=](const FInventoryItem& Slot) { return Slot.ItemID == INDEX_NONE; });
+    return InventoryItems.FindByPredicate([=](const FInventoryItem& Slot) { return Slot.InteractRowName == NAME_None; });
 }
 
 void URSInventoryComponent::BeginPlay()
@@ -233,18 +331,13 @@ void URSInventoryComponent::BeginPlay()
 
     AbilitySystem = GetOwner()->FindComponentByClass<URSAbilitySystem>();
     EquipmentComponent = GetOwner()->FindComponentByClass<URSEquipmentComponent>();
+    CraftComponent = GetOwner()->FindComponentByClass<URSCraftComponent>();
     // ToDo Load Inventory
 }
 
 void URSInventoryComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
     Super::EndPlay(EndPlayReason);
-}
-
-bool URSInventoryComponent::DivideItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot)
-{
-    // ToDo
-    return true;
 }
 
 bool URSInventoryComponent::SwapItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot)

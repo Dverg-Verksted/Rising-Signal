@@ -10,6 +10,7 @@
 #include "InteractItemActor.generated.h"
 
 
+class USphereComponent;
 class UWidgetComponent;
 class UInteractWidget;
 UCLASS(HideCategories = ("Variable", "Transform", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
@@ -28,6 +29,8 @@ protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
+    virtual void PostLoad() override;
+
 #if UE_EDITOR
 
     // Called when changed property
@@ -39,14 +42,21 @@ protected:
 
 #pragma region Components
 
+    UPROPERTY(EditInstanceOnly, Category = "Components")
+    float CollisionRadius = 100.0f;
+
 private:
     // @private Mesh component
-    UPROPERTY(EditDefaultsOnly, Category = "Components")
+    UPROPERTY(VisibleAnywhere, Category = "Components")
     UStaticMeshComponent* Mesh;
 
     // @private 3D Widget component
-    UPROPERTY(EditDefaultsOnly, Category = "Components")
+    UPROPERTY(VisibleAnywhere, Category = "Components")
     UWidgetComponent* WidgetComponent;
+
+    // @private SphereCollisionComponent
+    UPROPERTY(VisibleAnywhere, Category = "Components")
+    USphereComponent* SphereCollision;
 
 #pragma endregion
 
@@ -79,14 +89,23 @@ public:
     FDataInteract GetItemData() const
     {
         if (InteractData.DataTable && InteractData.RowName != "None")
-            return *InteractData.DataTable->FindRow<FDataInteract>(InteractData.RowName, "");
+        {
+            FDataInteract* CurrentInteractData = InteractData.DataTable->FindRow<FDataInteract>(InteractData.RowName, "");
+            if (CurrentInteractData) return *CurrentInteractData;
+        }
 
         return FDataInteract();
     };
 
 
     UFUNCTION(BlueprintPure, Category = "AInteractItemActor | DataInteractItem")
-    int32 GetItemCount() const { return ItemCount; };
+    int32 GetItemCount() const { return ItemCount; }
+
+    UFUNCTION(BlueprintPure, Category = "AInteractItemActor | DataInteractItem")
+    ARSInteractStaticItemBase* GetChildStaticActor() const { return ChildStaticItemActor; }
+
+    // UFUNCTION(BlueprintPure, Category = "AInteractItemActor | DataInteractItem")
+    // UWorld* GetAttachedMap() const {return AttachedMap;}
 
 private:
     // @private pointer on InteractItemDataAsset
@@ -127,7 +146,8 @@ private:
     UPROPERTY(EditInstanceOnly, Category = "Settings Interact",
         meta = (
             DisplayName = "Использовать уникальный для этого объекта текст взаимодействия",
-            ToolTip = "Если включено, текст будет браться из соответствующего поля. Если выключено - будет отображаться имя предмета. Приоритет - наивысший."
+            ToolTip =
+            "Если включено, текст будет браться из соответствующего поля. Если выключено - будет отображаться имя предмета. Приоритет - наивысший."
         )
     )
     bool bCustomInteractText = false;
@@ -144,14 +164,17 @@ private:
     FText InteractText;
 
     // UPROPERTY()
-    // ARSInteractStaticItemBase* ChildStaticItemActor = nullptr;
+    // UWorld* AttachedMap;
+
+    UPROPERTY()
+    ARSInteractStaticItemBase* ChildStaticItemActor = nullptr;
 
     UPROPERTY()
     UInteractWidget* InteractWidget;
 
     FTimerHandle ResetInteractAnimTimerHandle;
 
-    void InitDataInteract(FDataTableRowHandle NewInteractData);
+    void InitDataInteract(const FDataTableRowHandle NewInteractData, const bool bInitWidgetText = false);
 
 #pragma endregion
 

@@ -5,6 +5,7 @@
 #include "AlsCharacterMovementComponent.h"
 #include "InteractDataItem.h"
 #include "InteractItemActor.h"
+#include "RSInteractStaticItemBase.h"
 #include "AnimNotifies/RSItemPickUpEndedAnimNotify.h"
 #include "Components/BoxComponent.h"
 #include "Game/JournalSystem/JournalSystem.h"
@@ -206,14 +207,6 @@ void UInteractComponent::RegisterInteractEvent()
         FDataInteract* DataInteract = InteractRowHandle.DataTable->FindRow<FDataInteract>(InteractRowHandle.RowName, "");
         if (!DataInteract) return;
 
-        if (DataInteract->TypeItem == ETypeItem::StaticItem)
-        {
-            // TODO Add and call StartInteractAnimation() function
-            return;
-        }
-
-        StartPickUpAnimation();
-
         switch (DataInteract->TypeItem)
         {
             case ETypeItem::NoteItem:
@@ -233,12 +226,24 @@ void UInteractComponent::RegisterInteractEvent()
             }
             case ETypeItem::InvItem:
             {
-                InventoryComp->AddDataItem(DataInteract->RowRuleInvItem, InteractRowHandle.RowName, TargetInteractItem->GetItemCount());
+                if (DataInteract->RowRuleInvItem.DataTable && InteractRowHandle.RowName != "")
+                    InventoryComp->AddDataItem(DataInteract->RowRuleInvItem, InteractRowHandle.RowName, TargetInteractItem->GetItemCount());
                 // LOG_RS(ELogRSVerb::Error, InteractRowHandle.RowName.ToString());
+                break;
+            }
+            case ETypeItem::StaticItem:
+            {
+                if (ARSInteractStaticItemBase* ChildStaticActor = TargetInteractItem->GetChildStaticActor())
+                {
+                    ChildStaticActor->Interact(OwnerPlayer);
+                }
+
+                return;
                 break;
             }
         }
 
+        StartPickUpAnimation();
         TargetInteractItem->Destroy();
     }
 }
@@ -254,7 +259,7 @@ void UInteractComponent::SendNoteData(const FDataInteract* DataInteract) const
     InteractItemNote.NoteDate = DataInteract->NoteDate;
     InteractItemNote.NoteDescription = DataInteract->NoteDescription;
     InteractItemNote.NoteHeader = DataInteract->NoteHeader;
-    InteractItemNote.NoteMap = DataInteract->NoteMap;
+    InteractItemNote.NoteMap = GetWorld();
     JournalSystem->AddNoteItem(InteractItemNote);
 }
 
@@ -262,7 +267,7 @@ void UInteractComponent::SendAudioData(const FDataInteract* DataInteract) const
 {
     FInteractItemAudio InteractItemAudio;
     InteractItemAudio.AudioHeader = DataInteract->AudioHeader;
-    InteractItemAudio.AudioMap = DataInteract->AudioMap;
+    InteractItemAudio.AudioMap = GetWorld();
     InteractItemAudio.JournalAudio = DataInteract->JournalAudio;
     JournalSystem->AddAudioItem(InteractItemAudio);
 }
@@ -271,7 +276,7 @@ void UInteractComponent::SendPhotoData(const FDataInteract* DataInteract) const
 {
     FInteractItemPhoto InteractItemPhoto;
     InteractItemPhoto.PhotoHeader = DataInteract->PhotoHeader;
-    InteractItemPhoto.PhotoMap = DataInteract->PhotoMap;
+    InteractItemPhoto.PhotoMap = GetWorld();
     InteractItemPhoto.JournalPhoto = DataInteract->JournalPhoto;
     JournalSystem->AddPhotoItem(InteractItemPhoto);
 }
@@ -305,14 +310,15 @@ void UInteractComponent::StartPickUpAnimation() const
         return;
     }
 
-    OwnerPlayer->DisableInput(PlayerController);
+    OwnerPlayer->GetCharacterMovement()->DisableMovement();
+
 
     OwnerPlayer->PlayAnimMontage(GroundPickUpAnimMontage);
 
-    // some workaround
-    FTimerHandle TempHandle;
-
-    GetWorld()->GetTimerManager().SetTimer(TempHandle, this, &UInteractComponent::PickUpAnimationEnded, 2); // TODO: Fix this workaround
+    // // some workaround
+    // FTimerHandle TempHandle;
+    //
+    // GetWorld()->GetTimerManager().SetTimer(TempHandle, this, &UInteractComponent::PickUpAnimationEnded, 2); // TODO: Fix this workaround
 }
 
 void UInteractComponent::PickUpAnimationEnded() const
@@ -323,7 +329,7 @@ void UInteractComponent::PickUpAnimationEnded() const
         return;
     }
 
-    OwnerPlayer->EnableInput(PlayerController);
+    OwnerPlayer->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
 #if WITH_EDITOR
