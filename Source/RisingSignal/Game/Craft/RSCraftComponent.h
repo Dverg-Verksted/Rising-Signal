@@ -10,7 +10,9 @@
 
 #define OUTPUT_SLOT 6
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent),
+    HideCategories = ("Variable", "Transform", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
+        "Mobile", "Activation", "Component Replication", "Events", "Asset User Data", "Collision"))
 class RISINGSIGNAL_API URSCraftComponent : public UActorComponent, public IInventoryInterface
 {
     GENERATED_BODY()
@@ -18,7 +20,7 @@ class RISINGSIGNAL_API URSCraftComponent : public UActorComponent, public IInven
 public:
     URSCraftComponent();
 
-    UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
     FOnSlotChangedSignature OnCraftSlotChanged;
 
     void AddItemInSlot(const FInventoryItem& Item, int32 Index);
@@ -31,7 +33,7 @@ public:
 protected:
     virtual void BeginPlay() override;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Настройки крафта")
+    UPROPERTY(BlueprintReadOnly, Category="Настройки крафта")
     int32 MaxCraftingSlots = 7;
 
 private:

@@ -17,7 +17,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSlotChangedSignature, FInventoryI
 
 #define SLOT_REMOVE 34
 
-UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent),
+    HideCategories = ("Variable", "Transform", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
+        "Mobile", "Activation", "Component Replication", "Events", "Asset User Data", "Collision"))
 class RISINGSIGNAL_API URSInventoryComponent : public UActorComponent, public IInventoryInterface
 {
     GENERATED_BODY()
@@ -25,10 +27,10 @@ class RISINGSIGNAL_API URSInventoryComponent : public UActorComponent, public II
 public:
     URSInventoryComponent();
 
-    UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
     FOnSlotChangedSignature OnInventorySlotUpdate;
 
-    UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
     FOnSlotChangedSignature OnInventoryItemUse;
 
     UFUNCTION(BlueprintCallable, Category="Инвентарь")
@@ -54,7 +56,7 @@ protected:
     virtual void BeginPlay() override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Инвентарь | Настройки", DisplayName = "Макс. количество предметов")
+    UPROPERTY(BlueprintReadOnly, Category= "Инвентарь | Настройки", DisplayName = "Макс. количество предметов")
     int32 MaxCountItem = 34;
 
 private:
