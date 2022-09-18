@@ -9,7 +9,9 @@
 
 #define MAX_SLOTS 4
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent),
+    HideCategories = ("Variable", "Transform", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
+        "Mobile", "Activation", "Component Replication", "Events", "Asset User Data", "Collision"))
 class RISINGSIGNAL_API URSEquipmentComponent : public UActorComponent, public IInventoryInterface
 {
     GENERATED_BODY()
@@ -34,6 +36,5 @@ protected:
     TMap<int32, FInventoryItem> EquipmentSlots;
 
 private:
-
     int32 CurrentItemInHand;
 };

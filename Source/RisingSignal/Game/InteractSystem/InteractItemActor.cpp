@@ -202,7 +202,6 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
             }
             else
             {
-                LOG_RS(ELogRSVerb::Error, "InteractText = " + NameItem.ToString());
                 InteractWidget->SetText(this->NameItem);
             }
     }
