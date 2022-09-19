@@ -120,6 +120,16 @@ struct FInventoryItem : public FTableRowBase
         this->ItemsDurability = Other.ItemsDurability;
         return *this;
     }
+
+    bool operator ==(const FInventoryItem& Other) const
+    {
+        return this->InteractRowName == Other.InteractRowName;
+    }
+
+    bool operator !=(const FInventoryItem& Other) const
+    {
+        return this->InteractRowName != Other.InteractRowName;
+    }
 };
 
 USTRUCT(BlueprintType)

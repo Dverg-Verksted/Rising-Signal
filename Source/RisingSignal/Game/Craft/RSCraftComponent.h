@@ -27,7 +27,10 @@ public:
     virtual void RemoveItem(const FInventoryItem& Item) override;
     virtual bool SwapItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot) override;
 
+    UFUNCTION(BlueprintCallable)
     void SetCampfireNearBy(bool NewValue);
+
+    UFUNCTION(BlueprintCallable)
     void SetWorkbenchNearBy(bool NewValue);
 
 protected:
@@ -38,6 +41,11 @@ protected:
 
 private:
     virtual void UpdateSlot(int32 Index) override;
+
+    void CraftItem(FDataTableRowHandle Item);
+    void RemoveUsedItems();
+
+    void FindSuitableRecipe();
 
     bool bIsCampfireNearBy = false;
     bool bIsWorkbenchNearBy = false;
