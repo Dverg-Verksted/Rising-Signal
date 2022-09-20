@@ -66,6 +66,11 @@ void URSCraftComponent::UpdateSlot(int32 Index)
 
 void URSCraftComponent::PrepareItemToCraft(FDataTableRowHandle Item)
 {
+    if(CraftingItems[OUTPUT_SLOT].InteractRowName != NAME_None)
+    {
+        return;
+    }
+    
     FInventoryItem CraftedItem = Item.DataTable->FindRow<FInventoryItem>(Item.RowName, TEXT("Find crafted item data"));
     CraftedItem.InteractRowName = Item.RowName;
     CraftedItem.Count = 1;
@@ -78,6 +83,7 @@ void URSCraftComponent::PrepareItemToCraft(FDataTableRowHandle Item)
 void URSCraftComponent::ClearOutputSlot()
 {
     CraftingItems[OUTPUT_SLOT] = FInventoryItem(OUTPUT_SLOT);
+    Matchs.Empty();
     UpdateSlot(OUTPUT_SLOT);
 }
 
@@ -92,45 +98,52 @@ void URSCraftComponent::RemoveUsedItems()
     for (auto Match : Matchs)
     {
         RemoveItem((CraftingItems[Match.SlotIndex]));
-        Matchs.Remove(Match);
     }
+    Matchs.Empty();
+    CurrentIngredients.Empty();
 }
 
 void URSCraftComponent::FindSuitableRecipe()
 {
     UDataTable* RecipeDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/RisingSignal/Core/Inventory/DT_RecipeItems.DT_RecipeItems"));
+    
 
     TArray<FName> RowNames = RecipeDataTable->GetRowNames();
     for (auto RowName : RowNames)
     {
         FRecipeItem* RecipeItem = RecipeDataTable->FindRow<FRecipeItem>(RowName, TEXT("Find recipe data"));
-        if (RecipeItem->bIsNeedCampfire && !bIsCampfireNearBy || RecipeItem->bIsNeedWorkbench && !bIsWorkbenchNearBy)
+        if ((RecipeItem->bIsNeedCampfire && !bIsCampfireNearBy) || (RecipeItem->bIsNeedWorkbench && !bIsWorkbenchNearBy))
         {
             return;
         }
-        TArray<FCraftItem> Ingredients = RecipeItem->RequiredIngredients;
-        int32 NumsIngredients = Ingredients.Num();
-        for (auto Ingredient : Ingredients)
+        if(CurrentIngredients.Num() == 0)
         {
+            CurrentIngredients = RecipeItem->RequiredIngredients;
+        }
+        for (auto Ingredient : CurrentIngredients)
+        {
+            if(Ingredient.bIsChecked)
+            {
+                continue;
+            }
             FInventoryItem IngredientItem = Ingredient.Item.DataTable->FindRow<FInventoryItem>(Ingredient.Item.RowName,
                 TEXT("Find ingredient item data"));
-            for (int i = 0; i < MaxCraftingSlots; i++)
+            for (auto CraftItem : CraftingItems)
             {
-                if (CraftingItems[i] == IngredientItem)
+                if (CraftItem == IngredientItem)
                 {
-                    Matchs.Add(CraftingItems[i]);
-                    if (Matchs.Num() == NumsIngredients)
-                    {
-                        if (CraftingItems[OUTPUT_SLOT].InteractRowName == NAME_None)
-                        {
-                            GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Item crafted")));
-                            PrepareItemToCraft(RecipeItem->OutputItem);
-                            return;
-                        }
-                    }
+                    Matchs.Add(CraftItem);
+                    Ingredient.bIsChecked = true;
+                    break;
+                }
+                if (Matchs.Num() == CurrentIngredients.Num())
+                {
+                    PrepareItemToCraft(RecipeItem->OutputItem);
+                    return;
                 }
             }
         }
+        CurrentIngredients.Empty();
     }
 }
 
@@ -140,6 +153,7 @@ bool URSCraftComponent::SwapItem(const FInventoryItem& FirstInventorySlot, const
     CraftingItems[FirstInventorySlot.SlotIndex].SlotIndex = FirstInventorySlot.SlotIndex;
     CraftingItems[SecondInventorySlot.SlotIndex] = FirstInventorySlot;
     CraftingItems[SecondInventorySlot.SlotIndex].SlotIndex = SecondInventorySlot.SlotIndex;
+    GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("RowName FirstSlot, RowName SecondSlot %s, %s"), *FirstInventorySlot.InteractRowName.ToString(), *SecondInventorySlot.InteractRowName.ToString()));
     UpdateSlot(SecondInventorySlot.SlotIndex);
     UpdateSlot(FirstInventorySlot.SlotIndex);
     return true;

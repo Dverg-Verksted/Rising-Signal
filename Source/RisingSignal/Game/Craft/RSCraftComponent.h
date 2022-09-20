@@ -66,4 +66,7 @@ private:
 
     UPROPERTY()
     TArray<FInventoryItem> CraftingItems;
+
+    UPROPERTY()
+    TArray<FCraftItem> CurrentIngredients;
 };

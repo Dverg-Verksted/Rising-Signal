@@ -140,6 +140,19 @@ struct FCraftItem
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Крафт",
         DisplayName="Предмет")
     FDataTableRowHandle Item;
+
+    UPROPERTY()
+    bool bIsChecked = false;
+
+    bool operator ==(const FCraftItem& Other) const
+    {
+        return this->Item == Other.Item;
+    }
+
+    bool operator !=(const FCraftItem& Other) const
+    {
+        return this->Item != Other.Item;
+    }
 };
 
 USTRUCT(BlueprintType)
