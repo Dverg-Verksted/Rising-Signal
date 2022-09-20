@@ -104,9 +104,6 @@ public:
     UFUNCTION(BlueprintPure, Category = "AInteractItemActor | DataInteractItem")
     ARSInteractStaticItemBase* GetChildStaticActor() const { return ChildStaticItemActor; }
 
-    // UFUNCTION(BlueprintPure, Category = "AInteractItemActor | DataInteractItem")
-    // UWorld* GetAttachedMap() const {return AttachedMap;}
-
 private:
     // @private pointer on InteractItemDataAsset
     UPROPERTY(EditDefaultsOnly, Category = "Settings Interact")
@@ -162,9 +159,6 @@ private:
         )
     )
     FText InteractText;
-
-    // UPROPERTY()
-    // UWorld* AttachedMap;
 
     UPROPERTY()
     ARSInteractStaticItemBase* ChildStaticItemActor = nullptr;
