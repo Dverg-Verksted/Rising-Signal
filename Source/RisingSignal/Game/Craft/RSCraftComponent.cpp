@@ -43,6 +43,16 @@ void URSCraftComponent::SetWorkbenchNearBy(bool NewValue)
     bIsWorkbenchNearBy = NewValue;
 }
 
+bool URSCraftComponent::GetIsOutputSlotAvailable()
+{
+    return bIsOutputSlotAvailable;
+}
+
+
+void URSCraftComponent::SetIsOutputSlotAvailable(bool NewValue)
+{
+    bIsOutputSlotAvailable = NewValue;
+}
 
 void URSCraftComponent::BeginPlay()
 {
@@ -54,9 +64,8 @@ void URSCraftComponent::UpdateSlot(int32 Index)
     OnCraftSlotChanged.Broadcast(CraftingItems[Index]);
 }
 
-void URSCraftComponent::CraftItem(FDataTableRowHandle Item)
+void URSCraftComponent::PrepareItemToCraft(FDataTableRowHandle Item)
 {
-    RemoveUsedItems();
     FInventoryItem CraftedItem = Item.DataTable->FindRow<FInventoryItem>(Item.RowName, TEXT("Find crafted item data"));
     CraftedItem.InteractRowName = Item.RowName;
     CraftedItem.Count = 1;
@@ -66,14 +75,24 @@ void URSCraftComponent::CraftItem(FDataTableRowHandle Item)
     UpdateSlot(OUTPUT_SLOT);
 }
 
+void URSCraftComponent::ClearOutputSlot()
+{
+    CraftingItems[OUTPUT_SLOT] = FInventoryItem(OUTPUT_SLOT);
+    UpdateSlot(OUTPUT_SLOT);
+}
+
+void URSCraftComponent::CraftItem()
+{
+    RemoveUsedItems();
+    SetIsOutputSlotAvailable(true);
+}
+
 void URSCraftComponent::RemoveUsedItems()
 {
-    for (auto CraftingItem : CraftingItems)
+    for (auto Match : Matchs)
     {
-        if(CraftingItem.InteractRowName != NAME_None)
-        {
-            RemoveItem(CraftingItem);
-        }
+        RemoveItem((CraftingItems[Match.SlotIndex]));
+        Matchs.Remove(Match);
     }
 }
 
@@ -85,23 +104,27 @@ void URSCraftComponent::FindSuitableRecipe()
     for (auto RowName : RowNames)
     {
         FRecipeItem* RecipeItem = RecipeDataTable->FindRow<FRecipeItem>(RowName, TEXT("Find recipe data"));
+        if (RecipeItem->bIsNeedCampfire && !bIsCampfireNearBy || RecipeItem->bIsNeedWorkbench && !bIsWorkbenchNearBy)
+        {
+            return;
+        }
         TArray<FCraftItem> Ingredients = RecipeItem->RequiredIngredients;
         int32 NumsIngredients = Ingredients.Num();
-        int32 Coincidence = 0;
         for (auto Ingredient : Ingredients)
         {
-            FInventoryItem IngredientItem = Ingredient.Item.DataTable->FindRow<FInventoryItem>(Ingredient.Item.RowName, TEXT("Find ingredient item data"));
-            for(int i = 0; i < MaxCraftingSlots; i++)
+            FInventoryItem IngredientItem = Ingredient.Item.DataTable->FindRow<FInventoryItem>(Ingredient.Item.RowName,
+                TEXT("Find ingredient item data"));
+            for (int i = 0; i < MaxCraftingSlots; i++)
             {
-                if(CraftingItems[i] == IngredientItem)
+                if (CraftingItems[i] == IngredientItem)
                 {
-                    Coincidence++;
-                    if(Coincidence == NumsIngredients)
+                    Matchs.Add(CraftingItems[i]);
+                    if (Matchs.Num() == NumsIngredients)
                     {
-                        if(CraftingItems[OUTPUT_SLOT].InteractRowName == NAME_None)
+                        if (CraftingItems[OUTPUT_SLOT].InteractRowName == NAME_None)
                         {
                             GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Item crafted")));
-                            CraftItem(RecipeItem->OutputItem);
+                            PrepareItemToCraft(RecipeItem->OutputItem);
                             return;
                         }
                     }

@@ -28,10 +28,23 @@ public:
     virtual bool SwapItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot) override;
 
     UFUNCTION(BlueprintCallable)
+    void CraftItem();
+
+    UFUNCTION(BlueprintCallable)
     void SetCampfireNearBy(bool NewValue);
 
     UFUNCTION(BlueprintCallable)
     void SetWorkbenchNearBy(bool NewValue);
+
+    UFUNCTION(BlueprintGetter)
+    bool GetIsOutputSlotAvailable();
+
+    void SetIsOutputSlotAvailable(bool NewValue);
+
+    void ClearOutputSlot();
+
+    UPROPERTY()
+    TArray<FInventoryItem> Matchs;
 
 protected:
     virtual void BeginPlay() override;
@@ -41,14 +54,15 @@ protected:
 
 private:
     virtual void UpdateSlot(int32 Index) override;
+    void PrepareItemToCraft(FDataTableRowHandle Item);
 
-    void CraftItem(FDataTableRowHandle Item);
     void RemoveUsedItems();
 
     void FindSuitableRecipe();
 
     bool bIsCampfireNearBy = false;
     bool bIsWorkbenchNearBy = false;
+    bool bIsOutputSlotAvailable = false;
 
     UPROPERTY()
     TArray<FInventoryItem> CraftingItems;
