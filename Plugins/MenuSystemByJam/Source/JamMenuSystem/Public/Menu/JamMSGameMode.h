@@ -49,6 +49,8 @@ public:
      **/
     UFUNCTION(BlueprintCallable, Category = "AJamMSGameMode|Action")
     void ChangeMenuStateTimer(EJamMSMenuState NewState, float RateTime);
+
+    EJamMSMenuState GetMenuState() const { return this->MenuState; }
     
 #pragma region ExecCheat
     

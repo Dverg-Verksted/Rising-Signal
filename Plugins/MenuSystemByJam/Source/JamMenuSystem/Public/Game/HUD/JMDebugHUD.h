@@ -43,42 +43,42 @@ protected:
 
     // Enable debug information
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Debug", meta = (ToolTip = "Enable debug information?"))
-    bool EnableDebugHUD = true;
+    bool EnableJMDebugHUD = true;
 
 private:
     // Font used to render the debug information.
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Debug",
-        meta = (AllowPrivateAccess = "true", EditCondition = "EnableDebugHUD", EditConditionHides))
+        meta = (AllowPrivateAccess = "true", EditCondition = "EnableJMDebugHUD", EditConditionHides))
     UFont* MainFont = nullptr;
 
     // Size text for Main font.
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Debug",
-        meta = (AllowPrivateAccess = "true", EditCondition = "EnableDebugHUD", EditConditionHides))
+        meta = (AllowPrivateAccess = "true", EditCondition = "EnableJMDebugHUD", EditConditionHides))
     int32 SizeFont = 16;
 
     // Color display of the title parameter text
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Debug",
-        meta = (AllowPrivateAccess = "true", EditCondition = "EnableDebugHUD", EditConditionHides))
+        meta = (AllowPrivateAccess = "true", EditCondition = "EnableJMDebugHUD", EditConditionHides))
     FLinearColor TitleColor = FLinearColor::White;
 
     // The current X coordinate.
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Debug",
-        meta = (AllowPrivateAccess = "true", EditCondition = "EnableDebugHUD", EditConditionHides))
+        meta = (AllowPrivateAccess = "true", EditCondition = "EnableJMDebugHUD", EditConditionHides))
     float DefaultX = 50.0f;
 
     // The current Y coordinate.
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Debug",
-        meta = (AllowPrivateAccess = "true", EditCondition = "EnableDebugHUD", EditConditionHides))
+        meta = (AllowPrivateAccess = "true", EditCondition = "EnableJMDebugHUD", EditConditionHides))
     float DefaultY = 50.0f;
 
     // The line height to separate each HUD entry.
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Debug",
-        meta = (AllowPrivateAccess = "true", EditCondition = "EnableDebugHUD", EditConditionHides))
+        meta = (AllowPrivateAccess = "true", EditCondition = "EnableJMDebugHUD", EditConditionHides))
     float LineHeight = 26.0f;
 
     // The horizontal offset to render the statistic values.
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Debug",
-        meta = (AllowPrivateAccess = "true", EditCondition = "EnableDebugHUD", EditConditionHides))
+        meta = (AllowPrivateAccess = "true", EditCondition = "EnableJMDebugHUD", EditConditionHides))
     float HorizontalOffset = 250.0f;
 
     // Current X and Y

@@ -77,7 +77,10 @@ void AMenuHUD::SetupNewWidget(UMenuUserWidgetBase* Widget)
     this->MenuWidget = Widget;
     this->MenuWidget->SetupStateWidget(EStateObject::Active);
     this->MenuWidget->SetVisibility(ESlateVisibility::Visible);
-    this->MenuWidget->ShowAnim(this->MenuWidget->GetStartAnim());
+    if (this->GameMode->GetMenuState() != EJamMSMenuState::Loading)
+    {
+        this->MenuWidget->ShowAnim(this->MenuWidget->GetStartAnim());
+    }
 }
 
 void AMenuHUD::SwitchWidget(UMenuUserWidgetBase* OldWidget, UMenuUserWidgetBase* NewWidget)
