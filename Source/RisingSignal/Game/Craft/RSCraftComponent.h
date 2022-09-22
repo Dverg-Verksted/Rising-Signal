@@ -26,6 +26,7 @@ public:
     void AddItemInSlot(const FInventoryItem& Item, int32 Index);
     virtual void RemoveItem(const FInventoryItem& Item) override;
     virtual bool SwapItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot) override;
+    void FindSuitableRecipe();
 
     UFUNCTION(BlueprintCallable)
     void CraftItem();
@@ -44,7 +45,8 @@ public:
     void ClearOutputSlot();
 
     UPROPERTY()
-    TArray<FInventoryItem> Matchs;
+    TArray<FInventoryItem> UsedItems;
+    
 
 protected:
     virtual void BeginPlay() override;
@@ -58,7 +60,6 @@ private:
 
     void RemoveUsedItems();
 
-    void FindSuitableRecipe();
 
     bool bIsCampfireNearBy = false;
     bool bIsWorkbenchNearBy = false;
@@ -66,7 +67,4 @@ private:
 
     UPROPERTY()
     TArray<FInventoryItem> CraftingItems;
-
-    UPROPERTY()
-    TArray<FCraftItem> CurrentIngredients;
 };

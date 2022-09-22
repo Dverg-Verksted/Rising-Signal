@@ -3,6 +3,7 @@
 
 #include "Game/Craft/RSCraftComponent.h"
 
+
 URSCraftComponent::URSCraftComponent()
 {
     if (CraftingItems.Num() != MaxCraftingSlots)
@@ -66,11 +67,6 @@ void URSCraftComponent::UpdateSlot(int32 Index)
 
 void URSCraftComponent::PrepareItemToCraft(FDataTableRowHandle Item)
 {
-    if(CraftingItems[OUTPUT_SLOT].InteractRowName != NAME_None)
-    {
-        return;
-    }
-    
     FInventoryItem CraftedItem = Item.DataTable->FindRow<FInventoryItem>(Item.RowName, TEXT("Find crafted item data"));
     CraftedItem.InteractRowName = Item.RowName;
     CraftedItem.Count = 1;
@@ -83,7 +79,6 @@ void URSCraftComponent::PrepareItemToCraft(FDataTableRowHandle Item)
 void URSCraftComponent::ClearOutputSlot()
 {
     CraftingItems[OUTPUT_SLOT] = FInventoryItem(OUTPUT_SLOT);
-    Matchs.Empty();
     UpdateSlot(OUTPUT_SLOT);
 }
 
@@ -95,12 +90,11 @@ void URSCraftComponent::CraftItem()
 
 void URSCraftComponent::RemoveUsedItems()
 {
-    for (auto Match : Matchs)
+    for (auto UsedItem : UsedItems)
     {
-        RemoveItem((CraftingItems[Match.SlotIndex]));
+        RemoveItem((CraftingItems[UsedItem.SlotIndex]));
     }
-    Matchs.Empty();
-    CurrentIngredients.Empty();
+    UsedItems.Empty();
 }
 
 void URSCraftComponent::FindSuitableRecipe()
@@ -116,10 +110,8 @@ void URSCraftComponent::FindSuitableRecipe()
         {
             return;
         }
-        if(CurrentIngredients.Num() == 0)
-        {
-            CurrentIngredients = RecipeItem->RequiredIngredients;
-        }
+        TArray<FCraftItem> CurrentIngredients = RecipeItem->RequiredIngredients;
+        TArray<FInventoryItem> Matches;
         for (auto Ingredient : CurrentIngredients)
         {
             if(Ingredient.bIsChecked)
@@ -130,20 +122,20 @@ void URSCraftComponent::FindSuitableRecipe()
                 TEXT("Find ingredient item data"));
             for (auto CraftItem : CraftingItems)
             {
-                if (CraftItem == IngredientItem)
+                if (CraftItem == IngredientItem && !Matches.Contains(CraftItem))
                 {
-                    Matchs.Add(CraftItem);
+                    Matches.Add(CraftItem);
                     Ingredient.bIsChecked = true;
-                    break;
                 }
-                if (Matchs.Num() == CurrentIngredients.Num())
+                if (Matches.Num() == CurrentIngredients.Num())
                 {
+                    UsedItems = Matches;
                     PrepareItemToCraft(RecipeItem->OutputItem);
                     return;
                 }
             }
         }
-        CurrentIngredients.Empty();
+        Matches.Empty();
     }
 }
 

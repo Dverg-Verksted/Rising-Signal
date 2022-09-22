@@ -269,17 +269,20 @@ bool URSInventoryComponent::MoveItemCraft(const FInventoryItem& FirstInventorySl
                 }
                 CraftComponent->SetIsOutputSlotAvailable(false);
             }
-            for (auto Item : CraftComponent->Matchs)
+
+            CraftComponent->RemoveItem(FirstInventorySlot);
+            UpdateSlot(SecondInventorySlot.SlotIndex, FirstInventorySlot, FirstInventorySlot.Count);
+            
+            for (auto Item : CraftComponent->UsedItems)
             {
                 if (FirstInventorySlot == Item)
                 {
                     CraftComponent->ClearOutputSlot();
+                    CraftComponent->FindSuitableRecipe();
                     break;
                 }
             }
-
-            CraftComponent->RemoveItem(FirstInventorySlot);
-            UpdateSlot(SecondInventorySlot.SlotIndex, FirstInventorySlot, FirstInventorySlot.Count);
+            
             return true;
         }
         case ETypeComponent::Equipment:
