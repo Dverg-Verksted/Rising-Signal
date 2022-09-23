@@ -132,7 +132,7 @@ void URSAbilitySystem::SetChangeValue(EAbilityStatesType AbilityStateType, float
     {
         if(State.StateType == AbilityStateType)
         {
-            State.ChangedValue *= ChangedValueModifier;
+            State.ChangedValue += ChangedValueModifier;
         }
     }
 }
