@@ -174,11 +174,22 @@ public:
 private:
 
     bool canRun = true;
-
+    
+    /**
+     * @brief Open inventory in game HUD
+     */
     void OpenCloseInventory();
-
+    
+    /**
+     * @brief Open Journal in game HUD
+     */
     void OpenCloseJournal();
     
+    /**
+     * @brief Call on ability system states changes
+     * @param StateTyp - Type of changed ability state
+     * @param Value - Value which param changed
+     */
     UFUNCTION()
     void CheckSomeState(EAbilityStatesType StateTyp, float Value);
     
