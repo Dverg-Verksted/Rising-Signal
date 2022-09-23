@@ -42,8 +42,6 @@ protected:
 
 #pragma region Components
 
-    UPROPERTY(EditInstanceOnly, Category = "Components")
-    float CollisionRadius = 100.0f;
 
 private:
     // @private Mesh component
@@ -104,7 +102,12 @@ public:
     UFUNCTION(BlueprintPure, Category = "AInteractItemActor | DataInteractItem")
     ARSInteractStaticItemBase* GetChildStaticActor() const { return ChildStaticItemActor; }
 
+    void SetInteractText(FText NewText);
+
 private:
+    UPROPERTY(EditInstanceOnly, Category = "Settings Interact", DisplayName = "Радиус взаимодействия")
+    float CollisionRadius = 100.0f;
+
     // @private pointer on InteractItemDataAsset
     UPROPERTY(EditDefaultsOnly, Category = "Settings Interact")
     UDataTable* DataTableInteractItem;
@@ -173,11 +176,17 @@ private:
 #pragma endregion
 
 #pragma region Statics
+
 public:
+    /**
+     * Spawns item in front of actor
+     * @param Spawner AActor that spawns item
+     * @param InventoryItemRules FInventoryItem struct that uses when spawning item
+     * @param Count Count of spawning item. By default = 1.
+     * @param Distance Distance from Spawner where to spawn item. By default = 150.0f.
+     */
     UFUNCTION(BlueprintCallable)
     static void SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count = 1, float Distance = 150.0f);
 
-    static FName GetRowNameByItemName(const UDataTable* DataTable, FText ItemName);
-
-#pragma endregion
+#pragma endregion Statics
 };

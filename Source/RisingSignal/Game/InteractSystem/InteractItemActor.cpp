@@ -121,6 +121,12 @@ void AInteractItemActor::DestroyInteractWidget()
     }
 }
 
+void AInteractItemActor::SetInteractText(FText NewText)
+{
+    if (InteractWidget)
+        InteractWidget->SetText(NewText);
+}
+
 
 void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractData, const bool bInitWidgetText)
 {
@@ -211,7 +217,7 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
             {
                 InteractWidget->SetText(DataInteract->InteractText);
             }
-            else
+            else if(TypeItem != ETypeItem::StaticItem)
             {
                 InteractWidget->SetText(this->NameItem);
             }
@@ -244,23 +250,4 @@ void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItem
         Item->InteractData.RowName = InventoryItemRules.InteractRowName;
         Item->ItemCount = Count;
     }
-}
-
-
-FName AInteractItemActor::GetRowNameByItemName(const UDataTable* DataTable, FText ItemName)
-{
-    if (DataTable)
-    {
-        TMap<FName, uint8*> DTMap = DataTable->GetRowMap();
-
-        for (auto Pair : DTMap)
-        {
-            FDataInteract* ItemStruct = (FDataInteract*)Pair.Value;
-
-            if (ItemStruct->Name.EqualTo(ItemName))
-                return Pair.Key;
-        }
-    }
-
-    return "None";
 }
