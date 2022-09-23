@@ -34,11 +34,11 @@ void ARSInteractStaticBonfire::BeginPlay()
     {
         CheckIfCharactersInsideVolume();
 
-        ParentInteractActor->SetInteractText(FText::FromString("Сохранить"));
+        // ParentInteractActor->SetInteractText(FText::FromString("Сохранить"));
     }
     else
     {
-        ParentInteractActor->SetInteractText(FText::FromString("Зажечь огонь"));
+        // ParentInteractActor->SetInteractText(FText::FromString("Зажечь огонь"));
     }
 }
 
@@ -88,7 +88,7 @@ void ARSInteractStaticBonfire::Interact(ACharacter* InteractingCharacter)
     else
     {
         SetFire(true);
-        ParentInteractActor->SetInteractText(FText::FromString("Сохранить"));
+        // ParentInteractActor->SetInteractText(FText::FromString("Сохранить"));
     }
 }
 
