@@ -268,6 +268,7 @@ bool URSInventoryComponent::MoveItemCraft(const FInventoryItem& FirstInventorySl
                     return false;
                 }
                 CraftComponent->SetIsOutputSlotAvailable(false);
+                CraftComponent->FindSuitableRecipe();
             }
 
             CraftComponent->RemoveItem(FirstInventorySlot);

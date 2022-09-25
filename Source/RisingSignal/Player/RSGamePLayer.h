@@ -16,6 +16,14 @@ class URSAbilitySystem;
 class URSInventoryComponent;
 class URSEquipmentComponent;
 
+enum ESlots
+{
+    Equip_Slot1,
+    Equip_Slot2,
+    Equip_Slot3,
+    Equip_Slot4
+};
+
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJournalSignature);
@@ -53,13 +61,13 @@ public:
 
 public:
     UFUNCTION(BlueprintGetter)
-    URSInventoryComponent* GetInventoryComponent();
+    FORCEINLINE URSInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
 
     UFUNCTION(BlueprintGetter)
-    URSEquipmentComponent* GetEquipmentComponent();
+    FORCEINLINE URSEquipmentComponent* GetEquipmentComponent() const { return EquipmentComponent; }
 
     UFUNCTION(BlueprintGetter)
-    URSCraftComponent* GetCraftComponent();
+    FORCEINLINE URSCraftComponent* GetCraftComponent() const { return CraftComponent; }
     
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     URSAbilitySystem* AbilitySystem;
