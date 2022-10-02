@@ -143,45 +143,43 @@ public:
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
     void GetNextJournalState(EStateJournalSystem NextState);
 
-    // // Get element by Index
-    // UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    // FInteractItemNote GetNoteObjByIndex(int32 LevelIndex, int32 NotesIndex);
-    //
-    // UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    // FInteractItemAudio GetAudioObjByIndex(int32 LevelIndex, int32 NotesIndex);
-    //
-    // UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    // FInteractItemPhoto GetPhotoObjByIndex(int32 LevelIndex, int32 NotesIndex);
-
     // Get array size
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    int32 GetArrNoteObjSize();
+    FORCEINLINE int32 GetArrNoteObjSize()
+    {
+        return ArrNoteObj.Num();
+    }
 
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    int32 GetArrAudioObjSize();
+    FORCEINLINE int32 GetArrAudioObjSize()
+    {
+        return ArrAudioObj.Num();
+    }
 
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    int32 GetArrPhotoObjSize();
+    FORCEINLINE int32 GetArrPhotoObjSize()
+    {
+        return ArrPhotoObj.Num();
+    }
 
     // Get array
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    TArray<FInteractItemNote> GetAllNote();
+    FORCEINLINE TArray<FInteractItemNote> GetAllNote()
+    {
+        return (this->ArrNoteObj);
+    }
     
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    TArray<FInteractItemAudio> GetAllAudio();
+    FORCEINLINE TArray<FInteractItemAudio> GetAllAudio()
+    {
+        return (this->ArrAudioObj);
+    }
     
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    TArray<FInteractItemPhoto> GetAllPhoto();
-
-    // // Get Chapter's Index
-    // UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    // int32 GetNoteChapterIndex(FString NoteName);
-
-    // UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    // int32 GetAudioChapterIndex(FString AudioName);
-    //
-    // UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Get")
-    // int32 GetPhotoChapterIndex(FString PhotoName);
+    FORCEINLINE TArray<FInteractItemPhoto> GetAllPhoto()
+    {
+        return (this->ArrPhotoObj);
+    }
 
     // Delete element by Index
     UFUNCTION(BlueprintCallable, Category = "UJournalSystem|Action|Delete")
