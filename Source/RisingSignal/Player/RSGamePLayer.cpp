@@ -60,21 +60,6 @@ void ARSGamePLayer::CalcCamera(float DeltaTime, FMinimalViewInfo& ViewInfo)
     Super::CalcCamera(DeltaTime, ViewInfo);
 }
 
-URSInventoryComponent* ARSGamePLayer::GetInventoryComponent()
-{
-    return InventoryComponent;
-}
-
-URSEquipmentComponent* ARSGamePLayer::GetEquipmentComponent()
-{
-    return EquipmentComponent;
-}
-
-URSCraftComponent* ARSGamePLayer::GetCraftComponent()
-{
-    return CraftComponent;
-}
-
 #pragma endregion
 
 #pragma region PlayerInput
@@ -264,22 +249,22 @@ void ARSGamePLayer::InputSwitchShoulderPressed()
 
 void ARSGamePLayer::InputActionSlot1()
 {
-    EquipmentComponent->TakeInHands(0);
+    EquipmentComponent->TakeInHands(Equip_Slot1);
 }
 
 void ARSGamePLayer::InputActionSlot2()
 {
-    EquipmentComponent->TakeInHands(1);
+    EquipmentComponent->TakeInHands(Equip_Slot2);
 }
 
 void ARSGamePLayer::InputActionSlot3()
 {
-    EquipmentComponent->TakeInHands(2);
+    EquipmentComponent->TakeInHands(Equip_Slot3);
 }
 
 void ARSGamePLayer::InputActionSlot4()
 {
-    EquipmentComponent->TakeInHands(3);
+    EquipmentComponent->TakeInHands(Equip_Slot4);
 }
 
 void ARSGamePLayer::OpenCloseInventory()

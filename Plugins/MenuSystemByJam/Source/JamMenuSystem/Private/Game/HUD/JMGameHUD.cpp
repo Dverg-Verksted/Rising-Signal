@@ -12,7 +12,7 @@ void AJMGameHUD::DrawHUD()
 {
     Super::DrawHUD();
 
-    if (this->GameMode && EnableDebugHUD)
+    if (this->GameMode && EnableJMDebugHUD)
     {
         AddText(TEXT("Test function AddText"), FText::FromString("This AddText"));
         AddFloat(TEXT("Test function AddFloat"), 1.488f);

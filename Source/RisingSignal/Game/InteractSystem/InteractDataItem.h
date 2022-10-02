@@ -72,6 +72,15 @@ struct FDataInteract : public FTableRowBase
     )
     FText InteractText;
 
+    // @private Attached Map Description
+    UPROPERTY(EditDefaultsOnly, Category="Settings Data Item", DisplayName = " Привязанная карта",
+        meta = (
+            ToolTip = "Укажите карту, принадлежность к которой будет указываться в журнале",
+            AllowedClasses= "World",
+            EditCondition = "TypeItem == ETypeItem::NoteItem || TypeItem == ETypeItem::AudioItem || TypeItem == ETypeItem::PhotoItem",
+            EditConditionHides
+        ))
+    FSoftObjectPath AttachedMap;
 
 
 #pragma region StaticItem

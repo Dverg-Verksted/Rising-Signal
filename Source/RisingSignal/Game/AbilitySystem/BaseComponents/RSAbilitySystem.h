@@ -8,6 +8,7 @@
 
 class ARSGamePLayer;
 
+// Enum for ability state types
 UENUM(BlueprintType)
 enum class EAbilityStatesType : uint8
 {
@@ -19,26 +20,33 @@ enum class EAbilityStatesType : uint8
     Temp
 };
 
+// Struct for creating state in ability system
 USTRUCT(BlueprintType)
 struct FStateParams
 {
     GENERATED_USTRUCT_BODY()
-    
+
+    // Value definition on start and be default
     UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Значение по умолчанию на старте"))
     float CurrentValue = 0.0f;
-    
+
+    // Max state value
     UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Максимальное значение параметра"))
     float MaxValue = 100.0f;
-    
+
+    // Min state value
     UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Минимальное значение параметра"))
     float MinValue = 0.0f;
 
+    // Ability State type 
     UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Тип параметра"))
     EAbilityStatesType StateType = EAbilityStatesType::Health;
 
+    // Value for Hungry, when system should make damage on health
     UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Значение, после которого голод будет убавлять здоровье", EditCondition = "StateType == EAbilityStatesType::Hungry", EditConditionHides))
     float AfterIsDebafHungry = 0.0f;
 
+    // Value for Temp, when system should make damage on health
     UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Значение, после которого замерзание будет убавлять здоровье", EditCondition = "StateType == EAbilityStatesType::Temp", EditConditionHides))
     float AfterIsDebafTemp = 0.0f;
     
@@ -65,7 +73,7 @@ public:
     // Sets default values for this component's properties
     URSAbilitySystem();
 
-    //
+    // Set new change value in state in ability system with AbilityStateType
     UFUNCTION()
     void SetChangeValue(EAbilityStatesType AbilityStateType, float ChangedValueModifier);
     
@@ -96,8 +104,14 @@ public:
      * if damage (decrease state value) should send parameter with minus
      */
     UFUNCTION(BlueprintCallable)
-    void ChangeCurrentStateValue(EAbilityStatesType StateTy,float AddValue);
+    void ChangeCurrentStateValue(EAbilityStatesType StateTy, float AddValue);
 
+    
+    /**
+     * @brief Need for getting choose state from states in ability system
+     * @param AbilityStateType - state`s type which will be returned
+     * @return - return State from ability system states
+     */
     UFUNCTION(BlueprintCallable)
     FStateParams GetState(EAbilityStatesType AbilityStateType);
     
@@ -110,36 +124,43 @@ private:
     UFUNCTION()
     void CheckStateChanges();
 
-    //
+    // need to count how mach Stamina need to change
     UFUNCTION()
     float GetStaminaChangedValue();
 
-    //
+    // need to count how mach Health need to change
     UFUNCTION()
     float GetHealthChangedValue();
-    
+
+    // Timer for control how often need to check state changes
     FTimerHandle TStateChange;
 
     // UPROPERTIES
-    
+
+    // Array of Ability states
     UPROPERTY(EditDefaultsOnly, Category = "Ability states")
     TArray<FStateParams> States;
 
     UPROPERTY()
     ARSGamePLayer* GamePlayerRef;
 
+    // Value which add plus to stamina state, when it changes
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", meta = (ToolTip = "На сколько изменяется выносливость, если игрок стоит"))
     float ValueStaminaActorStay = 7.0f;
     
+    // Value which add plus to stamina state, when it changes
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", meta = (ToolTip = "На сколько изменяется выносливость, если игрок идет"))
     float ValueStaminaActorWalk = 5.0f;
 
+    // Value which add plus to stamina state, when it changes
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", meta = (ToolTip = "На сколько изменяется выносливость, если игрок бежит"))
     float ValueStaminaActorRun = -7.0f;
 
+    // Value for control player dead, хз зачем оно
     UPROPERTY(VisibleDefaultsOnly, Category = "Ability states")
     bool bIsDead = false;
 
+    // Value is how often need update timer
     UPROPERTY(EditDefaultsOnly, Category= "Ability states")
     float TimerChackStateRate = 0.1f;
     

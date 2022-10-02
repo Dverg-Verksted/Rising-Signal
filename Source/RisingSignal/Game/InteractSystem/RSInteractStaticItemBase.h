@@ -6,6 +6,11 @@
 #include "GameFramework/Actor.h"
 #include "RSInteractStaticItemBase.generated.h"
 
+
+/**
+ * Base class for static interact objects.
+ * When implements child class, you can use Interact and Interact_Blueprint functions that calls when character interacts with this object
+ */
 UCLASS()
 class RISINGSIGNAL_API ARSInteractStaticItemBase : public AActor
 {
