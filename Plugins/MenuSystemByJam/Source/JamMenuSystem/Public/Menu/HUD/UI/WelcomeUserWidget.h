@@ -32,6 +32,10 @@ protected:
     // Native handling for SObjectWidget
     virtual void NativeOnInitialized() override;
 
+    // Blueprint native event
+    UFUNCTION(BlueprintImplementableEvent)
+    void StartLogo();
+
 private:
     // A picture that will act as a greeting
     UPROPERTY(Transient, meta = (BindWidget))

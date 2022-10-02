@@ -54,11 +54,10 @@ void URSEquipmentComponent::CombineItem(const FInventoryItem& FirstInventorySlot
 {
     const int32 FirstIndexSlot = FirstInventorySlot.SlotIndex;
     const int32 SecondIndexSlot = SecondInventorySlot.SlotIndex;
-    int32 RemainingCount = 0;
 
     if (FirstInventorySlot.Count + SecondInventorySlot.Count > SecondInventorySlot.MaxCount)
     {
-        RemainingCount = FirstInventorySlot.Count + SecondInventorySlot.Count - FirstInventorySlot.MaxCount;
+        int32 RemainingCount = FirstInventorySlot.Count + SecondInventorySlot.Count - FirstInventorySlot.MaxCount;
         EquipmentSlots[SecondIndexSlot].Count = SecondInventorySlot.MaxCount;
         EquipmentSlots[FirstIndexSlot].Count = RemainingCount;
         UpdateSlot(SecondIndexSlot);
@@ -75,7 +74,7 @@ void URSEquipmentComponent::TakeInHands(int32 Index)
 {
     CurrentItemInHand = Index;
 
-    if (EquipmentSlots[CurrentItemInHand].InteractRowName != NAME_None)
+    if (EquipmentSlots.Contains(CurrentItemInHand))
     {
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red,
             FString::Printf(TEXT("Current item in hands is %s"), *EquipmentSlots[CurrentItemInHand].Name.ToString()));
