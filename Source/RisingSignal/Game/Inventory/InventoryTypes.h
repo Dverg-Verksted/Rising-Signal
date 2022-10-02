@@ -120,6 +120,16 @@ struct FInventoryItem : public FTableRowBase
         this->ItemsDurability = Other.ItemsDurability;
         return *this;
     }
+
+    bool operator ==(const FInventoryItem& Other) const
+    {
+        return this->InteractRowName == Other.InteractRowName;
+    }
+
+    bool operator !=(const FInventoryItem& Other) const
+    {
+        return this->InteractRowName != Other.InteractRowName;
+    }
 };
 
 USTRUCT(BlueprintType)
@@ -130,6 +140,19 @@ struct FCraftItem
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Крафт",
         DisplayName="Предмет")
     FDataTableRowHandle Item;
+
+    UPROPERTY()
+    bool bIsChecked = false;
+
+    bool operator ==(const FCraftItem& Other) const
+    {
+        return this->Item == Other.Item;
+    }
+
+    bool operator !=(const FCraftItem& Other) const
+    {
+        return this->Item != Other.Item;
+    }
 };
 
 USTRUCT(BlueprintType)

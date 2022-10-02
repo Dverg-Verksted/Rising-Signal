@@ -1,12 +1,10 @@
 ﻿// It is owned by the company Dverg Verksted.
 
 
-#include "RSAbilitySystem.h"
+#include "RSAbilitySystem.h" 
 
 #include "TimerManager.h"
 #include "../../../../../Plugins/ElectronicNodes/Source/ElectronicNodes/Private/Lib/HotPatch.h"
-#include "GameInstance/RSGameInstance.h"
-#include "Library/RSFunctionLibrary.h"
 #include "Player/RSGamePLayer.h"
 
 // Sets default values for this component's properties
@@ -41,10 +39,6 @@ void URSAbilitySystem::CheckStateChanges()
         
         State.CurrentValue = FMath::Clamp(State.CurrentValue += State.ChangedValue,State.MinValue,State.MaxValue);
 
-        // LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("%f"),State.ChangedValue));
-        
-        //LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Current %hhd Value %f"), State.StateType ,State.CurrentValue));
-        
         if(OnStateChangedSignature.IsBound())
         {
             OnStateChangedSignature.Broadcast(State.StateType, State.CurrentValue);
@@ -132,7 +126,7 @@ void URSAbilitySystem::SetChangeValue(EAbilityStatesType AbilityStateType, float
     {
         if(State.StateType == AbilityStateType)
         {
-            State.ChangedValue *= ChangedValueModifier;
+            State.ChangedValue += ChangedValueModifier;
         }
     }
 }
@@ -158,7 +152,6 @@ void URSAbilitySystem::ChangeCurrentStateValue(EAbilityStatesType StateTy, float
         {
             State.CurrentValue += AddValue;
             State.CurrentValue = FMath::Clamp(State.CurrentValue,State.MinValue,State.MaxValue);
-            // LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("ChangesValue %f"), ChangesValue));
             return;
         }
     }

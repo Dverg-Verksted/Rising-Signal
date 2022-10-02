@@ -5,6 +5,7 @@
 #include "RSInteractStaticItemBase.h"
 #include "Components/WidgetComponent.h"
 // #include "Engine/AssetManager.h"
+#include "Editor.h"
 #include "Components/SphereComponent.h"
 #include "Game/Inventory/RSInventoryComponent.h"
 #include "Library/RSFunctionLibrary.h"
@@ -120,6 +121,13 @@ void AInteractItemActor::DestroyInteractWidget()
     }
 }
 
+void AInteractItemActor::SetInteractText(FText NewText)
+{
+    if (InteractWidget)
+        InteractWidget->SetText(NewText);
+}
+
+
 void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractData, const bool bInitWidgetText)
 {
     if (NewInteractData.DataTable && NewInteractData.RowName != "None")
@@ -132,6 +140,15 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
             ChildStaticItemActor->Destroy();
         }
 
+#if WITH_EDITOR
+        if (!DataInteract->AttachedMap.IsNull() && DataInteract->AttachedMap != GetWorld())
+        {
+            this->Mesh->SetStaticMesh(nullptr);
+            LOG_RS(ELogRSVerb::Error, "Selected interact Note/Audio/Photo can't be placed on this Map");
+            return;
+        }
+#endif
+
         if (DataInteract->TypeItem == ETypeItem::StaticItem)
         {
             this->Mesh->SetStaticMesh(nullptr);
@@ -139,7 +156,7 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
             FTransform StaticItemActorTransform{GetActorRotation(), GetActorLocation()};
 
             UClass* StaticActorClass = LoadClass<ARSInteractStaticItemBase>(nullptr,
-                *DataInteract->StaticActorClassPtr.ToSoftObjectPath().ToString());
+                *DataInteract->StaticActorClassPtr.ToString());
 
             ChildStaticItemActor = GetWorld()->SpawnActor<ARSInteractStaticItemBase>(StaticActorClass,
                 StaticItemActorTransform);
@@ -152,7 +169,7 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
         else
         {
             // AttachedMap = GetWorld();
-            
+
             UStaticMesh* L_Mesh = LoadObject<UStaticMesh>(nullptr, *(DataInteract->MeshItem.ToString()));
             if (L_Mesh)
             {
@@ -200,7 +217,7 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
             {
                 InteractWidget->SetText(DataInteract->InteractText);
             }
-            else
+            else if(TypeItem != ETypeItem::StaticItem)
             {
                 InteractWidget->SetText(this->NameItem);
             }
@@ -233,33 +250,4 @@ void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItem
         Item->InteractData.RowName = InventoryItemRules.InteractRowName;
         Item->ItemCount = Count;
     }
-    // AInteractItemActor* Item = Spawner->GetWorld()->SpawnActorDeferred<AInteractItemActor>(AInteractItemActor::StaticClass(),
-    //     ItemSpawnTransform);
-    // if (Item && Item->InteractData.DataTable)
-    // {
-    //     Item->TypeItem = ETypeItem::InvItem;
-    //     Item->InteractData.RowName = GetRowNameByItemName(Item->InteractData.DataTable, (InventoryItemRules.Name));
-    //     Item->ItemCount = Count;
-    //
-    //     Item->FinishSpawning(ItemSpawnTransform);
-    // }
-}
-
-
-FName AInteractItemActor::GetRowNameByItemName(const UDataTable* DataTable, FText ItemName)
-{
-    if (DataTable)
-    {
-        TMap<FName, uint8*> DTMap = DataTable->GetRowMap();
-
-        for (auto Pair : DTMap)
-        {
-            FDataInteract* ItemStruct = (FDataInteract*)Pair.Value;
-
-            if (ItemStruct->Name.EqualTo(ItemName))
-                return Pair.Key;
-        }
-    }
-
-    return "None";
 }
