@@ -45,15 +45,15 @@ protected:
 
 private:
     // @private Mesh component
-    UPROPERTY(VisibleAnywhere, Category = "Components")
+    UPROPERTY(VisibleDefaultsOnly, Category = "Components")
     UStaticMeshComponent* Mesh;
 
     // @private 3D Widget component
-    UPROPERTY(VisibleAnywhere, Category = "Components")
+    UPROPERTY(VisibleDefaultsOnly, Category = "Components")
     UWidgetComponent* WidgetComponent;
 
     // @private SphereCollisionComponent
-    UPROPERTY(VisibleAnywhere, Category = "Components")
+    UPROPERTY(VisibleDefaultsOnly, Category = "Components")
     USphereComponent* SphereCollision;
 
 #pragma endregion

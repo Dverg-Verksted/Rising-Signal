@@ -91,6 +91,12 @@ void AInteractItemActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyC
 
     if (PropertyChangedEvent.Property->GetName() == TEXT("RowName"))
     {
+        if (ChildStaticItemActor)
+        {
+            ChildStaticItemActor->Destroy();
+            ChildStaticItemActor = nullptr;
+        }
+
         InitDataInteract(InteractData);
     }
 }
@@ -127,18 +133,12 @@ void AInteractItemActor::SetInteractText(FText NewText)
         InteractWidget->SetText(NewText);
 }
 
-
 void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractData, const bool bInitWidgetText)
 {
     if (NewInteractData.DataTable && NewInteractData.RowName != "None")
     {
         const FDataInteract* DataInteract = NewInteractData.DataTable->FindRow<FDataInteract>(NewInteractData.RowName, "");
         if (!DataInteract) return;
-
-        if (ChildStaticItemActor)
-        {
-            ChildStaticItemActor->Destroy();
-        }
 
 #if WITH_EDITOR
         if (!DataInteract->AttachedMap.IsNull() && DataInteract->AttachedMap != GetWorld())
@@ -153,17 +153,24 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
         {
             this->Mesh->SetStaticMesh(nullptr);
 
-            FTransform StaticItemActorTransform{GetActorRotation(), GetActorLocation()};
-
-            UClass* StaticActorClass = LoadClass<ARSInteractStaticItemBase>(nullptr,
-                *DataInteract->StaticActorClassPtr.ToString());
-
-            ChildStaticItemActor = GetWorld()->SpawnActor<ARSInteractStaticItemBase>(StaticActorClass,
-                StaticItemActorTransform);
-
-            if (ChildStaticItemActor)
+            if (!ChildStaticItemActor)
             {
-                ChildStaticItemActor->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+                FTransform StaticItemActorTransform{GetActorRotation(), GetActorLocation()};
+
+                UClass* StaticActorClass = LoadClass<ARSInteractStaticItemBase>(nullptr,
+                    *DataInteract->StaticActorClassPtr.ToString());
+
+                ChildStaticItemActor = GetWorld()->SpawnActorDeferred<ARSInteractStaticItemBase>(StaticActorClass,
+                    StaticItemActorTransform);
+
+                if (ChildStaticItemActor)
+                {
+                    ChildStaticItemActor->SetOwner(this);
+
+                    ChildStaticItemActor->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+
+                    ChildStaticItemActor->FinishSpawning(StaticItemActorTransform);
+                }
             }
         }
         else
@@ -217,7 +224,7 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
             {
                 InteractWidget->SetText(DataInteract->InteractText);
             }
-            else if(TypeItem != ETypeItem::StaticItem)
+            else if (TypeItem != ETypeItem::StaticItem)
             {
                 InteractWidget->SetText(this->NameItem);
             }
