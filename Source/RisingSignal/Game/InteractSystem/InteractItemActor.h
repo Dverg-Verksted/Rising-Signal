@@ -186,7 +186,8 @@ public:
      * @param Distance Distance from Spawner where to spawn item. By default = 150.0f.
      */
     UFUNCTION(BlueprintCallable)
-    static void SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count = 1, float Distance = 150.0f);
+    static void SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count = 1, float Distance = 150.0f,
+        bool RandomDirection = false);
 
 #pragma endregion Statics
 };

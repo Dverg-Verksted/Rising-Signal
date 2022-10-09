@@ -8,6 +8,7 @@
 #include "Editor.h"
 #include "Components/SphereComponent.h"
 #include "Game/Inventory/RSInventoryComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Library/RSFunctionLibrary.h"
 #include "Widgets/InteractWidget.h"
 
@@ -231,7 +232,7 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
     }
 }
 
-void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count, float Distance)
+void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count, float Distance, bool RandomDirection)
 {
     if (!Spawner) return;
 
@@ -240,9 +241,18 @@ void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItem
     if (Distance < 1) return;
 
     FVector SpawnerLocation = Spawner->GetActorLocation();
-    FVector SpawnerRotation = Spawner->GetActorForwardVector();
+    FVector SpawnDirection;
+    if (RandomDirection)
+    {
+        SpawnDirection = UKismetMathLibrary::RandomUnitVector();
+        SpawnDirection.Z = 0;
+    }
+    else
+    {
+        SpawnDirection = Spawner->GetActorForwardVector();
+    }
 
-    FVector ItemSpawnLocation = SpawnerLocation + (SpawnerRotation * Distance);
+    FVector ItemSpawnLocation = SpawnerLocation + (SpawnDirection * Distance);
 
     FTransform ItemSpawnTransform{ItemSpawnLocation};
 
