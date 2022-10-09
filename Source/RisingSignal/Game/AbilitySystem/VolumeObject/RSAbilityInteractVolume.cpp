@@ -14,7 +14,7 @@ ARSAbilityInteractVolume::ARSAbilityInteractVolume()
     SphereComponent->InitSphereRadius(SphereRadius);
     SphereComponent->SetCollisionProfileName("CharacterMesh");
     SphereComponent->SetGenerateOverlapEvents(true);
-    SphereComponent->bHiddenInGame = false;
+    SphereComponent->bHiddenInGame = IsHiddenInGame;
     SetRootComponent(SphereComponent);
     
 }
@@ -48,9 +48,10 @@ void ARSAbilityInteractVolume::SetStateChangedValue(const AActor* Actor, const E
 {
     if(!Actor) return;
     
-    URSAbilitySystem* AbilitySystem = Cast<URSAbilitySystem>(Actor->GetComponentByClass(URSAbilitySystem::StaticClass()));
+    URSAbilitySystem* AbilitySystem = Actor->FindComponentByClass<URSAbilitySystem>();
     if(AbilitySystem != nullptr)
     {
         AbilitySystem->SetChangeValue(AbilityStateType, AddValue);
     }
+    
 }

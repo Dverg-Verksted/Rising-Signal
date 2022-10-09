@@ -36,6 +36,10 @@ public:
     UPROPERTY(EditAnywhere, Category = "Params", DisplayName="Добавить к значению на изменение у типа",
         meta = (ToolTip = "На примере температуры = Положительное значение - холод, отрицательное на согревание"))
     float AddValueToState = 0.0f;
+
+    UPROPERTY(EditAnywhere, Category = "Params", DisplayName = "Показывать в мире",
+            meta=(ToolTip="При 'ложь' коллизия объекта будет показана в мире"))
+    bool IsHiddenInGame = false;
     
 protected:
     virtual void BeginPlay() override;

@@ -136,7 +136,6 @@ void ARSGamePLayer::InputSprintPressed()
             {
                 SetDesiredGait(EAlsGait::Sprinting);
             }), StartDelay, false);
-    
     }
     
 }
@@ -316,7 +315,6 @@ void ARSGamePLayer::RegisterDeath()
 float ARSGamePLayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
     AbilitySystem->ChangeCurrentStateValue(EAbilityStatesType::Health, -1 * DamageAmount);
-    
     
     return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
