@@ -6,8 +6,8 @@
 #include "GameFramework/Character.h"
 #include "RSAICharacter.generated.h"
 
+class URSAbilitySystem;
 class ARSAIController;
-class URSHealthComponent;
 class UBehaviorTree;
 
 
@@ -101,8 +101,8 @@ public:
 
 
 protected:
-    // UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
-    // URSHealthComponent* HealthComponent;
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+    URSAbilitySystem* AbilitySystem;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
     float WalkSpeed = 100;
@@ -158,6 +158,31 @@ protected:
     float AttackDamage = 50.0f;
 
     void ClearAlert();
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death | Base Config", meta = (DisplayName = "Аниммонтаж смерти"))
+    UAnimMontage* DeathAnimMontage;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death | Base Config",
+        meta = (DisplayName = "Убивается только огнем?", ToolTip = "Нужно ли сжигать персонажа, чтобы уничтожить окончательно?"))
+    bool bDieByFire = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death | Base Config",
+        meta=(EditCondition = "bDieByFire", EditConditionHides,
+            DisplayName = "Время возрождения", ToolTip = "Через сколько персонаж должен возродиться"))
+    float ReviveTime = 20.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death | Base Config",
+        meta = (EditCondition = "!bDieByFire", EditConditionHides,
+            DisplayName = "Время уничтожения", ToolTip = "Через сколько секунд труп должен исчезнуть"))
+    float DestroyTime = 10.0f;
+
+    FTimerHandle ReviveTimerHandle;
+
+    UFUNCTION()
+    virtual void OnDeath();
+
+    UFUNCTION()
+    virtual void Revive();
 
 #pragma region DEBUG
 

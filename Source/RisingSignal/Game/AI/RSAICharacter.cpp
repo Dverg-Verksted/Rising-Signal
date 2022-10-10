@@ -5,6 +5,8 @@
 
 #include "RSAIController.h"
 // #include "Game/AbilitySystem/ActorsComponents/RSHealthComponent.h"
+#include "BrainComponent.h"
+#include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Library/RSFunctionLibrary.h"
 
@@ -17,7 +19,7 @@ ARSAICharacter::ARSAICharacter()
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
     AIControllerClass = ARSAIController::StaticClass();
 
-    // HealthComponent = CreateDefaultSubobject<URSHealthComponent>(TEXT("HealthComponent"));
+    AbilitySystem = CreateDefaultSubobject<URSAbilitySystem>(TEXT("Ability System"));
 
     GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
@@ -60,6 +62,8 @@ void ARSAICharacter::BeginPlay()
     OnAIStateChanged.AddDynamic(this, &ARSAICharacter::AIStateChanged);
 
     OnEnemyInSightChangeSignature.AddUObject(this, &ARSAICharacter::EnemyInSight);
+
+    AbilitySystem->OnDeath.AddDynamic(this, &ARSAICharacter::OnDeath);
 }
 
 void ARSAICharacter::CalculateTurnOffset()
@@ -102,7 +106,7 @@ void ARSAICharacter::EnemyInSight(bool IsNoticed)
     else
     {
         LOG_RS(ELogRSVerb::Warning, "No Enemy!");
-        
+
         if (IsAlerted())
         {
             GetWorldTimerManager().SetTimer(ClearAlertLevelTimer, this, &ARSAICharacter::ClearAlert, ClearAlertTime);
@@ -209,4 +213,39 @@ void ARSAICharacter::ClearAlert()
     GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
     GetCharacterMovement()->RotationRate = FRotator(50);
     LOG_RS(ELogRSVerb::Warning, "Alert cleared");
+}
+
+void ARSAICharacter::OnDeath()
+{
+    if (!DeathAnimMontage)
+    {
+        LOG_RS(ELogRSVerb::Warning, "No Death Anim Montage set on " + GetName());
+    }
+    LOG_RS(ELogRSVerb::Display, GetName() + " is dead");
+
+    GetCharacterMovement()->DisableMovement();
+    PlayAnimMontage(DeathAnimMontage);
+
+    if (bDieByFire)
+    {
+        GetWorldTimerManager().SetTimer(ReviveTimerHandle, this, &ARSAICharacter::Revive, ReviveTime);
+    }
+    else
+    {
+        SetLifeSpan(DestroyTime);
+    }
+    if (AIController && AIController->BrainComponent)
+    {
+        AIController->BrainComponent->Cleanup();
+    }
+}
+
+void ARSAICharacter::Revive()
+{
+    GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+    AbilitySystem->ChangeCurrentStateValue(EAbilityStatesType::Health, 100);
+    if (AIController)
+    {
+        AIController->RunBehaviorTree(BehaviorTreeAsset);
+    }
 }
