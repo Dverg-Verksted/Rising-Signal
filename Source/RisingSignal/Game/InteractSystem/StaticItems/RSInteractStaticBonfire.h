@@ -47,6 +47,7 @@ protected:
 
     virtual void BeginPlay() override;
 
+
     UFUNCTION()
     void OnVolumeBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
         int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -73,10 +74,10 @@ protected:
 
 
 #pragma region Protected_Components
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
     UStaticMeshComponent* BaseMesh;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
     USphereComponent* HeatVolume;
 
 #pragma endregion Protected_Components
@@ -115,14 +116,14 @@ protected:
             DisplayName = "Текст без огня",
             ToolTip = "Текст, который будет выведен у негорящего костра"
         ))
-    FText FireOffText = FText::FromString("Зажечь огонь");
+    FText FireOffText;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings",
         meta = (
             DisplayName = "Текст с огнем",
             ToolTip = "Текст, который будет выведен у горящего костра"
         ))
-    FText FireOnText = FText::FromString("Сохранить");
+    FText FireOnText;
 
 #pragma endregion Protected_Properties
 };

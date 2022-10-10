@@ -204,7 +204,5 @@ private:
     UFUNCTION()
     void RegisterDeath();
 
-   
-
 #pragma endregion Extension
 };

@@ -46,7 +46,12 @@ public:
 
     UPROPERTY()
     TArray<FInventoryItem> UsedItems;
-    
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Craft parameters")
+    bool bIsCampfireNearBy = false;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Craft parameters")
+    bool bIsWorkbenchNearBy = false;
 
 protected:
     virtual void BeginPlay() override;
@@ -61,8 +66,6 @@ private:
     void RemoveUsedItems();
 
 
-    bool bIsCampfireNearBy = false;
-    bool bIsWorkbenchNearBy = false;
     bool bIsOutputSlotAvailable = false;
 
     UPROPERTY()
