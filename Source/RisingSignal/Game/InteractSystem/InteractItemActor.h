@@ -45,15 +45,15 @@ protected:
 
 private:
     // @private Mesh component
-    UPROPERTY(VisibleAnywhere, Category = "Components")
+    UPROPERTY(VisibleDefaultsOnly, Category = "Components")
     UStaticMeshComponent* Mesh;
 
     // @private 3D Widget component
-    UPROPERTY(VisibleAnywhere, Category = "Components")
+    UPROPERTY(VisibleDefaultsOnly, Category = "Components")
     UWidgetComponent* WidgetComponent;
 
     // @private SphereCollisionComponent
-    UPROPERTY(VisibleAnywhere, Category = "Components")
+    UPROPERTY(VisibleDefaultsOnly, Category = "Components")
     USphereComponent* SphereCollision;
 
 #pragma endregion
@@ -186,7 +186,8 @@ public:
      * @param Distance Distance from Spawner where to spawn item. By default = 150.0f.
      */
     UFUNCTION(BlueprintCallable)
-    static void SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count = 1, float Distance = 150.0f);
+    static void SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count = 1, float Distance = 150.0f,
+        bool RandomDirection = false);
 
 #pragma endregion Statics
 };

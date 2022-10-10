@@ -69,6 +69,8 @@ class RISINGSIGNAL_API URSAbilitySystem : public UActorComponent
 {
     GENERATED_BODY()
 
+#pragma region Defaults
+    
 public:
     // Sets default values for this component's properties
     URSAbilitySystem();
@@ -77,8 +79,6 @@ public:
     UFUNCTION()
     void SetChangeValue(EAbilityStatesType AbilityStateType, float ChangedValueModifier);
     
-#pragma region DeclareDelegate
-
     UPROPERTY(BlueprintAssignable)
     FOnStateChangedSignature OnStateChangedSignature;
     
@@ -86,17 +86,31 @@ public:
      */
     UPROPERTY(BlueprintAssignable)
     FOnDeathSignature OnDeath;
+    
+    // Timer for control how often need to check state changes
+    FTimerHandle TStateChange;
 
-#pragma endregion DeclareDelegate 
+    // Just player references for take ability system or some another component/params
+    UPROPERTY()
+    ARSGamePLayer* GamePlayerRef;
 
-#pragma region Getters
+protected:
+    // Called when the game starts
+    virtual void BeginPlay() override;
+
+#pragma endregion Defaults
+
+#pragma region Functions
+
+public:
     // Getter for return current any state in TArray States
     UFUNCTION(BlueprintCallable, BlueprintPure)
     float GetCurrentStateValue(EAbilityStatesType SearchState) const;
+
     
     UFUNCTION(BlueprintCallable, BlueprintPure)
+    FORCEINLINE
     bool GetIsDead() const {return  bIsDead;}
-#pragma endregion Getters
 
     /* Universal func on change any state in TArray States
      * Has a check for the presence of a parameter
@@ -105,7 +119,6 @@ public:
      */
     UFUNCTION(BlueprintCallable)
     void ChangeCurrentStateValue(EAbilityStatesType StateTy, float AddValue);
-
     
     /**
      * @brief Need for getting choose state from states in ability system
@@ -114,10 +127,6 @@ public:
      */
     UFUNCTION(BlueprintCallable)
     FStateParams GetState(EAbilityStatesType AbilityStateType);
-    
-protected:
-    // Called when the game starts
-    virtual void BeginPlay() override;
 
 private:
     // control on state changes, it check all state on new change value
@@ -132,36 +141,66 @@ private:
     UFUNCTION()
     float GetHealthChangedValue();
 
-    // Timer for control how often need to check state changes
-    FTimerHandle TStateChange;
+#pragma endregion Functions
 
-    // UPROPERTIES
+#pragma region AbilitySystemParams
 
+private:
     // Array of Ability states
     UPROPERTY(EditDefaultsOnly, Category = "Ability states")
     TArray<FStateParams> States;
 
-    UPROPERTY()
-    ARSGamePLayer* GamePlayerRef;
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Критический уровень здоровья ниже или равен",
+        meta = (ToolTip = "Ниже или равно какому значению, у игрока будет критический уровень здоровья"))
+    float ValueHealthWhenItCriticalLevel = 20.0f;
 
+    
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Регенерация здоровья от Сытости",
+            meta = (ToolTip = "Ниже или равно какому значению, у игрока будет регенерироваться здоровье от сытости"))
+    float ValueHungryWhenItNeedToRegeneration = 30.0f;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Регенерация здоровья от Тепла",
+        meta = (ToolTip = "Ниже или равно какому значению, у игрока будет регенерироваться здоровье от тепла"))
+    float ValueTempWhenItNeedToRegeneration = 30.0f;
+
+    
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Игрок стоит при скорости",
+        meta = (ToolTip = "Ниже или равно какой скорости, у игрока будет фиксироваться что он стоит"))
+    float ValueSpeedWhenPlayerStay = 0.0f;
+    
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Игрок идет при скорости",
+        meta = (ToolTip = "Ниже или равно какой скорости, у игрока будет фиксироваться ходьба"))
+    float ValueSpeedWhenPlayerWalk = 360.f;
+    
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Игрок бежит при скорости",
+            meta = (ToolTip = "Выше или равно какой скорости, у игрока будет фиксироваться бег"))
+    float ValueSpeedWhenPlayerRun = 410.0f;
+
+    
     // Value which add plus to stamina state, when it changes
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", meta = (ToolTip = "На сколько изменяется выносливость, если игрок стоит"))
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Размер изменения выносливости, если игрок стоит",
+        meta = (ToolTip = "На сколько изменяется выносливость, если игрок стоит"))
     float ValueStaminaActorStay = 7.0f;
     
     // Value which add plus to stamina state, when it changes
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", meta = (ToolTip = "На сколько изменяется выносливость, если игрок идет"))
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Размер изменения выносливости, если игрок идет",
+        meta = (ToolTip = "На сколько изменяется выносливость, если игрок идет"))
     float ValueStaminaActorWalk = 5.0f;
 
     // Value which add plus to stamina state, when it changes
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", meta = (ToolTip = "На сколько изменяется выносливость, если игрок бежит"))
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Размер изменения выносливости, если игрок бежит",
+        meta = (ToolTip = "На сколько изменяется выносливость, если игрок бежит"))
     float ValueStaminaActorRun = -7.0f;
 
+    
     // Value for control player dead, хз зачем оно
     UPROPERTY(VisibleDefaultsOnly, Category = "Ability states")
     bool bIsDead = false;
 
     // Value is how often need update timer
     UPROPERTY(EditDefaultsOnly, Category= "Ability states")
-    float TimerChackStateRate = 0.1f;
+    float TimerCheckStateRate = 0.1f;
+
+#pragma endregion AbilitySystemParams
     
 };

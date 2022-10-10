@@ -7,6 +7,8 @@
 #include "../../../../../Plugins/ElectronicNodes/Source/ElectronicNodes/Private/Lib/HotPatch.h"
 #include "Player/RSGamePLayer.h"
 
+
+#pragma region Defaults
 // Sets default values for this component's properties
 URSAbilitySystem::URSAbilitySystem()
 {
@@ -19,10 +21,14 @@ void URSAbilitySystem::BeginPlay()
 {
     Super::BeginPlay();
     
-    GetWorld()->GetTimerManager().SetTimer(TStateChange, this, &URSAbilitySystem::CheckStateChanges, TimerChackStateRate, true);
+    GetWorld()->GetTimerManager().SetTimer(TStateChange, this, &URSAbilitySystem::CheckStateChanges, TimerCheckStateRate, true);
     GamePlayerRef = Cast<ARSGamePLayer>(GetOwner());
     
 }
+
+#pragma endregion Defaults
+
+#pragma region Functions
 
 void URSAbilitySystem::CheckStateChanges()
 {
@@ -50,23 +56,20 @@ float URSAbilitySystem::GetStaminaChangedValue()
 {
     if(GamePlayerRef)
     {
-        // add in player pawn enum on movement type - stand, walk, run, jump and etc.
         float const CurrentPlayerSpeed = GamePlayerRef->GetVelocity().Size();
-        // this shitcode should rewrite on enum switcher
-        // if player stand, make regeneration stamina
-        if(CurrentPlayerSpeed <= 0)
+        if(CurrentPlayerSpeed <= ValueSpeedWhenPlayerStay)
         {
-            return ValueStaminaActorStay * TimerChackStateRate;
+            return ValueStaminaActorStay * TimerCheckStateRate;
         }
         // if player walk, make decrease stamina
-        if(CurrentPlayerSpeed <= 360)
+        if(GamePlayerRef->GetDesiredGait() == EAlsGait::Walking)
         {
-            return ValueStaminaActorWalk * TimerChackStateRate;
+            return ValueStaminaActorWalk * TimerCheckStateRate;
         }
         // if player run, make more decrease stamina
-        if(CurrentPlayerSpeed >= 410)
+        if(CurrentPlayerSpeed >= ValueSpeedWhenPlayerRun)
         {
-            return ValueStaminaActorRun * TimerChackStateRate;
+            return ValueStaminaActorRun * TimerCheckStateRate;
         }
     }
     return 0.0f;
@@ -80,7 +83,7 @@ float URSAbilitySystem::GetHealthChangedValue()
     {
         if(State.StateType == EAbilityStatesType::Health)
         {
-            if (State.CurrentValue <= 20)
+            if (State.CurrentValue <= ValueHealthWhenItCriticalLevel)
             {
                 bHealthIsCriticalLevel = true;
             }
@@ -95,12 +98,12 @@ float URSAbilitySystem::GetHealthChangedValue()
             // if player is not hungry, make regeneration hp
             if (State.CurrentValue >= State.AfterIsDebafHungry)
             {
-                ValueOnChangeHealth -= State.ChangedValue * TimerChackStateRate;
+                ValueOnChangeHealth -= State.ChangedValue * TimerCheckStateRate;
             }
             // if player is hungry, make decrease hp
-            if (State.CurrentValue <= 30.0f && bHealthIsCriticalLevel)
+            if (State.CurrentValue <= ValueHungryWhenItNeedToRegeneration && bHealthIsCriticalLevel)
             {
-                ValueOnChangeHealth += State.ChangedValue * TimerChackStateRate;
+                ValueOnChangeHealth += State.ChangedValue * TimerCheckStateRate;
             }
         }
         // check relation with temperature state
@@ -108,12 +111,12 @@ float URSAbilitySystem::GetHealthChangedValue()
         {
             if (State.CurrentValue >= State.AfterIsDebafTemp)
             {
-                ValueOnChangeHealth -= State.ChangedValue * TimerChackStateRate;
+                ValueOnChangeHealth -= State.ChangedValue * TimerCheckStateRate;
             }
             // if player is hungry, make decrease hp
-            if (State.CurrentValue <= 30.0f && bHealthIsCriticalLevel)
+            if (State.CurrentValue <= ValueTempWhenItNeedToRegeneration && bHealthIsCriticalLevel)
             {
-                ValueOnChangeHealth += State.ChangedValue * TimerChackStateRate;
+                ValueOnChangeHealth += State.ChangedValue * TimerCheckStateRate;
             }
         }
     }
@@ -143,7 +146,6 @@ float URSAbilitySystem::GetCurrentStateValue(EAbilityStatesType SearchState) con
     return -1.0f;
 }
 
-
 void URSAbilitySystem::ChangeCurrentStateValue(EAbilityStatesType StateTy, float AddValue)
 {
     for (auto &State : States)
@@ -166,7 +168,8 @@ FStateParams URSAbilitySystem::GetState(EAbilityStatesType AbilityStateType)
             return State;
         }
     }
-    FStateParams TempParam;
-    return TempParam;
+     
+    return FStateParams();
 }
 
+#pragma endregion Functions

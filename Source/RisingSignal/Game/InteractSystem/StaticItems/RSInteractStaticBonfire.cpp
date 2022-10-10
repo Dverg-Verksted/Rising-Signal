@@ -25,7 +25,7 @@ void ARSInteractStaticBonfire::BeginPlay()
     HeatVolume->OnComponentBeginOverlap.AddDynamic(this, &ARSInteractStaticBonfire::OnVolumeBeginOverlap);
     HeatVolume->OnComponentEndOverlap.AddDynamic(this, &ARSInteractStaticBonfire::OnVolumeEndOverlap);
 
-    if (auto InteractActor = Cast<AInteractItemActor>(GetOwner()))
+    if (const auto InteractActor = Cast<AInteractItemActor>(GetOwner()))
     {
         ParentInteractActor = InteractActor;
     }
@@ -33,23 +33,31 @@ void ARSInteractStaticBonfire::BeginPlay()
     if (bIsFired)
     {
         CheckIfCharactersInsideVolume();
-
-        // ParentInteractActor->SetInteractText(FText::FromString("Сохранить"));
-    }
-    else
-    {
-        // ParentInteractActor->SetInteractText(FText::FromString("Зажечь огонь"));
     }
 }
 
 void ARSInteractStaticBonfire::OnVolumeBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (!bIsFired) return;
-
-    if (const auto OverlapChar = Cast<ACharacter>(OtherActor))
+    if (bIsFired)
     {
-        CharacterInsideVolume(OverlapChar, false);
+        if (ParentInteractActor)
+        {
+            ParentInteractActor->SetInteractText(FireOnText);
+        }
+
+        if (const auto OverlapChar = Cast<ACharacter>(OtherActor))
+        {
+            CharacterInsideVolume(OverlapChar, true);
+        }
+    }
+    else
+    {
+        if (ParentInteractActor)
+        {
+            ParentInteractActor->SetInteractText(FireOffText);
+        }
+        return;
     }
 }
 
@@ -68,12 +76,12 @@ void ARSInteractStaticBonfire::CharacterInsideVolume(ACharacter* Character, cons
 {
     if (const auto AbilitySystem = Character->FindComponentByClass<URSAbilitySystem>())
     {
-        AbilitySystem->SetChangeValue(EAbilityStatesType::Temp, HeatTemperIncreaseValue * (bCharInside ? 1 : -1));
+        AbilitySystem->SetChangeValue(EAbilityStatesType::Temp, HeatTemperIncreaseValue * (bCharInside ? -1 : 1));
     }
 
     if (const auto CraftComp = Character->FindComponentByClass<URSCraftComponent>())
     {
-        CraftComp->SetCampfireNearBy(true);
+        CraftComp->SetCampfireNearBy(bCharInside);
     }
 }
 
@@ -88,7 +96,11 @@ void ARSInteractStaticBonfire::Interact(ACharacter* InteractingCharacter)
     else
     {
         SetFire(true);
-        // ParentInteractActor->SetInteractText(FText::FromString("Сохранить"));
+        if (ParentInteractActor)
+        {
+            ParentInteractActor->SetInteractText(FireOnText);
+            ParentInteractActor->LoadInteractWidget();
+        }
     }
 }
 
@@ -115,7 +127,9 @@ void ARSInteractStaticBonfire::PostEditChangeProperty(FPropertyChangedEvent& Pro
         return;
     }
 
-    if (PropertyChangedEvent.GetPropertyName() == TEXT("HeatVolumeRadius"))
+    // LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Name changed property: %s"), *PropertyChangedEvent.Property->GetName()));
+
+    if (PropertyChangedEvent.Property->GetName() == TEXT("HeatVolumeRadius"))
     {
         HeatVolume->SetSphereRadius(HeatVolumeRadius);
     }
@@ -123,11 +137,15 @@ void ARSInteractStaticBonfire::PostEditChangeProperty(FPropertyChangedEvent& Pro
     if (PropertyChangedEvent.Property->GetName() == TEXT("bIsFired"))
     {
         //SetupFireFX(bIsFired)
+
+        if (ParentInteractActor)
+        {
+            ParentInteractActor->SetInteractText(bIsFired ? FireOnText : FireOffText);
+        }
     }
 }
 
 #endif
-
 
 void ARSInteractStaticBonfire::CheckIfCharactersInsideVolume()
 {

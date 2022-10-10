@@ -202,7 +202,6 @@ void UInteractComponent::RegisterInteractEvent()
 
     if (TargetInteractItem)
     {
-        RemoveItem(TargetInteractItem);
         FDataTableRowHandle InteractRowHandle = TargetInteractItem->GetInteractData();
         FDataInteract* DataInteract = InteractRowHandle.DataTable->FindRow<FDataInteract>(InteractRowHandle.RowName, "");
         if (!DataInteract) return;
@@ -212,23 +211,28 @@ void UInteractComponent::RegisterInteractEvent()
             case ETypeItem::NoteItem:
             {
                 SendNoteData(DataInteract);
+                RemoveItem(TargetInteractItem);
                 break;
             }
             case ETypeItem::AudioItem:
             {
                 SendAudioData(DataInteract);
+                RemoveItem(TargetInteractItem);
                 break;
             }
             case ETypeItem::PhotoItem:
             {
                 SendPhotoData(DataInteract);
+                RemoveItem(TargetInteractItem);
                 break;
             }
             case ETypeItem::InvItem:
             {
                 if (DataInteract->RowRuleInvItem.DataTable && InteractRowHandle.RowName != "")
+                {
                     InventoryComp->AddDataItem(DataInteract->RowRuleInvItem, InteractRowHandle.RowName, TargetInteractItem->GetItemCount());
-                // LOG_RS(ELogRSVerb::Error, InteractRowHandle.RowName.ToString());
+                    RemoveItem(TargetInteractItem);
+                }
                 break;
             }
             case ETypeItem::StaticItem:
@@ -311,7 +315,6 @@ void UInteractComponent::StartPickUpAnimation() const
     }
 
     OwnerPlayer->GetCharacterMovement()->DisableMovement();
-
 
     OwnerPlayer->PlayAnimMontage(GroundPickUpAnimMontage);
 

@@ -8,6 +8,7 @@
 #include "Editor.h"
 #include "Components/SphereComponent.h"
 #include "Game/Inventory/RSInventoryComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Library/RSFunctionLibrary.h"
 #include "Widgets/InteractWidget.h"
 
@@ -91,6 +92,12 @@ void AInteractItemActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyC
 
     if (PropertyChangedEvent.Property->GetName() == TEXT("RowName"))
     {
+        if (ChildStaticItemActor)
+        {
+            ChildStaticItemActor->Destroy();
+            ChildStaticItemActor = nullptr;
+        }
+
         InitDataInteract(InteractData);
     }
 }
@@ -127,18 +134,12 @@ void AInteractItemActor::SetInteractText(FText NewText)
         InteractWidget->SetText(NewText);
 }
 
-
 void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractData, const bool bInitWidgetText)
 {
     if (NewInteractData.DataTable && NewInteractData.RowName != "None")
     {
         const FDataInteract* DataInteract = NewInteractData.DataTable->FindRow<FDataInteract>(NewInteractData.RowName, "");
         if (!DataInteract) return;
-
-        if (ChildStaticItemActor)
-        {
-            ChildStaticItemActor->Destroy();
-        }
 
 #if WITH_EDITOR
         if (!DataInteract->AttachedMap.IsNull() && DataInteract->AttachedMap != GetWorld())
@@ -153,17 +154,24 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
         {
             this->Mesh->SetStaticMesh(nullptr);
 
-            FTransform StaticItemActorTransform{GetActorRotation(), GetActorLocation()};
-
-            UClass* StaticActorClass = LoadClass<ARSInteractStaticItemBase>(nullptr,
-                *DataInteract->StaticActorClassPtr.ToString());
-
-            ChildStaticItemActor = GetWorld()->SpawnActor<ARSInteractStaticItemBase>(StaticActorClass,
-                StaticItemActorTransform);
-
-            if (ChildStaticItemActor)
+            if (!ChildStaticItemActor)
             {
-                ChildStaticItemActor->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+                FTransform StaticItemActorTransform{GetActorRotation(), GetActorLocation()};
+
+                UClass* StaticActorClass = LoadClass<ARSInteractStaticItemBase>(nullptr,
+                    *DataInteract->StaticActorClassPtr.ToString());
+
+                ChildStaticItemActor = GetWorld()->SpawnActorDeferred<ARSInteractStaticItemBase>(StaticActorClass,
+                    StaticItemActorTransform);
+
+                if (ChildStaticItemActor)
+                {
+                    ChildStaticItemActor->SetOwner(this);
+
+                    ChildStaticItemActor->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+
+                    ChildStaticItemActor->FinishSpawning(StaticItemActorTransform);
+                }
             }
         }
         else
@@ -217,14 +225,14 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
             {
                 InteractWidget->SetText(DataInteract->InteractText);
             }
-            else if(TypeItem != ETypeItem::StaticItem)
+            else if (TypeItem != ETypeItem::StaticItem)
             {
                 InteractWidget->SetText(this->NameItem);
             }
     }
 }
 
-void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count, float Distance)
+void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count, float Distance, bool RandomDirection)
 {
     if (!Spawner) return;
 
@@ -233,9 +241,18 @@ void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItem
     if (Distance < 1) return;
 
     FVector SpawnerLocation = Spawner->GetActorLocation();
-    FVector SpawnerRotation = Spawner->GetActorForwardVector();
+    FVector SpawnDirection;
+    if (RandomDirection)
+    {
+        SpawnDirection = UKismetMathLibrary::RandomUnitVector();
+        SpawnDirection.Z = 0;
+    }
+    else
+    {
+        SpawnDirection = Spawner->GetActorForwardVector();
+    }
 
-    FVector ItemSpawnLocation = SpawnerLocation + (SpawnerRotation * Distance);
+    FVector ItemSpawnLocation = SpawnerLocation + (SpawnDirection * Distance);
 
     FTransform ItemSpawnTransform{ItemSpawnLocation};
 
