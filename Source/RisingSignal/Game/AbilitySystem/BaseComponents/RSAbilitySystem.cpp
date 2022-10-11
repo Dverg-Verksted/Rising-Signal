@@ -96,7 +96,7 @@ float URSAbilitySystem::GetHealthChangedValue()
         if(State.StateType == EAbilityStatesType::Hungry)
         {
             // if player is not hungry, make regeneration hp
-            if (State.CurrentValue >= State.AfterIsDebafHungry)
+            if (State.CurrentValue <= State.AfterIsDebafHungry)
             {
                 ValueOnChangeHealth -= State.ChangedValue * TimerCheckStateRate;
             }
