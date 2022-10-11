@@ -21,12 +21,15 @@ class RISINGSIGNAL_API ARSAbilityInteractVolume : public AActor
 public:
     ARSAbilityInteractVolume();
 
+    // Component for base
     UPROPERTY()
     USceneComponent* SceneComponent;
 
+    // Component for sphere collision
     UPROPERTY()
     USphereComponent* SphereComponent;
 
+    // Component for box collision
     UPROPERTY()
     UBoxComponent* BoxComponent;
     
@@ -35,6 +38,17 @@ public:
         meta=(ToolTip="Если сфера, то это значение будет радиусов, если коробка, то это половина грани и тд"))
     float SphereRadius = 100.0f;
 
+    // that value determine SPHERE collision shape
+    UPROPERTY(EditAnywhere, Category = "Shape Component", DisplayName = "Форма сферы",
+                meta=(ToolTip=""))
+    bool IsSphereForm = false;
+
+    // that value determine BOX collision shape
+    UPROPERTY(EditAnywhere, Category = "Shape Component", DisplayName = "Форма Коробки",
+                meta=(ToolTip=""))
+    bool IsBoxForm = true;
+
+    
     // Type ability system state, which will be changed when actor overlap
     UPROPERTY(EditAnywhere, Category = "Params", DisplayName = "Тип параметра",
         meta = (ToolTip="Параметр, который будет изменяться у вошедшего"))
@@ -45,17 +59,10 @@ public:
         meta = (ToolTip = "На примере температуры = Положительное значение - холод, отрицательное на согревание"))
     float AddValueToState = 0.0f;
 
+    // That value control view actor in game
     UPROPERTY(EditAnywhere, Category = "Params", DisplayName = "Показывать в мире",
             meta=(ToolTip="При 'ложь' коллизия объекта будет показана в мире"))
     bool IsHiddenInGame = true;
-
-    UPROPERTY(EditAnywhere, Category = "Params", DisplayName = "Форма сферы",
-                meta=(ToolTip=""))
-    bool IsSphereForm = false;
-
-    UPROPERTY(EditAnywhere, Category = "Params", DisplayName = "Форма Коробки",
-                meta=(ToolTip=""))
-    bool IsBoxForm = true;
 
     
 protected:
