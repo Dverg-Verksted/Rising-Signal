@@ -10,7 +10,8 @@
 class USphereComponent;
 class UBoxComponent;
 
-UCLASS()
+UCLASS(HideCategories = ("Rendering", "Replication", "Collision", "Input", "Actor",
+    "LOD", "Cooking"))
 class RISINGSIGNAL_API ARSAbilityInteractVolume : public AActor
 {
     GENERATED_BODY()
@@ -28,18 +29,18 @@ public:
     float SphereRadius = 100.0f;
 
     // Type ability system state, which will be changed when actor overlap
-    UPROPERTY(EditAnywhere, Category = "Params", DisplayName = "Тип параметра абилити системы",
+    UPROPERTY(EditAnywhere, Category = "Params", DisplayName = "Тип параметра",
         meta = (ToolTip="Параметр, который будет изменяться у вошедшего"))
     EAbilityStatesType AbilityStateType = EAbilityStatesType::Temp;
 
     // That Value was added plus to current value in ability system
-    UPROPERTY(EditAnywhere, Category = "Params", DisplayName="Добавить к значению на изменение у типа",
+    UPROPERTY(EditAnywhere, Category = "Params", DisplayName="Прибавить к параметру",
         meta = (ToolTip = "На примере температуры = Положительное значение - холод, отрицательное на согревание"))
     float AddValueToState = 0.0f;
 
     UPROPERTY(EditAnywhere, Category = "Params", DisplayName = "Показывать в мире",
             meta=(ToolTip="При 'ложь' коллизия объекта будет показана в мире"))
-    bool IsHiddenInGame = false;
+    bool IsHiddenInGame = true;
     
 protected:
     virtual void BeginPlay() override;
