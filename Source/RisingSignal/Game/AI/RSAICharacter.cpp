@@ -41,7 +41,7 @@ void ARSAICharacter::AIStateChanged(EAIState NewState, EAIState PrevState)
 {
 }
 
-void ARSAICharacter::Attack(AActor* AttackActor)
+void ARSAICharacter::Attack(AActor* ActorToAttack)
 {
 }
 
@@ -93,9 +93,9 @@ void ARSAICharacter::EnemyInSight(bool IsNoticed)
                 IncreaseAlertLevelTimer,
                 this,
                 &ARSAICharacter::IncreaseAlertLevelUpdate,
-                AlertIncreaseData.LevelUpTimerRate,
+                AlertIncreaseData.LevelChangeTimerRate,
                 true,
-                AlertIncreaseData.LevelUpDelay
+                AlertIncreaseData.LevelChangeDelay
                 );
         }
         else
@@ -119,9 +119,9 @@ void ARSAICharacter::EnemyInSight(bool IsNoticed)
                 DecreaseAlertLevelTimer,
                 this,
                 &ARSAICharacter::DecreaseAlertLevelUpdate,
-                AlertDecreaseData.LevelDownTimerRate,
+                AlertDecreaseData.LevelChangeTimerRate,
                 true,
-                AlertDecreaseData.LevelDownDelay
+                AlertDecreaseData.LevelChangeDelay
                 );
         }
     }
@@ -138,7 +138,7 @@ void ARSAICharacter::IncreaseAlertLevelUpdate()
         return;
     }
 
-    TryToIncreaseAlertLevel(AlertIncreaseData.LevelUpValue);
+    TryToIncreaseAlertLevel(AlertIncreaseData.LevelChangeValue);
 }
 
 void ARSAICharacter::DecreaseAlertLevelUpdate()
@@ -146,11 +146,11 @@ void ARSAICharacter::DecreaseAlertLevelUpdate()
     if (FMath::IsNearlyZero(CurrentAlertLevel))
     {
         GetWorldTimerManager().ClearTimer(DecreaseAlertLevelTimer);
-        SetNewAIState(Patrol);
+        SetNewAIState(EAIState::Patrol);
         return;
     }
 
-    TryToDecreaseAlertLevel(AlertDecreaseData.LevelDownValue);
+    TryToDecreaseAlertLevel(AlertDecreaseData.LevelChangeValue);
 }
 
 bool ARSAICharacter::TryToIncreaseAlertLevel(float Value)
