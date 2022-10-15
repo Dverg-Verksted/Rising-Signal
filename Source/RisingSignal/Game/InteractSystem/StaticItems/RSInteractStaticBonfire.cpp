@@ -127,8 +127,6 @@ void ARSInteractStaticBonfire::PostEditChangeProperty(FPropertyChangedEvent& Pro
         return;
     }
 
-    // LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("Name changed property: %s"), *PropertyChangedEvent.Property->GetName()));
-
     if (PropertyChangedEvent.Property->GetName() == TEXT("HeatVolumeRadius"))
     {
         HeatVolume->SetSphereRadius(HeatVolumeRadius);

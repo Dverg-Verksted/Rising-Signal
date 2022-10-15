@@ -192,8 +192,7 @@ void UInteractComponent::RegisterInteractEvent()
 {
     LOG_INTERACT(ELogRSVerb::Display, "Pressed button interact");
 
-    const ARSGamePLayer* Player = GetOwner<ARSGamePLayer>();
-    // UAlsCharacterMovementComponent* PlayerALSMovement = Cast<UAlsCharacterMovementComponent>(Player->GetCharacterMovement()); 
+    const ARSGamePLayer* Player = GetOwner<ARSGamePLayer>(); 
     if (!Player || Player->GetCharacterMovement()->IsFalling()) // TODO: Add check for rolling
     {
         LOG_INTERACT(ELogRSVerb::Warning, "Can't interact, Player is Falling");
@@ -318,7 +317,7 @@ void UInteractComponent::StartPickUpAnimation() const
 
     OwnerPlayer->PlayAnimMontage(GroundPickUpAnimMontage);
 
-    // // some workaround
+    // some workaround
     // FTimerHandle TempHandle;
     //
     // GetWorld()->GetTimerManager().SetTimer(TempHandle, this, &UInteractComponent::PickUpAnimationEnded, 2); // TODO: Fix this workaround

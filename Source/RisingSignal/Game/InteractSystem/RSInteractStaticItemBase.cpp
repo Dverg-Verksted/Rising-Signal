@@ -13,7 +13,7 @@ ARSInteractStaticItemBase::ARSInteractStaticItemBase()
     PrimaryActorTick.bCanEverTick = false;
 }
 
-// Called when the game starts or when spawned
+
 void ARSInteractStaticItemBase::BeginPlay()
 {
     Super::BeginPlay();

@@ -27,11 +27,9 @@ class RISINGSIGNAL_API UInteractComponent : public UActorComponent
 #pragma region Default
 
 public:
-    // Sets default values for this component's properties
     UInteractComponent();
 
 protected:
-    // Called when the game starts
     virtual void BeginPlay() override;
 
 #define LOG_INTERACT(LogVerb, Text) Print_Log(LogVerb, Text, __LINE__, __FUNCTION__)

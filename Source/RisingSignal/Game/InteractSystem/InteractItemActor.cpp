@@ -4,7 +4,6 @@
 
 #include "RSInteractStaticItemBase.h"
 #include "Components/WidgetComponent.h"
-// #include "Engine/AssetManager.h"
 #include "Editor.h"
 #include "Components/SphereComponent.h"
 #include "Game/Inventory/RSInventoryComponent.h"
@@ -48,7 +47,7 @@ AInteractItemActor::AInteractItemActor()
     }
 }
 
-// Called when the game starts or when spawned
+
 void AInteractItemActor::BeginPlay()
 {
     Super::BeginPlay();
@@ -83,8 +82,6 @@ void AInteractItemActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyC
         return;
     }
 
-    // LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Name changed property: %s"), *PropertyChangedEvent.Property->GetName()));
-
     if (PropertyChangedEvent.Property->GetName() == TEXT("CollisionRadius"))
     {
         SphereCollision->SetSphereRadius(CollisionRadius);
@@ -108,7 +105,6 @@ void AInteractItemActor::LoadInteractWidget()
 {
     if (InteractWidget)
     {
-        // LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Name interact actor: %s | Load interact Widget"), *GetName()));
         GetWorldTimerManager().ClearTimer(ResetInteractAnimTimerHandle);
         InteractWidget->SetVisibility(ESlateVisibility::Visible);
         this->InteractWidget->StartAnimation();
@@ -119,7 +115,6 @@ void AInteractItemActor::DestroyInteractWidget()
 {
     if (InteractWidget)
     {
-        // LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Name interact actor: %s | Destroy interact Widget"), *GetName()));
         InteractWidget->EndAnimation();
         GetWorldTimerManager().SetTimer(ResetInteractAnimTimerHandle, [&]()
         {
@@ -176,8 +171,6 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
         }
         else
         {
-            // AttachedMap = GetWorld();
-
             UStaticMesh* L_Mesh = LoadObject<UStaticMesh>(nullptr, *(DataInteract->MeshItem.ToString()));
             if (L_Mesh)
             {
