@@ -43,6 +43,7 @@ public:
 
 protected:
 #pragma region Protected_Defaults
+
     ARSInteractStaticBonfire();
 
     virtual void BeginPlay() override;
@@ -62,6 +63,11 @@ protected:
      */
     void CharacterInsideVolume(ACharacter* Character, const bool bCharInside);
 
+    /**
+     * Toggle Fire and Smoke VFXs 
+     */
+    void SetEnabledVFX(bool bEnable);
+
 #if UE_EDITOR
 
     virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
@@ -80,16 +86,21 @@ protected:
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
     USphereComponent* HeatVolume;
 
+    // UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Settings | VFX")
+    // UParticleSystemComponent* ParticleSystemComponent;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
+    UParticleSystemComponent* FireVFX;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
+    UParticleSystemComponent* SmokeVFX;
+
+
 #pragma endregion Protected_Components
 
 
 #pragma region Protected_Properties
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings | VFX")
-    UNiagaraSystem* FireVFX;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings | VFX")
-    UNiagaraSystem* SmokeVFX;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings | HeatVolume")
     float HeatVolumeRadius = 100.0f;

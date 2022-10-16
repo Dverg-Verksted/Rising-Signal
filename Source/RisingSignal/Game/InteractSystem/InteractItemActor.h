@@ -189,5 +189,6 @@ public:
     static void SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count = 1, float Distance = 150.0f,
         bool RandomDirection = false);
 
+
 #pragma endregion Statics
 };

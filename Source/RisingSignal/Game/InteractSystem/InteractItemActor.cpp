@@ -261,3 +261,13 @@ void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItem
         Item->ItemCount = Count;
     }
 }
+
+
+
+// void AInteractItemActor::Destroyed()
+// {
+//     if (ChildStaticItemActor)
+//         ChildStaticItemActor->Destroy();
+//     
+//     Super::Destroyed();
+// }

@@ -2,7 +2,6 @@
 
 #include "Game/InteractSystem/InteractComponent.h"
 
-#include "AlsCharacterMovementComponent.h"
 #include "InteractDataItem.h"
 #include "InteractItemActor.h"
 #include "RSInteractStaticItemBase.h"
@@ -192,7 +191,7 @@ void UInteractComponent::RegisterInteractEvent()
 {
     LOG_INTERACT(ELogRSVerb::Display, "Pressed button interact");
 
-    const ARSGamePLayer* Player = GetOwner<ARSGamePLayer>(); 
+    const ARSGamePLayer* Player = GetOwner<ARSGamePLayer>();
     if (!Player || Player->GetCharacterMovement()->IsFalling()) // TODO: Add check for rolling
     {
         LOG_INTERACT(ELogRSVerb::Warning, "Can't interact, Player is Falling");
@@ -242,7 +241,9 @@ void UInteractComponent::RegisterInteractEvent()
                 }
 
                 return;
-                break;
+            }
+            default:
+            {
             }
         }
 

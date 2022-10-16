@@ -3,9 +3,12 @@
 
 #include "Game/InteractSystem/StaticItems/RSInteractStaticBonfire.h"
 
+#include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Game/InteractSystem/InteractItemActor.h"
 #include "Library/RSFunctionLibrary.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "Player/RSGamePLayer.h"
 
 ARSInteractStaticBonfire::ARSInteractStaticBonfire()
@@ -16,6 +19,12 @@ ARSInteractStaticBonfire::ARSInteractStaticBonfire()
     HeatVolume = CreateDefaultSubobject<USphereComponent>("HeatVolume");
     HeatVolume->SetupAttachment(BaseMesh);
     HeatVolume->SetSphereRadius(HeatVolumeRadius);
+
+    FireVFX = CreateDefaultSubobject<UParticleSystemComponent>("Fire");
+    FireVFX->SetupAttachment(RootComponent);
+
+    SmokeVFX = CreateDefaultSubobject<UParticleSystemComponent>("Smoke");
+    SmokeVFX->SetupAttachment(FireVFX);
 }
 
 void ARSInteractStaticBonfire::BeginPlay()
@@ -34,6 +43,8 @@ void ARSInteractStaticBonfire::BeginPlay()
     {
         CheckIfCharactersInsideVolume();
     }
+
+    SetFire(bIsFired);
 }
 
 void ARSInteractStaticBonfire::OnVolumeBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -41,13 +52,15 @@ void ARSInteractStaticBonfire::OnVolumeBeginOverlap(UPrimitiveComponent* Overlap
 {
     if (bIsFired)
     {
-        if (ParentInteractActor)
+        const auto OverlapComp = Cast<UCapsuleComponent>(OtherComp);
+        const auto OverlapChar = Cast<ACharacter>(OtherActor);
+        if (OverlapComp && OverlapChar)
         {
-            ParentInteractActor->SetInteractText(FireOnText);
-        }
+            if (ParentInteractActor)
+            {
+                ParentInteractActor->SetInteractText(FireOnText);
+            }
 
-        if (const auto OverlapChar = Cast<ACharacter>(OtherActor))
-        {
             CharacterInsideVolume(OverlapChar, true);
         }
     }
@@ -57,7 +70,6 @@ void ARSInteractStaticBonfire::OnVolumeBeginOverlap(UPrimitiveComponent* Overlap
         {
             ParentInteractActor->SetInteractText(FireOffText);
         }
-        return;
     }
 }
 
@@ -66,7 +78,10 @@ void ARSInteractStaticBonfire::OnVolumeEndOverlap(UPrimitiveComponent* Overlappe
 {
     if (!bIsFired) return;
 
-    if (const auto OverlapChar = Cast<ACharacter>(OtherActor))
+    const auto OverlapComp = Cast<UCapsuleComponent>(OtherComp);
+    const auto OverlapChar = Cast<ACharacter>(OtherActor);
+
+    if (OverlapComp && OverlapChar)
     {
         CharacterInsideVolume(OverlapChar, false);
     }
@@ -76,12 +91,26 @@ void ARSInteractStaticBonfire::CharacterInsideVolume(ACharacter* Character, cons
 {
     if (const auto AbilitySystem = Character->FindComponentByClass<URSAbilitySystem>())
     {
-        AbilitySystem->SetChangeValue(EAbilityStatesType::Temp, HeatTemperIncreaseValue * (bCharInside ? -1 : 1));
+        AbilitySystem->SetChangeValue(EAbilityStatesType::Temp, HeatTemperIncreaseValue * (bCharInside ? 1 : -1));
     }
 
     if (const auto CraftComp = Character->FindComponentByClass<URSCraftComponent>())
     {
         CraftComp->SetCampfireNearBy(bCharInside);
+    }
+}
+
+void ARSInteractStaticBonfire::SetEnabledVFX(bool bEnable)
+{
+    if (bEnable)
+    {
+        FireVFX->ActivateSystem();
+        SmokeVFX->ActivateSystem();
+    }
+    else
+    {
+        FireVFX->DeactivateSystem();
+        SmokeVFX->DeactivateSystem();
     }
 }
 
@@ -106,13 +135,13 @@ void ARSInteractStaticBonfire::Interact(ACharacter* InteractingCharacter)
 
 void ARSInteractStaticBonfire::SetFire(bool bSetFire)
 {
+    SetEnabledVFX(bSetFire);
+
     if (bSetFire == bIsFired) return;
 
     bIsFired = bSetFire;
 
     CheckIfCharactersInsideVolume();
-
-    // SetupFireFX()
 }
 
 #if UE_EDITOR
@@ -134,7 +163,7 @@ void ARSInteractStaticBonfire::PostEditChangeProperty(FPropertyChangedEvent& Pro
 
     if (PropertyChangedEvent.Property->GetName() == TEXT("bIsFired"))
     {
-        //SetupFireFX(bIsFired)
+        SetEnabledVFX(bIsFired);
 
         if (ParentInteractActor)
         {
