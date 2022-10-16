@@ -41,10 +41,11 @@ void ARSInteractStaticBonfire::BeginPlay()
 
     if (bIsFired)
     {
-        CheckIfCharactersInsideVolume();
+        FTimerHandle TempTimerHandle;
+        GetWorldTimerManager().SetTimer(TempTimerHandle, this, &ARSInteractStaticBonfire::CheckIfCharactersInsideVolume, 0.1);
     }
 
-    SetFire(bIsFired);
+    SetEnabledVFX(bIsFired);
 }
 
 void ARSInteractStaticBonfire::OnVolumeBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -54,7 +55,7 @@ void ARSInteractStaticBonfire::OnVolumeBeginOverlap(UPrimitiveComponent* Overlap
     {
         const auto OverlapComp = Cast<UCapsuleComponent>(OtherComp);
         const auto OverlapChar = Cast<ACharacter>(OtherActor);
-        if (OverlapComp && OverlapChar)
+        if (OverlapComp)
         {
             if (ParentInteractActor)
             {
