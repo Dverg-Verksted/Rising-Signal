@@ -90,6 +90,9 @@ struct FInventoryItem : public FTableRowBase
     UPROPERTY()
     FName InteractRowName;
 
+    UPROPERTY();
+    bool bIsChecked = false;
+
     FInventoryItem()
         : ImageItem(nullptr)
     {
@@ -118,6 +121,7 @@ struct FInventoryItem : public FTableRowBase
         this->CharacterAttributesEffects = Other.CharacterAttributesEffects;
         this->ItemCategory = Other.ItemCategory;
         this->ItemsDurability = Other.ItemsDurability;
+        this->bIsChecked = Other.bIsChecked;
         return *this;
     }
 
@@ -165,8 +169,12 @@ struct FRecipeItem : public FTableRowBase
     TArray<FCraftItem> RequiredIngredients;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Крафт",
-        DisplayName="Нужен ли костер?", meta=(ToolTip = "Нужен ли будет находиться игроку рядом с костром для крафта предмета."))
-    bool bIsNeedCampfire = false;
+        DisplayName="Нужен ли маленький костер?", meta=(ToolTip = "Нужен ли будет находиться игроку рядом с маленьким костром для крафта предмета."))
+    bool bIsNeedSmallFire = false;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Крафт",
+        DisplayName="Нужен ли большой костер?", meta=(ToolTip = "Нужен ли будет находиться игроку рядом с большим костром для крафта предмета."))
+    bool bIsNeedCampFire = false;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Крафт",
         DisplayName="Нужен ли верстак?", meta=(ToolTip = "Нужен ли будет находиться игроку рядом с верстаком для крафта предмета."))

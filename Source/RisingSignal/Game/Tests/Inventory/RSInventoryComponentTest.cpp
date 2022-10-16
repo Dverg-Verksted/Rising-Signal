@@ -10,13 +10,11 @@
 #include "Tests/AutomationCommon.h"
 
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FAddFewPoultryEggsItemsCount5Stackable, "RS.InventoryComponent.AddFewPoultryEggsItemsStackable",
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFindItem, "RS.InventoryComponent.FindItem",
     EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FAddBottleFewItemsNonStackable, "RS.InventoryComponent.AddFewBottleItemsNonStackable",
-    EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
-
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FAddBottleAndUseItem, "RS.InventoryComponent.AddBottleAndUseItem",
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestCraft, "RS.InventoryComponent.TestCraft",
     EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
 
 namespace
@@ -36,7 +34,7 @@ namespace
 }
 
 
-bool FAddFewPoultryEggsItemsCount5Stackable::RunTest(const FString& Parameters)
+bool FFindItem::RunTest(const FString& Parameters)
 {
     AutomationOpenMap("/Game/RisingSignal/Maps/DevMaps/Map_TEST_InventoryComponent");
     
@@ -65,11 +63,16 @@ bool FAddFewPoultryEggsItemsCount5Stackable::RunTest(const FString& Parameters)
         }, 1.0f, false);
     }
 
+    FTimerHandle TimerHandle;
+    World->GetTimerManager().SetTimer(TimerHandle, [=]()
+        {
+            InventoryComponent->FindItem("PoultryEggs", 5);
+        }, 10.0f, false);
 
     return true;
 }
 
-bool FAddBottleFewItemsNonStackable::RunTest(const FString& Parameters)
+bool FTestCraft::RunTest(const FString& Parameters)
 {
     AutomationOpenMap("/Game/RisingSignal/Maps/DevMaps/Map_TEST_InventoryComponent");
     
@@ -85,7 +88,7 @@ bool FAddBottleFewItemsNonStackable::RunTest(const FString& Parameters)
     UDataTable* DataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/RisingSignal/Core/Inventory/DT_InventoryItemRules.DT_InventoryItemRules"));
     if(!TestNotNull("DataTable exists", DataTable)) return false;
 
-    for(int i = 0; i < 5; i++)
+    for(int i = 0; i < 2; i++)
     {
         FDataTableRowHandle DataTableRowHandle;
         DataTableRowHandle.DataTable = DataTable;
@@ -98,41 +101,76 @@ bool FAddBottleFewItemsNonStackable::RunTest(const FString& Parameters)
         }, 1.0f, false);
     }
 
-    return true;
-}
-
-bool FAddBottleAndUseItem::RunTest(const FString& Parameters)
-{
-    AutomationOpenMap("/Game/RisingSignal/Maps/DevMaps/Map_TEST_InventoryComponent");
-    
-    UWorld* World = GetTestGameWorld();
-    if(!TestNotNull("World exists", World)) return false;
-
-    ARSGamePLayer* Character = StaticCast<ARSGamePLayer*>(UGameplayStatics::GetPlayerCharacter(World, 0));
-    if(!TestNotNull("Character exists", Character)) return false;
-
-    URSInventoryComponent* InventoryComponent = Character->GetInventoryComponent();
-    if(!TestNotNull("Inventory component exists", InventoryComponent)) return false;
-
-    UDataTable* DataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/RisingSignal/Core/Inventory/DT_InventoryItemRules.DT_InventoryItemRules"));
-    if(!TestNotNull("DataTable exists", DataTable)) return false;
-    
-    FDataTableRowHandle DataTableRowHandle;
-    DataTableRowHandle.DataTable = DataTable;
-    DataTableRowHandle.RowName = FName("FoodBottleOfWater");
-
-    FTimerHandle TimerHandle;
-    World->GetTimerManager().SetTimer(TimerHandle, [=]()
+    for(int i = 0; i < 2; i++)
     {
-        InventoryComponent->AddDataItem(DataTableRowHandle, "FoodBottleOfWater", 1);
-        TArray<FInventoryItem> Items;
-        Items = InventoryComponent->GetItems();
-        InventoryComponent->UseItem(Items[0]);
-    }, 1.0f, false);
+        FDataTableRowHandle DataTableRowHandle;
+        DataTableRowHandle.DataTable = DataTable;
+        DataTableRowHandle.RowName = FName("MetalScrap");
 
+        FTimerHandle TimerHandle;
+        World->GetTimerManager().SetTimer(TimerHandle, [=]()
+        {
+            InventoryComponent->AddDataItem(DataTableRowHandle, "MetalScrap", 5);
+        }, 1.0f, false);
+    }
+
+    for(int i = 0; i < 2; i++)
+    {
+        FDataTableRowHandle DataTableRowHandle;
+        DataTableRowHandle.DataTable = DataTable;
+        DataTableRowHandle.RowName = FName("PoultryEggs");
+
+        FTimerHandle TimerHandle;
+        World->GetTimerManager().SetTimer(TimerHandle, [=]()
+        {
+            InventoryComponent->AddDataItem(DataTableRowHandle, "PoultryEggs", 5);
+        }, 1.0f, false);
+    }
+
+    for(int i = 0; i < 2; i++)
+    {
+        FDataTableRowHandle DataTableRowHandle;
+        DataTableRowHandle.DataTable = DataTable;
+        DataTableRowHandle.RowName = FName("Berries");
+
+        FTimerHandle TimerHandle;
+        World->GetTimerManager().SetTimer(TimerHandle, [=]()
+        {
+            InventoryComponent->AddDataItem(DataTableRowHandle, "Berries", 5);
+        }, 1.0f, false);
+    }
+
+    for(int i = 0; i < 2; i++)
+    {
+        FDataTableRowHandle DataTableRowHandle;
+        DataTableRowHandle.DataTable = DataTable;
+        DataTableRowHandle.RowName = FName("WoodStick");
+
+        FTimerHandle TimerHandle;
+        World->GetTimerManager().SetTimer(TimerHandle, [=]()
+        {
+            InventoryComponent->AddDataItem(DataTableRowHandle, "WoodStick", 5);
+        }, 1.0f, false);
+    }
+
+    for(int i = 0; i < 2; i++)
+    {
+        FDataTableRowHandle DataTableRowHandle;
+        DataTableRowHandle.DataTable = DataTable;
+        DataTableRowHandle.RowName = FName("Gas");
+
+        FTimerHandle TimerHandle;
+        World->GetTimerManager().SetTimer(TimerHandle, [=]()
+        {
+            InventoryComponent->AddDataItem(DataTableRowHandle, "Gas", 5);
+        }, 1.0f, false);
+    }
 
     return true;
 }
+
+
+
 
 
 

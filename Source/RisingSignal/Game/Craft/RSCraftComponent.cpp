@@ -44,11 +44,10 @@ void URSCraftComponent::SetWorkbenchNearBy(bool NewValue)
     bIsWorkbenchNearBy = NewValue;
 }
 
-bool URSCraftComponent::GetIsOutputSlotAvailable()
+bool URSCraftComponent::GetIsOutputSlotAvailable() const
 {
     return bIsOutputSlotAvailable;
 }
-
 
 void URSCraftComponent::SetIsOutputSlotAvailable(bool NewValue)
 {
@@ -74,6 +73,19 @@ void URSCraftComponent::PrepareItemToCraft(FDataTableRowHandle Item)
     CraftedItem.TypeComponent = ETypeComponent::Craft;
     CraftingItems[OUTPUT_SLOT] = CraftedItem;
     UpdateSlot(OUTPUT_SLOT);
+}
+
+bool URSCraftComponent::CanCraft(const FRecipeItem* RecipeItem) const
+{
+    return (RecipeItem->bIsNeedSmallFire && !bIsSmallFireNearBy) || (RecipeItem->bIsNeedCampFire && !bIsCampfireNearBy) || (RecipeItem->bIsNeedWorkbench && !bIsWorkbenchNearBy);
+}
+
+void URSCraftComponent::RefreshItems()
+{
+    for(int i = 0; i < CraftingItems.Num(); i++)
+    {
+        CraftingItems[i].bIsChecked = false;
+    }
 }
 
 void URSCraftComponent::ClearOutputSlot()
@@ -106,7 +118,7 @@ void URSCraftComponent::FindSuitableRecipe()
     for (auto RowName : RowNames)
     {
         FRecipeItem* RecipeItem = RecipeDataTable->FindRow<FRecipeItem>(RowName, TEXT("Find recipe data"));
-        if ((RecipeItem->bIsNeedCampfire && !bIsCampfireNearBy) || (RecipeItem->bIsNeedWorkbench && !bIsWorkbenchNearBy))
+        if ((RecipeItem->bIsNeedCampFire && !bIsCampfireNearBy) || (RecipeItem->bIsNeedWorkbench && !bIsWorkbenchNearBy))
         {
             return;
         }
@@ -120,22 +132,26 @@ void URSCraftComponent::FindSuitableRecipe()
             }
             FInventoryItem IngredientItem = Ingredient.Item.DataTable->FindRow<FInventoryItem>(Ingredient.Item.RowName,
                 TEXT("Find ingredient item data"));
-            for (auto CraftItem : CraftingItems)
+            for(FInventoryItem& CraftItem : CraftingItems)
             {
-                if (CraftItem == IngredientItem && !Matches.Contains(CraftItem))
+                if (CraftItem == IngredientItem && !CraftItem.bIsChecked)
                 {
                     Matches.Add(CraftItem);
+                    GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Matches: %i"), Matches.Num()));
+                    CraftItem.bIsChecked = true;
                     Ingredient.bIsChecked = true;
-                }
-                if (Matches.Num() == CurrentIngredients.Num())
-                {
-                    UsedItems = Matches;
-                    PrepareItemToCraft(RecipeItem->OutputItem);
-                    return;
+                    if (Matches.Num() == CurrentIngredients.Num())
+                    {
+                        UsedItems = Matches;
+                        PrepareItemToCraft(RecipeItem->OutputItem);
+                        return;
+                    }
+                    break;
                 }
             }
         }
         Matches.Empty();
+        RefreshItems();
     }
 }
 

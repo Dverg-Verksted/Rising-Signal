@@ -38,7 +38,7 @@ public:
     void SetWorkbenchNearBy(bool NewValue);
 
     UFUNCTION(BlueprintGetter)
-    bool GetIsOutputSlotAvailable();
+    bool GetIsOutputSlotAvailable() const;
 
     void SetIsOutputSlotAvailable(bool NewValue);
 
@@ -46,6 +46,9 @@ public:
 
     UPROPERTY()
     TArray<FInventoryItem> UsedItems;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Craft parameters")
+    bool bIsSmallFireNearBy = false;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Craft parameters")
     bool bIsCampfireNearBy = false;
@@ -62,9 +65,11 @@ protected:
 private:
     virtual void UpdateSlot(int32 Index) override;
     void PrepareItemToCraft(FDataTableRowHandle Item);
+    bool CanCraft(const FRecipeItem* RecipeItem) const;
+    void RefreshItems();
 
     void RemoveUsedItems();
-
+   
 
     bool bIsOutputSlotAvailable = false;
 

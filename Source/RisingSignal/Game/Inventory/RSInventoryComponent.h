@@ -50,6 +50,8 @@ public:
     {
         return FString::Printf(TEXT("Slot: %i, Count: %i"), Item.SlotIndex, Item.Count);
     }
+    UFUNCTION(BlueprintCallable)
+    bool FindItem(FName RowName, int32 Count);
 
 protected:
     // Called when the game starts
@@ -72,6 +74,7 @@ private:
     void AddStacks(FInventoryItem* Item, int32 Count);
     FInventoryItem* FindItemData(const FDataTableRowHandle& RowDataHandle);
     FInventoryItem* FindFreeSlot();
+
 
     TSoftObjectPtr<URSAbilitySystem> AbilitySystem;
     TSoftObjectPtr<URSEquipmentComponent> EquipmentComponent;
