@@ -66,7 +66,11 @@ bool FFindItem::RunTest(const FString& Parameters)
     FTimerHandle TimerHandle;
     World->GetTimerManager().SetTimer(TimerHandle, [=]()
         {
-            InventoryComponent->FindItem("PoultryEggs", 5);
+            TArray<FInventoryItem> NeedItems;
+            FInventoryItem NeedItem;
+            NeedItem.InteractRowName = FName("Test");
+            NeedItems.Add(NeedItem);
+            InventoryComponent->FindItemsToUse(NeedItems);
         }, 10.0f, false);
 
     return true;

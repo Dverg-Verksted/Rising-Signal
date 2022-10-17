@@ -153,6 +153,11 @@ void URSInventoryComponent::UpdateSlot(int32 Index, const FInventoryItem& Item, 
     OnInventorySlotUpdate.Broadcast(InventoryItems[Index]);
 }
 
+FInventoryItem URSInventoryComponent::GetItemByIndex(int32 Index)
+{
+    return InventoryItems[Index];
+}
+
 bool URSInventoryComponent::MoveItemInventory(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot)
 {
     switch (SecondInventorySlot.TypeComponent)
@@ -350,16 +355,29 @@ FInventoryItem* URSInventoryComponent::FindFreeSlot()
     return InventoryItems.FindByPredicate([=](const FInventoryItem& Slot) { return Slot.InteractRowName == NAME_None; });
 }
 
-bool URSInventoryComponent::FindItem(FName RowName, int32 Count)
+bool URSInventoryComponent::FindItemsToUse(TArray<FInventoryItem>& NeedItems)
 {
-    const FInventoryItem* Item = InventoryItems.FindByPredicate([=](const FInventoryItem& Slot) {return Slot.InteractRowName == RowName && Slot.Count == Count; });
-    if(Item)
+    TArray<FInventoryItem> FoundItems;
+    for(const FInventoryItem& NeedItem : NeedItems)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Item found")));
-        RemoveItem(*Item, Item->Count, true);
-        return true;
+        const FInventoryItem* CurrentItem = InventoryItems.FindByPredicate([=](const FInventoryItem& Item) { return Item == NeedItem; });
+        if(CurrentItem)
+        {
+            FoundItems.Add(*CurrentItem);
+        }
     }
-    GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Item not found")));
+
+    if(FoundItems.Num() == NeedItems.Num())
+    {
+        for(const FInventoryItem& Item : FoundItems)
+        {
+            RemoveItem(Item, Item.Count, true);
+            GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Items found")));
+            return true;
+        }
+    }
+
+    GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Items not found")));
     return false;
 }
 
