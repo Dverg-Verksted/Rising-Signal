@@ -3,21 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/DataTable.h"
+#include "InteractTypes.h"
 #include "GameFramework/Actor.h"
 #include "RSInteractStaticItemBase.generated.h"
-
-USTRUCT()
-struct FNeededItem
-{
-    GENERATED_BODY()
-
-    UPROPERTY(EditAnywhere, DisplayName = "Предмет")
-    FDataTableRowHandle ItemRowHandle;
-
-    UPROPERTY(EditAnywhere, DisplayName = "Количество")
-    float ItemCount = 1;
-};
 
 
 /**
@@ -51,10 +39,4 @@ protected:
     UPROPERTY(EditAnywhere, DisplayName = "Необходимые предметы", Category = "Settings | Interact",
         meta = (EditCondition = "bNeedItem", EditConditionHides))
     TArray<FNeededItem> NeededItems;
-
-    // UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings | Interact", meta = (EditCondition = "bNeedItem", EditConditionHides))
-    // FDataTableRowHandle ItemRowHandle;
-    //
-    // UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings | Interact", meta = (EditCondition = "bNeedItem", EditConditionHides))
-    // float ItemCount = 1;
 };

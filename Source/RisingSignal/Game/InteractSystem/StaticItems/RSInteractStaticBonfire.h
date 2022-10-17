@@ -10,23 +10,6 @@ class AInteractItemActor;
 class UNiagaraSystem;
 class USphereComponent;
 
-UENUM()
-enum class EFireSize
-{
-    None UMETA(DisplayName = "Отсутствует"),
-    Low UMETA(DisplayName = "Слабый"),
-    Medium UMETA(DisplayName = "Средний"),
-    Big UMETA(DisplayName = "Сильный")
-};
-
-UENUM()
-enum class EBonfireType : uint8
-{
-    None,
-    SmallFire UMETA(DisplayName = "Малый костер"),
-    BigFire UMETA(DisplayName = "Большой костер")
-};
-
 
 /**
  * 
