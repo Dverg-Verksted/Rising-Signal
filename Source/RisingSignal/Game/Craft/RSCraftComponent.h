@@ -32,6 +32,9 @@ public:
     void CraftItem();
 
     UFUNCTION(BlueprintCallable)
+    void SetSmallFireNearBy(bool NewValue);
+
+    UFUNCTION(BlueprintCallable)
     void SetCampfireNearBy(bool NewValue);
 
     UFUNCTION(BlueprintCallable)
@@ -69,7 +72,7 @@ private:
     void RefreshItems();
 
     void RemoveUsedItems();
-   
+
 
     bool bIsOutputSlotAvailable = false;
 

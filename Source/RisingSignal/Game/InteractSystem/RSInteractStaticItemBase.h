@@ -1,10 +1,23 @@
-// It is owned by the company Dverg Verksted.
+﻿// It is owned by the company Dverg Verksted.
 
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "GameFramework/Actor.h"
 #include "RSInteractStaticItemBase.generated.h"
+
+USTRUCT()
+struct FNeededItem
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, DisplayName = "Предмет")
+    FDataTableRowHandle ItemRowHandle;
+
+    UPROPERTY(EditAnywhere, DisplayName = "Количество")
+    float ItemCount = 1;
+};
 
 
 /**
@@ -21,7 +34,6 @@ public:
     ARSInteractStaticItemBase();
 
 protected:
-    
     virtual void BeginPlay() override;
 
 public:
@@ -30,4 +42,19 @@ public:
 
     UFUNCTION(BlueprintImplementableEvent)
     void Interact_Blueprint(ACharacter* InteractingCharacter);
+
+protected:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings | Interact", DisplayName = "Запрашивать предмет",
+        meta = (ToolTip = "Необходимо ли проверить наличие необходимых предметов у персонажа при первом взаимодействии"))
+    bool bNeedItem = false;
+
+    UPROPERTY(EditAnywhere, DisplayName = "Необходимые предметы", Category = "Settings | Interact",
+        meta = (EditCondition = "bNeedItem", EditConditionHides))
+    TArray<FNeededItem> NeededItems;
+
+    // UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings | Interact", meta = (EditCondition = "bNeedItem", EditConditionHides))
+    // FDataTableRowHandle ItemRowHandle;
+    //
+    // UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings | Interact", meta = (EditCondition = "bNeedItem", EditConditionHides))
+    // float ItemCount = 1;
 };

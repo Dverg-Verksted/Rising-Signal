@@ -19,6 +19,14 @@ enum class EFireSize
     Big UMETA(DisplayName = "Сильный")
 };
 
+UENUM()
+enum class EBonfireType : uint8
+{
+    None,
+    SmallFire UMETA(DisplayName = "Малый костер"),
+    BigFire UMETA(DisplayName = "Большой костер")
+};
+
 
 /**
  * 
@@ -101,6 +109,11 @@ protected:
 
 #pragma region Protected_Properties
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings", DisplayName = "Тип костра",
+        meta = (ToolTip =
+            "Малый костер - костер без котла, с ограниченными рецептами.\nБольшой костер - костер с котлом, все рецепты для костра"
+        ))
+    EBonfireType BonfireType = EBonfireType::None;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings | HeatVolume")
     float HeatVolumeRadius = 100.0f;

@@ -97,7 +97,23 @@ void ARSInteractStaticBonfire::CharacterInsideVolume(ACharacter* Character, cons
 
     if (const auto CraftComp = Character->FindComponentByClass<URSCraftComponent>())
     {
-        CraftComp->SetCampfireNearBy(bCharInside);
+        switch (BonfireType)
+        {
+            case EBonfireType::SmallFire:
+            {
+                CraftComp->SetSmallFireNearBy(bCharInside);
+                break;
+            }
+            case EBonfireType::BigFire:
+            {
+                CraftComp->SetCampfireNearBy(bCharInside);
+
+                break;
+            }
+            default:
+            {
+            }
+        }
     }
 }
 
@@ -118,6 +134,8 @@ void ARSInteractStaticBonfire::SetEnabledVFX(bool bEnable)
 void ARSInteractStaticBonfire::Interact(ACharacter* InteractingCharacter)
 {
     Super::Interact(InteractingCharacter);
+
+    if (bNeedItem) return;
 
     if (bIsFired)
     {

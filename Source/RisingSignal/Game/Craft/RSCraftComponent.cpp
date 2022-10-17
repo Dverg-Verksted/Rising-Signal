@@ -39,6 +39,11 @@ void URSCraftComponent::SetCampfireNearBy(bool NewValue)
     bIsCampfireNearBy = NewValue;
 }
 
+void URSCraftComponent::SetSmallFireNearBy(bool NewValue)
+{
+    bIsSmallFireNearBy = NewValue;
+}
+
 void URSCraftComponent::SetWorkbenchNearBy(bool NewValue)
 {
     bIsWorkbenchNearBy = NewValue;

@@ -3,6 +3,7 @@
 
 #include "Game/InteractSystem/RSInteractStaticItemBase.h"
 
+#include "Game/Inventory/RSInventoryComponent.h"
 #include "GameFramework/Character.h"
 #include "Library/RSFunctionLibrary.h"
 
@@ -21,6 +22,21 @@ void ARSInteractStaticItemBase::BeginPlay()
 
 void ARSInteractStaticItemBase::Interact(ACharacter* InteractingCharacter)
 {
-    LOG_RS(ELogRSVerb::Display, InteractingCharacter->GetName() + " interacted with " + GetName());
+    if (bNeedItem)
+    {
+        if (const auto InvComp = InteractingCharacter->FindComponentByClass<URSInventoryComponent>())
+        {
+            for (const auto Item : NeededItems)
+            {
+                if (!InvComp->FindItem(Item.ItemRowHandle.RowName, Item.ItemCount))
+                {
+                    bNeedItem = true;
+                    return;
+                }
+            }
+            bNeedItem = false;
+        }
+    }
+
     Interact_Blueprint(InteractingCharacter);
 }
