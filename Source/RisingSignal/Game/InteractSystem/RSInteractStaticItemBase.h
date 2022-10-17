@@ -12,7 +12,8 @@
  * Base class for static interact objects.
  * When implements child class, you can use Interact and Interact_Blueprint functions that calls when character interacts with this object
  */
-UCLASS()
+UCLASS(HideCategories = ("Variable", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
+    "Mobile", "Activation", "Component Replication", "Events", "Asset User Data", "Collision", "Rendering", "Input", "Actor", "LOD"))
 class RISINGSIGNAL_API ARSInteractStaticItemBase : public AActor
 {
     GENERATED_BODY()

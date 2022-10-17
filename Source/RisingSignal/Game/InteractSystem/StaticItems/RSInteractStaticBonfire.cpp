@@ -90,6 +90,8 @@ void ARSInteractStaticBonfire::OnVolumeEndOverlap(UPrimitiveComponent* Overlappe
 
 void ARSInteractStaticBonfire::CharacterInsideVolume(ACharacter* Character, const bool bCharInside)
 {
+    if (!Character) return;
+
     if (const auto AbilitySystem = Character->FindComponentByClass<URSAbilitySystem>())
     {
         AbilitySystem->SetChangeValue(EAbilityStatesType::Temp, HeatTemperIncreaseValue * (bCharInside ? 1 : -1));

@@ -14,7 +14,7 @@ class USphereComponent;
 /**
  * 
  */
-UCLASS(HideCategories = ("Variable", "Transform", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
+UCLASS(HideCategories = ("Variable", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
     "Mobile", "Activation", "Component Replication", "Events", "Asset User Data", "Collision", "Rendering", "Input", "Actor", "LOD"))
 class RISINGSIGNAL_API ARSInteractStaticBonfire : public ARSInteractStaticItemBase
 {
@@ -76,9 +76,6 @@ protected:
 
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
     USphereComponent* HeatVolume;
-
-    // UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Settings | VFX")
-    // UParticleSystemComponent* ParticleSystemComponent;
 
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
     UParticleSystemComponent* FireVFX;
