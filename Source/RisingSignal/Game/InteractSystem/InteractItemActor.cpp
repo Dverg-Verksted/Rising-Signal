@@ -137,7 +137,11 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
         if (!DataInteract) return;
 
 #if WITH_EDITOR
-        if (!DataInteract->AttachedMap.IsNull() && DataInteract->AttachedMap != GetWorld())
+
+        
+        // LOG_RS(ELogRSVerb::Warning, GetWorld()->GetName() + " = CurrentMapName --- SelectedMapName = " + DataInteract->AttachedMap.GetAssetName());
+        
+        if (!DataInteract->AttachedMap.IsNull() && DataInteract->AttachedMap.GetAssetName() != GetWorld()->GetName())
         {
             this->Mesh->SetStaticMesh(nullptr);
             LOG_RS(ELogRSVerb::Error, "Selected interact Note/Audio/Photo can't be placed on this Map");
@@ -264,10 +268,4 @@ void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItem
 
 
 
-// void AInteractItemActor::Destroyed()
-// {
-//     if (ChildStaticItemActor)
-//         ChildStaticItemActor->Destroy();
-//     
-//     Super::Destroyed();
-// }
+
