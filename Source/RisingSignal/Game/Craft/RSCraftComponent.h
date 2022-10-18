@@ -68,8 +68,9 @@ protected:
 private:
     virtual void UpdateSlot(int32 Index) override;
     void PrepareItemToCraft(FDataTableRowHandle Item);
-    bool CanCraft(const FRecipeItem* RecipeItem) const;
     void RefreshItems();
+    TArray<FName> SortRecipesByIngredients(const UDataTable* RecipeTable) const;
+    bool CanCraftRecipe(const FRecipeItem* RecipeItem) const;
 
     void RemoveUsedItems();
 

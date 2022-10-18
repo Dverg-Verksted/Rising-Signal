@@ -3,6 +3,8 @@
 
 #include "Game/Craft/RSCraftComponent.h"
 
+#include "Algo/StableSort.h"
+
 
 URSCraftComponent::URSCraftComponent()
 {
@@ -80,17 +82,55 @@ void URSCraftComponent::PrepareItemToCraft(FDataTableRowHandle Item)
     UpdateSlot(OUTPUT_SLOT);
 }
 
-bool URSCraftComponent::CanCraft(const FRecipeItem* RecipeItem) const
-{
-    return (RecipeItem->bIsNeedSmallFire && !bIsSmallFireNearBy) || (RecipeItem->bIsNeedCampFire && !bIsCampfireNearBy) || (RecipeItem->bIsNeedWorkbench && !bIsWorkbenchNearBy);
-}
-
 void URSCraftComponent::RefreshItems()
 {
     for(int i = 0; i < CraftingItems.Num(); i++)
     {
         CraftingItems[i].bIsChecked = false;
     }
+}
+
+TArray<FName> URSCraftComponent::SortRecipesByIngredients(const UDataTable* RecipeTable) const
+{
+    TArray<FName> Recipes = RecipeTable->GetRowNames();
+    Algo::StableSort(Recipes, [=](const FName& Recipe1, const FName& Recipe2)
+    {
+        const FRecipeItem* RecipeItem1 = RecipeTable->FindRow<FRecipeItem>(Recipe1, TEXT("Find recipe data"));
+        const FRecipeItem* RecipeItem2 = RecipeTable->FindRow<FRecipeItem>(Recipe2, TEXT("Find recipe data"));
+        return RecipeItem1->RequiredIngredients.Num() > RecipeItem2->RequiredIngredients.Num();
+    });
+
+    return Recipes;
+}
+
+bool URSCraftComponent::CanCraftRecipe(const FRecipeItem* RecipeItem) const
+{
+    if(RecipeItem->bIsNeedSmallFire)
+    {
+        if(bIsSmallFireNearBy)
+        {
+            return true;
+        }
+        return false;
+    }
+    if(RecipeItem->bIsNeedCampFire)
+    {
+        if(bIsCampfireNearBy)
+        {
+            return true;
+        }
+        return false;
+    }
+    if(RecipeItem->bIsNeedWorkbench)
+    {
+        if(bIsWorkbenchNearBy)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    return true;
 }
 
 void URSCraftComponent::ClearOutputSlot()
@@ -107,7 +147,7 @@ void URSCraftComponent::CraftItem()
 
 void URSCraftComponent::RemoveUsedItems()
 {
-    for (auto UsedItem : UsedItems)
+    for (const auto UsedItem : UsedItems)
     {
         RemoveItem((CraftingItems[UsedItem.SlotIndex]));
     }
@@ -116,16 +156,15 @@ void URSCraftComponent::RemoveUsedItems()
 
 void URSCraftComponent::FindSuitableRecipe()
 {
-    UDataTable* RecipeDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/RisingSignal/Core/Inventory/DT_RecipeItems.DT_RecipeItems"));
+    const UDataTable* RecipeDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/RisingSignal/Core/Inventory/DT_RecipeItems.DT_RecipeItems"));
     
-
-    TArray<FName> RowNames = RecipeDataTable->GetRowNames();
-    for (auto RowName : RowNames)
+    TArray<FName> RowNames = SortRecipesByIngredients(RecipeDataTable);
+    for (const auto RowName : RowNames)
     {
-        FRecipeItem* RecipeItem = RecipeDataTable->FindRow<FRecipeItem>(RowName, TEXT("Find recipe data"));
-        if ((RecipeItem->bIsNeedCampFire && !bIsCampfireNearBy) || (RecipeItem->bIsNeedWorkbench && !bIsWorkbenchNearBy))
+        const FRecipeItem* RecipeItem = RecipeDataTable->FindRow<FRecipeItem>(RowName, TEXT("Find recipe data"));
+        if(!CanCraftRecipe(RecipeItem))
         {
-            return;
+            continue;
         }
         TArray<FCraftItem> CurrentIngredients = RecipeItem->RequiredIngredients;
         TArray<FInventoryItem> Matches;

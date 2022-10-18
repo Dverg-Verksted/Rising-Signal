@@ -197,7 +197,7 @@ bool URSInventoryComponent::MoveItemInventory(const FInventoryItem& FirstInvento
         }
         case ETypeComponent::Craft:
         {
-            if (SecondInventorySlot.SlotIndex == OUTPUT_SLOT)
+            if (SecondInventorySlot.SlotIndex == OUTPUT_SLOT || SecondInventorySlot.InteractRowName != NAME_None)
             {
                 return false;
             }
