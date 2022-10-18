@@ -23,6 +23,23 @@ enum class ETypeComponent : uint8
 };
 
 USTRUCT(BlueprintType)
+struct FItemEffect
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Эффект",
+        DisplayName="Эффекты",
+        meta=(ToolTip = "Эффекты накладываемые на игрока, которые изменяют значения выбранных атрибутов игрока при использовании предмета.",
+            EditCondition="bCanUse", EditConditionHides))
+    TMap<EAbilityStatesType, float> CharacterAttributesEffects;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Эффект",
+        DisplayName="Длительность эффекта",
+        meta=(ToolTip = "Длительность эффекта, при которой будет накладываться эффект", ClampMin = 0.0f, UIMin = 0.0f))
+    float EffectDuration = 0.0f;
+};
+
+USTRUCT(BlueprintType)
 struct FInventoryItem : public FTableRowBase
 {
     GENERATED_BODY()
@@ -79,10 +96,10 @@ struct FInventoryItem : public FTableRowBase
     int32 MaxCount = 50;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь",
-        DisplayName="Эффекты",
-        meta=(ToolTip = "Эффекты накладываемые на игрока, которые изменяют значения выбранных атрибутов игрока при использовании предмета.",
+        DisplayName="Настройки эффектов",
+        meta=(ToolTip = "Настройки эффектов накладываемые на игрока, которые изменяют значения выбранных атрибутов игрока при использовании предмета.",
             EditCondition="bCanUse", EditConditionHides))
-    TMap<EAbilityStatesType, float> CharacterAttributesEffects;
+    FItemEffect ItemEffect;
 
     UPROPERTY()
     TArray<float> ItemsDurability;
@@ -118,7 +135,7 @@ struct FInventoryItem : public FTableRowBase
         this->bStack = Other.bStack;
         this->bCanUse = Other.bCanUse;
         this->MaxCount = Other.MaxCount;
-        this->CharacterAttributesEffects = Other.CharacterAttributesEffects;
+        this->ItemEffect = Other.ItemEffect;
         this->ItemCategory = Other.ItemCategory;
         this->ItemsDurability = Other.ItemsDurability;
         this->bIsChecked = Other.bIsChecked;
@@ -184,3 +201,4 @@ struct FRecipeItem : public FTableRowBase
         DisplayName="Выходной предмет", meta=(ToolTip = "Предмет, который будет произведен."))
     FDataTableRowHandle OutputItem;
 };
+

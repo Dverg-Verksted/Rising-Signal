@@ -17,7 +17,7 @@ FInventoryItem::FInventoryItem(const FInventoryItem* OtherItem)
     bStack = OtherItem->bStack;
     bCanUse = OtherItem->bCanUse;
     MaxCount = OtherItem->MaxCount;
-    CharacterAttributesEffects = OtherItem->CharacterAttributesEffects;
+    ItemEffect = OtherItem->ItemEffect;
     ItemCategory = OtherItem->ItemCategory;
     ItemsDurability = OtherItem->ItemsDurability;
     bIsChecked = OtherItem->bIsChecked;
@@ -104,13 +104,12 @@ bool URSInventoryComponent::UseItem(const FInventoryItem& InventorySlot)
 {
     if (InventorySlot.bCanUse && InventorySlot.InteractRowName != NAME_None)
     {
-        for (auto& Effect : InventorySlot.CharacterAttributesEffects)
+        for (auto& Effect : InventorySlot.ItemEffect.CharacterAttributesEffects)
         {
             AbilitySystem->ChangeCurrentStateValue(Effect.Key, Effect.Value);
         }
 
         RemoveItem(InventorySlot, 1, true);
-
         return true;
     }
     return false;
