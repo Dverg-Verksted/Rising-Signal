@@ -24,15 +24,17 @@ void ARSInteractStaticItemBase::Interact(ACharacter* InteractingCharacter)
 {
     if (bNeedItem)
     {
+
+        
         if (const auto InvComp = InteractingCharacter->FindComponentByClass<URSInventoryComponent>())
         {
             for (const auto Item : NeededItems)
             {
-                if (!InvComp->FindItem(Item.ItemRowHandle.RowName, Item.ItemCount))
-                {
-                    bNeedItem = true;
-                    return;
-                }
+                // if (!InvComp->FindItemsToUse(NeededItems))
+                // {
+                //     bNeedItem = true;
+                //     return;
+                // }
             }
             bNeedItem = false;
         }
