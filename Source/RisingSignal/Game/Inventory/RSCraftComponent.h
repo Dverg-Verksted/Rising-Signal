@@ -50,14 +50,14 @@ public:
     UPROPERTY()
     TArray<FInventoryItem> UsedItems;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Craft parameters")
-    bool bIsSmallFireNearBy = false;
+    UFUNCTION(BlueprintCallable)
+    bool GetIsSmallFireNearBy() const { return bIsSmallFireNearBy; }
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Craft parameters")
-    bool bIsCampfireNearBy = false;
+    UFUNCTION(BlueprintCallable)
+    bool GetIsCampfireNearBy() const { return bIsCampfireNearBy; }
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Craft parameters")
-    bool bIsWorkbenchNearBy = false;
+    UFUNCTION(BlueprintCallable)
+    bool GetIsWorkbenchNearBy() const { return bIsWorkbenchNearBy; }
 
 protected:
     virtual void BeginPlay() override;
@@ -66,6 +66,11 @@ protected:
     int32 MaxCraftingSlots = 7;
 
 private:
+    
+    bool bIsSmallFireNearBy = false;
+    bool bIsCampfireNearBy = false;
+    bool bIsWorkbenchNearBy = false;
+    
     virtual void UpdateSlot(int32 Index) override;
     void PrepareItemToCraft(FDataTableRowHandle Item);
     void RefreshItems();
