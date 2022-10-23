@@ -8,6 +8,7 @@
 #include "Components/ActorComponent.h"
 #include "Engine/DataTable.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
+#include "Game/InteractSystem/RSInteractStaticItemBase.h"
 #include "RSInventoryComponent.generated.h"
 
 class URSEquipmentComponent;
@@ -51,7 +52,7 @@ public:
         return FString::Printf(TEXT("Slot: %i, Count: %i"), Item.SlotIndex, Item.Count);
     }
     
-    bool FindItemsToUse(TArray<FInventoryItem>& NeedItems);
+    bool FindItemsToUse(TArray<FNeededItem>& NeedItems);
     FInventoryItem GetItemByIndex(int32 Index);
 
 protected:

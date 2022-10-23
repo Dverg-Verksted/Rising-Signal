@@ -2,6 +2,7 @@
 #include "RSEquipmentComponent.h"
 #include "Game/Craft/RSCraftComponent.h"
 #include "Game/InteractSystem/InteractItemActor.h"
+#include "Game/InteractSystem/RSInteractStaticItemBase.h"
 
 
 FInventoryItem::FInventoryItem(const FInventoryItem* OtherItem)
@@ -354,12 +355,13 @@ FInventoryItem* URSInventoryComponent::FindFreeSlot()
     return InventoryItems.FindByPredicate([=](const FInventoryItem& Slot) { return Slot.InteractRowName == NAME_None; });
 }
 
-bool URSInventoryComponent::FindItemsToUse(TArray<FInventoryItem>& NeedItems)
+bool URSInventoryComponent::FindItemsToUse(TArray<FNeededItem>& NeedItems)
 {
     TArray<FInventoryItem> FoundItems;
-    for(const FInventoryItem& NeedItem : NeedItems)
+    for(const FNeededItem& NeedItem : NeedItems)
     {
-        const FInventoryItem* CurrentItem = InventoryItems.FindByPredicate([=](const FInventoryItem& Item) { return Item == NeedItem; });
+        const FInventoryItem NeedInventoryItem = FindItemData(NeedItem.ItemRowHandle);
+        const FInventoryItem* CurrentItem = InventoryItems.FindByPredicate([=](const FInventoryItem& Item) { return Item == NeedInventoryItem; });
         if(CurrentItem)
         {
             FoundItems.Add(*CurrentItem);
