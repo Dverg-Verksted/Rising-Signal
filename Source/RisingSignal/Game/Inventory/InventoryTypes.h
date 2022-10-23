@@ -99,7 +99,7 @@ struct FInventoryItem : public FTableRowBase
         DisplayName="Настройки эффектов",
         meta=(ToolTip = "Настройки эффектов накладываемые на игрока, которые изменяют значения выбранных атрибутов игрока при использовании предмета.",
             EditCondition="bCanUse", EditConditionHides))
-    FItemEffect ItemEffect;
+    TArray<FItemEffect> ItemEffect;
 
     UPROPERTY()
     TArray<float> ItemsDurability;
