@@ -75,7 +75,7 @@ private:
     bool MoveItemCraft(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
 
     void AddStacks(FInventoryItem* Item, int32 Count);
-    FInventoryItem* FindItemData(const FDataTableRowHandle& RowDataHandle);
+    FInventoryItem* FindItemData(const FDataTableRowHandle& RowDataHandle) const;
     FInventoryItem* FindFreeSlot();
 
 

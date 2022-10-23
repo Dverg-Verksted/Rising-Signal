@@ -5,7 +5,7 @@
 
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
-#include "Game/Craft/RSCraftComponent.h"
+#include "Game/Inventory/RSCraftComponent.h"
 #include "Game/InteractSystem/InteractItemActor.h"
 #include "GameFramework/Character.h"
 #include "Library/RSFunctionLibrary.h"

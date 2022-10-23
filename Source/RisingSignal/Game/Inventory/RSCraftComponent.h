@@ -73,8 +73,7 @@ private:
     bool CanCraftRecipe(const FRecipeItem* RecipeItem) const;
 
     void RemoveUsedItems();
-
-
+    
     bool bIsOutputSlotAvailable = false;
 
     UPROPERTY()

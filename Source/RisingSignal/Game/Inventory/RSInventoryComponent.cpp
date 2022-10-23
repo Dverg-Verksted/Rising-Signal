@@ -1,6 +1,6 @@
 #include "Game/Inventory/RSInventoryComponent.h"
 #include "RSEquipmentComponent.h"
-#include "Game/Craft/RSCraftComponent.h"
+#include "Game/Inventory/RSCraftComponent.h"
 #include "Game/InteractSystem/InteractItemActor.h"
 #include "Game/InteractSystem/RSInteractStaticItemBase.h"
 
@@ -105,9 +105,9 @@ bool URSInventoryComponent::UseItem(const FInventoryItem& InventorySlot)
 {
     if (InventorySlot.bCanUse && InventorySlot.InteractRowName != NAME_None)
     {
-        for (auto& Effect : InventorySlot.ItemEffect.CharacterAttributesEffects)
+        for (auto& Effect : InventorySlot.ItemEffect)
         {
-            AbilitySystem->ChangeCurrentStateValue(Effect.Key, Effect.Value);
+            AbilitySystem->ChangeCurrentStateValue(Effect.StateType, Effect.EffectValue);
         }
 
         RemoveItem(InventorySlot, 1, true);
@@ -341,7 +341,7 @@ void URSInventoryComponent::AddStacks(FInventoryItem* Item, int32 Count)
     }
 }
 
-FInventoryItem* URSInventoryComponent::FindItemData(const FDataTableRowHandle& RowDataHandle)
+FInventoryItem* URSInventoryComponent::FindItemData(const FDataTableRowHandle& RowDataHandle) const
 {
     const UDataTable* DataTable = RowDataHandle.DataTable;
     const FName RowName = RowDataHandle.RowName;
@@ -361,7 +361,7 @@ bool URSInventoryComponent::FindItemsToUse(TArray<FNeededItem>& NeedItems)
     for(const FNeededItem& NeedItem : NeedItems)
     {
         const FInventoryItem NeedInventoryItem = FindItemData(NeedItem.ItemRowHandle);
-        const FInventoryItem* CurrentItem = InventoryItems.FindByPredicate([=](const FInventoryItem& Item) { return Item == NeedInventoryItem; });
+        const FInventoryItem* CurrentItem = InventoryItems.FindByPredicate([=](const FInventoryItem& Item) { return Item == NeedInventoryItem && NeedItem.ItemCount == Item.Count; });
         if(CurrentItem)
         {
             FoundItems.Add(*CurrentItem);

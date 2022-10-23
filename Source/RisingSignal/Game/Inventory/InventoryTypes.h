@@ -28,10 +28,13 @@ struct FItemEffect
     GENERATED_BODY()
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Эффект",
-        DisplayName="Эффекты",
-        meta=(ToolTip = "Эффекты накладываемые на игрока, которые изменяют значения выбранных атрибутов игрока при использовании предмета.",
-            EditCondition="bCanUse", EditConditionHides))
-    TMap<EAbilityStatesType, float> CharacterAttributesEffects;
+        DisplayName="Тип")
+    EAbilityStatesType StateType;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Эффект",
+        DisplayName="Значение эффекта",
+        meta=(ToolTip = "Значение, которое будет накладываться на выбранный тип."))
+    float EffectValue;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Эффект",
         DisplayName="Длительность эффекта",

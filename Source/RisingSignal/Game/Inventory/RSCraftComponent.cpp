@@ -1,8 +1,7 @@
 // It is owned by the company Dverg Verksted.
 
 
-#include "Game/Craft/RSCraftComponent.h"
-
+#include "Game/Inventory/RSCraftComponent.h"
 #include "Algo/StableSort.h"
 
 
@@ -30,7 +29,7 @@ void URSCraftComponent::AddItemInSlot(const FInventoryItem& Item, int32 Index)
 
 void URSCraftComponent::RemoveItem(const FInventoryItem& Item)
 {
-    int32 SlotIndex = Item.SlotIndex;
+    const int32 SlotIndex = Item.SlotIndex;
     CraftingItems[SlotIndex] = FInventoryItem(SlotIndex);
     CraftingItems[SlotIndex].TypeComponent = ETypeComponent::Craft;
     UpdateSlot(SlotIndex);
@@ -176,6 +175,7 @@ void URSCraftComponent::FindSuitableRecipe()
             }
             FInventoryItem IngredientItem = Ingredient.Item.DataTable->FindRow<FInventoryItem>(Ingredient.Item.RowName,
                 TEXT("Find ingredient item data"));
+            IngredientItem.InteractRowName = Ingredient.Item.RowName;
             for(FInventoryItem& CraftItem : CraftingItems)
             {
                 if (CraftItem == IngredientItem && !CraftItem.bIsChecked)

@@ -11,8 +11,8 @@
 
 
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFindItem, "RS.InventoryComponent.FindItem",
-    EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
+/*IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFindItem, "RS.InventoryComponent.FindItem",
+    EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);*/
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTestCraft, "RS.InventoryComponent.TestCraft",
     EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
@@ -34,7 +34,7 @@ namespace
 }
 
 
-bool FFindItem::RunTest(const FString& Parameters)
+/*bool FFindItem::RunTest(const FString& Parameters)
 {
     AutomationOpenMap("/Game/RisingSignal/Maps/DevMaps/Map_TEST_InventoryComponent");
     
@@ -70,11 +70,11 @@ bool FFindItem::RunTest(const FString& Parameters)
             FInventoryItem NeedItem;
             NeedItem.InteractRowName = FName("Test");
             NeedItems.Add(NeedItem);
-            InventoryComponent->FindItemsToUse(NeedItems);
+            //InventoryComponent->FindItemsToUse(NeedItems);
         }, 10.0f, false);
 
     return true;
-}
+}*/
 
 bool FTestCraft::RunTest(const FString& Parameters)
 {
