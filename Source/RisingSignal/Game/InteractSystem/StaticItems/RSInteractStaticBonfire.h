@@ -10,20 +10,11 @@ class AInteractItemActor;
 class UNiagaraSystem;
 class USphereComponent;
 
-UENUM()
-enum class EFireSize
-{
-    None UMETA(DisplayName = "Отсутствует"),
-    Low UMETA(DisplayName = "Слабый"),
-    Medium UMETA(DisplayName = "Средний"),
-    Big UMETA(DisplayName = "Сильный")
-};
-
 
 /**
  * 
  */
-UCLASS(HideCategories = ("Variable", "Transform", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
+UCLASS(HideCategories = ("Variable", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
     "Mobile", "Activation", "Component Replication", "Events", "Asset User Data", "Collision", "Rendering", "Input", "Actor", "LOD"))
 class RISINGSIGNAL_API ARSInteractStaticBonfire : public ARSInteractStaticItemBase
 {
@@ -43,6 +34,7 @@ public:
 
 protected:
 #pragma region Protected_Defaults
+
     ARSInteractStaticBonfire();
 
     virtual void BeginPlay() override;
@@ -62,6 +54,11 @@ protected:
      */
     void CharacterInsideVolume(ACharacter* Character, const bool bCharInside);
 
+    /**
+     * Toggle Fire and Smoke VFXs 
+     */
+    void SetEnabledVFX(bool bEnable);
+
 #if UE_EDITOR
 
     virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
@@ -80,16 +77,23 @@ protected:
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
     USphereComponent* HeatVolume;
 
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
+    UParticleSystemComponent* FireVFX;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
+    UParticleSystemComponent* SmokeVFX;
+
+
 #pragma endregion Protected_Components
 
 
 #pragma region Protected_Properties
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings | VFX")
-    UNiagaraSystem* FireVFX;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings | VFX")
-    UNiagaraSystem* SmokeVFX;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings", DisplayName = "Тип костра",
+        meta = (ToolTip =
+            "Малый костер - костер без котла, с ограниченными рецептами.\nБольшой костер - костер с котлом, все рецепты для костра"
+        ))
+    EBonfireType BonfireType = EBonfireType::None;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings | HeatVolume")
     float HeatVolumeRadius = 100.0f;

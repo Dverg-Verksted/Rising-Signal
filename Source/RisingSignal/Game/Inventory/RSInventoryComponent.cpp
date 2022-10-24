@@ -1,7 +1,8 @@
 #include "Game/Inventory/RSInventoryComponent.h"
 #include "RSEquipmentComponent.h"
-#include "Game/Craft/RSCraftComponent.h"
+#include "Game/Inventory/RSCraftComponent.h"
 #include "Game/InteractSystem/InteractItemActor.h"
+#include "Game/InteractSystem/RSInteractStaticItemBase.h"
 
 
 FInventoryItem::FInventoryItem(const FInventoryItem* OtherItem)
@@ -17,9 +18,10 @@ FInventoryItem::FInventoryItem(const FInventoryItem* OtherItem)
     bStack = OtherItem->bStack;
     bCanUse = OtherItem->bCanUse;
     MaxCount = OtherItem->MaxCount;
-    CharacterAttributesEffects = OtherItem->CharacterAttributesEffects;
+    ItemEffect = OtherItem->ItemEffect;
     ItemCategory = OtherItem->ItemCategory;
     ItemsDurability = OtherItem->ItemsDurability;
+    bIsChecked = OtherItem->bIsChecked;
 }
 
 URSInventoryComponent::URSInventoryComponent()
@@ -42,11 +44,11 @@ TArray<FInventoryItem> URSInventoryComponent::GetItems()
 
 void URSInventoryComponent::RemoveItem(const FInventoryItem& InventorySlot, int32 CountRemove, bool bItemUsed)
 {
-    int32 IndexItem = InventorySlot.SlotIndex;
+    const int32 IndexItem = InventorySlot.SlotIndex;
 
     if (InventorySlot.Count - CountRemove <= 0)
     {
-        UpdateSlot(IndexItem, FInventoryItem(), 0);
+        UpdateSlot(IndexItem, FInventoryItem(IndexItem), 0);
     }
     else
     {
@@ -103,13 +105,12 @@ bool URSInventoryComponent::UseItem(const FInventoryItem& InventorySlot)
 {
     if (InventorySlot.bCanUse && InventorySlot.InteractRowName != NAME_None)
     {
-        for (auto& Effect : InventorySlot.CharacterAttributesEffects)
+        for (auto& Effect : InventorySlot.ItemEffect)
         {
-            AbilitySystem->ChangeCurrentStateValue(Effect.Key, Effect.Value);
+            AbilitySystem->ChangeCurrentStateValue(Effect.StateType, Effect.EffectValue);
         }
 
         RemoveItem(InventorySlot, 1, true);
-
         return true;
     }
     return false;
@@ -131,7 +132,7 @@ void URSInventoryComponent::AddDataItem(const FDataTableRowHandle& RowDataHandle
         return;
     }
 
-    FInventoryItem* FreeSlot = FindFreeSlot();
+    const FInventoryItem* FreeSlot = FindFreeSlot();
 
     if (FreeSlot == nullptr)
     {
@@ -150,6 +151,11 @@ void URSInventoryComponent::UpdateSlot(int32 Index, const FInventoryItem& Item, 
     InventoryItems[Index].TypeComponent = ETypeComponent::Inventory;
 
     OnInventorySlotUpdate.Broadcast(InventoryItems[Index]);
+}
+
+FInventoryItem URSInventoryComponent::GetItemByIndex(int32 Index)
+{
+    return InventoryItems[Index];
 }
 
 bool URSInventoryComponent::MoveItemInventory(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot)
@@ -191,7 +197,7 @@ bool URSInventoryComponent::MoveItemInventory(const FInventoryItem& FirstInvento
         }
         case ETypeComponent::Craft:
         {
-            if (SecondInventorySlot.SlotIndex == OUTPUT_SLOT)
+            if (SecondInventorySlot.SlotIndex == OUTPUT_SLOT || SecondInventorySlot.InteractRowName != NAME_None)
             {
                 return false;
             }
@@ -316,7 +322,7 @@ void URSInventoryComponent::AddStacks(FInventoryItem* Item, int32 Count)
     int32 CurrentItemCount = Count;
     while (CurrentItemCount > 0)
     {
-        FInventoryItem* FreeSlot = FindFreeSlot();
+        const FInventoryItem* FreeSlot = FindFreeSlot();
         if (FreeSlot == nullptr)
         {
             return;
@@ -335,10 +341,10 @@ void URSInventoryComponent::AddStacks(FInventoryItem* Item, int32 Count)
     }
 }
 
-FInventoryItem* URSInventoryComponent::FindItemData(const FDataTableRowHandle& RowDataHandle)
+FInventoryItem* URSInventoryComponent::FindItemData(const FDataTableRowHandle& RowDataHandle) const
 {
     const UDataTable* DataTable = RowDataHandle.DataTable;
-    FName RowName = RowDataHandle.RowName;
+    const FName RowName = RowDataHandle.RowName;
     FInventoryItem* Item = DataTable->FindRow<FInventoryItem>(RowName, TEXT("Find item data"));
 
     return Item;
@@ -347,6 +353,33 @@ FInventoryItem* URSInventoryComponent::FindItemData(const FDataTableRowHandle& R
 FInventoryItem* URSInventoryComponent::FindFreeSlot()
 {
     return InventoryItems.FindByPredicate([=](const FInventoryItem& Slot) { return Slot.InteractRowName == NAME_None; });
+}
+
+bool URSInventoryComponent::FindItemsToUse(TArray<FNeededItem>& NeedItems)
+{
+    TArray<FInventoryItem> FoundItems;
+    for(const FNeededItem& NeedItem : NeedItems)
+    {
+        const FInventoryItem NeedInventoryItem = FindItemData(NeedItem.ItemRowHandle);
+        const FInventoryItem* CurrentItem = InventoryItems.FindByPredicate([=](const FInventoryItem& Item) { return Item == NeedInventoryItem && NeedItem.ItemCount == Item.Count; });
+        if(CurrentItem)
+        {
+            FoundItems.Add(*CurrentItem);
+        }
+    }
+
+    if(FoundItems.Num() == NeedItems.Num())
+    {
+        for(const FInventoryItem& Item : FoundItems)
+        {
+            RemoveItem(Item, Item.Count, true);
+            GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Items found")));
+            return true;
+        }
+    }
+
+    GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Items not found")));
+    return false;
 }
 
 void URSInventoryComponent::BeginPlay()

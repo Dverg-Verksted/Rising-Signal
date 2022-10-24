@@ -58,9 +58,9 @@ void ARSAICharacter_Wolf::AIStateChanged(EAIState NewState, EAIState PrevState)
     Super::AIStateChanged(NewState, PrevState);
 }
 
-void ARSAICharacter_Wolf::Attack(AActor* AttackActor)
+void ARSAICharacter_Wolf::Attack(AActor* ActorToAttack)
 {
-    LOG_RS(ELogRSVerb::Warning, "Attack");
+    LOG_RS(ELogRSVerb::Display, "Attack");
 
     PlayAnimMontage(BiteAnimMontage);
 }
@@ -77,16 +77,16 @@ void ARSAICharacter_Wolf::ProvideDamage(USkeletalMeshComponent* FromMeshComponen
 
     const float DistanceToAttackActor = FVector::Distance(EnemyLocation, JawLocation);
 
-    LOG_RS(ELogRSVerb::Warning, "Distance to enemy = " + FString::SanitizeFloat(DistanceToAttackActor));
+    LOG_RS(ELogRSVerb::Display, "Distance to enemy = " + FString::SanitizeFloat(DistanceToAttackActor));
     if (DistanceToAttackActor > AttackDistance) return;
 
     const FRotator BiteDirection = (EnemyLocation - JawLocation).Rotation();
 
     UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, BloodEffect, EnemyLocation, BiteDirection);
 
-    Player->TakeDamage(AttackDamage, {}, GetController(), this);
+    Player->TakeDamage(AttackList[0].AttackDamage, {}, GetController(), this);
 
-    LOG_RS(ELogRSVerb::Warning, "DamageProvided");
+    LOG_RS(ELogRSVerb::Display, "DamageProvided");
 }
 
 void ARSAICharacter_Wolf::SwitchWolfColorToBlack(bool bSwitch)

@@ -26,7 +26,7 @@ public:
     AInteractItemActor();
 
 protected:
-    // Called when the game starts or when spawned
+    
     virtual void BeginPlay() override;
 
     virtual void PostLoad() override;
@@ -188,6 +188,7 @@ public:
     UFUNCTION(BlueprintCallable)
     static void SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count = 1, float Distance = 150.0f,
         bool RandomDirection = false);
+
 
 #pragma endregion Statics
 };

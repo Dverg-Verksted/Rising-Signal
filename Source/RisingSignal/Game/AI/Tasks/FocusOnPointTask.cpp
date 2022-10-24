@@ -41,11 +41,7 @@ EBTNodeResult::Type UFocusOnPointTask::ExecuteTask(UBehaviorTreeComponent& Owner
 
     if (FMath::Abs(DeltaAngle) <= PrecisionAngle)
         return EBTNodeResult::Succeeded;
-
-    // YawRotation = UKismetMathLibrary::NormalizeAxis(PawnRotationYaw + DeltaAngle);
-
-    // DrawDebugLine(GetWorld(), PawnLocation, PawnLocation + PawnRotation.Vector() * 800, FColor::Red, false, 5);
-
+    
     TaskMemory->StartRotation = PawnRotation;
     TaskMemory->EndRotation = TargetRotation;
     TaskMemory->AICharacter = Pawn;
@@ -68,8 +64,6 @@ void UFocusOnPointTask::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
     const FRotator CurrentRotation = TaskMemory->AICharacter->GetActorRotation();
     const FRotator TargetRotation = TaskMemory->EndRotation;
 
-    // LOG_RS(ELogRSVerb::Warning, FString::Printf(TEXT("CurrentYaw = %f, TargetYaw = %f"), CurrentRotation, TargetRotation));
-
     const FRotator NewRotation = FMath::RInterpConstantTo(CurrentRotation, TargetRotation, DeltaSeconds, TurnSpeed);
     const float DeltaYaw = NewRotation.Yaw - TargetRotation.Yaw;
 
@@ -77,13 +71,6 @@ void UFocusOnPointTask::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 
     if (FMath::Abs(DeltaYaw) <= PrecisionAngle)
     {
-        // UE_LOG(LogTemp, Warning, TEXT("DeltaYaw = %f, PrecisionAngle = %f"), DeltaYaw, PrecisionAngle);
-
-        // FVector PawnLocation = TaskMemory->AICharacter->GetActorLocation();
-        
-        // DrawDebugLine(GetWorld(), PawnLocation, PawnLocation + CurrentRotation.Vector() * 800, FColor::Red, false, 5);
-
-
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
     }
 }

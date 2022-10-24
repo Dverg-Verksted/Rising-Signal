@@ -8,6 +8,7 @@
 #include "Components/ActorComponent.h"
 #include "Engine/DataTable.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
+#include "Game/InteractSystem/RSInteractStaticItemBase.h"
 #include "RSInventoryComponent.generated.h"
 
 class URSEquipmentComponent;
@@ -50,6 +51,9 @@ public:
     {
         return FString::Printf(TEXT("Slot: %i, Count: %i"), Item.SlotIndex, Item.Count);
     }
+    
+    bool FindItemsToUse(TArray<FNeededItem>& NeedItems);
+    FInventoryItem GetItemByIndex(int32 Index);
 
 protected:
     // Called when the game starts
@@ -65,13 +69,15 @@ private:
     virtual void CombineItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot) override;
     virtual void UpdateSlot(int32 Index, const FInventoryItem& Item, int32 Count) override;
 
+
     bool MoveItemInventory(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
     bool MoveItemEquipment(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
     bool MoveItemCraft(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
 
     void AddStacks(FInventoryItem* Item, int32 Count);
-    FInventoryItem* FindItemData(const FDataTableRowHandle& RowDataHandle);
+    FInventoryItem* FindItemData(const FDataTableRowHandle& RowDataHandle) const;
     FInventoryItem* FindFreeSlot();
+
 
     TSoftObjectPtr<URSAbilitySystem> AbilitySystem;
     TSoftObjectPtr<URSEquipmentComponent> EquipmentComponent;

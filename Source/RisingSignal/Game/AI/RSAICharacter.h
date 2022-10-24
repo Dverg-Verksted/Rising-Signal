@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "RSAICharacter.generated.h"
 
+class ARSBaseWeapon;
 class URSAbilitySystem;
 class ARSAIController;
 class UBehaviorTree;
@@ -15,7 +16,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FEnemyInSightChangeSignature, bool);
 
 
 UENUM(BlueprintType)
-enum EAIState
+enum class EAIState : uint8
 {
     Idle,
     Patrol,
@@ -24,40 +25,70 @@ enum EAIState
     None
 };
 
-USTRUCT()
-struct FAlertIncreaseData
+UENUM()
+enum class EAttackType : uint8
 {
-    GENERATED_BODY()
-
-    UPROPERTY(EditAnywhere, meta = (ToolTip = "Отложенный старт повышения уровня угрозы. -1 - не откладывать"))
-    float LevelUpDelay = -1;
-
-    UPROPERTY(EditAnywhere, meta = (ToolTip = "Частота повышения уровня угрозы", Units = "s"))
-    float LevelUpTimerRate = 0.1;
-
-    UPROPERTY(EditAnywhere, meta = (ToolTip = "На сколько повышается уровень угрозы каждое срабатывание"))
-    float LevelUpValue = 1;
+    None,
+    NonWeapon UMETA(DisplayName = "Без оружия"),
+    WithWeapon UMETA(DisplayName = "С оружием")
 };
 
 USTRUCT()
-struct FAlertDecreaseData
+struct FAttackData
 {
     GENERATED_BODY()
 
-    UPROPERTY(EditAnywhere, meta = (ToolTip = "Отложенный старт понижения уровня угрозы. -1 - не откладывать"))
-    float LevelDownDelay = -1;
+    UPROPERTY(EditAnywhere, DisplayName = "Тип атаки")
+    EAttackType AttackType = EAttackType::None;
 
-    UPROPERTY(EditAnywhere, meta = (ToolTip = "Частота повышения уровня угрозы", Units = "s"))
-    float LevelDownTimerRate = 0.1;
+    UPROPERTY(EditAnywhere, DisplayName = "Уникальное название атаки")
+    FName AttackName = "";
 
-    UPROPERTY(EditAnywhere, meta = (ToolTip = "На сколько понижается уровень угрозы каждое срабатывание"))
-    float LevelDownValue = 1;
+    UPROPERTY(EditAnywhere, DisplayName = "Класс оружия",
+        meta = (EditCondition = "AttackType == EAttackType::WithWeapon", EditConditionHides))
+    TSoftClassPtr<ARSBaseWeapon> WeaponClassPtr = nullptr;
+
+    UPROPERTY(EditAnywhere, DisplayName = "Аниммонтаж атаки",
+        meta = (EditCondition = "AttackType == EAttackType::NonWeapon", EditConditionHides))
+    UAnimMontage* AttackAnimMontage;
+
+    UPROPERTY(EditAnywhere, DisplayName = "Имя сокета",
+        meta = (ToolTip = "Имя сокета, относительно которого будет высчитываться дистанция до цели",
+            EditCondition = "AttackType == EAttackType::NonWeapon", EditConditionHides))
+    FName MeleeAttackSocket = "";
+
+    UPROPERTY(EditAnywhere, DisplayName = "Урон атаки", meta = (EditCondition = "AttackType == EAttackType::NonWeapon", EditConditionHides))
+    float AttackDamage = 10.0f;
+
+    UPROPERTY(EditAnywhere, DisplayName = "Дистанция атаки",
+        meta = (EditCondition = "AttackType == EAttackType::NonWeapon", EditConditionHides))
+    float AttackDistance = 10.0f;
 };
+
+USTRUCT()
+struct FAlertData
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, DisplayName = "Откладывать старт на ",
+        meta = (ToolTip = "Отложенный старт изменения уровня угрозы. -1 - не откладывать"))
+    float LevelChangeDelay = -1;
+
+    UPROPERTY(EditAnywhere, DisplayName = "Частота изменения уровня",
+        meta = (ToolTip = "Частота изменения уровня угрозы", Units = "s"))
+    float LevelChangeTimerRate = 0.1;
+
+    UPROPERTY(EditAnywhere, DisplayName = "Величина изменения уровня",
+        meta = (ToolTip = "На сколько изменяется уровень угрозы каждое срабатывание"))
+    float LevelChangeValue = 1;
+};
+
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAIStateChangedSignature, EAIState, NewState, EAIState, OldState);
 
 
-UCLASS()
+UCLASS(HideCategories = ("Variable", "Transform", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
+        "Mobile", "Activation", "Component Replication", "Events", "Asset User Data", "Collision"))
 class RISINGSIGNAL_API ARSAICharacter : public ACharacter
 {
     GENERATED_BODY()
@@ -89,19 +120,22 @@ public:
     UFUNCTION()
     virtual void EnemyInSight(bool IsNoticed);
 
-    virtual void Attack(AActor* AttackActor);
+    virtual void Attack(AActor* ActorToAttack);
 
     UFUNCTION()
     virtual void ProvideDamage(USkeletalMeshComponent* FromMeshComponent);
 
     FEnemyInSightChangeSignature OnEnemyInSightChangeSignature;
 
-    UFUNCTION()
+    UFUNCTION(BlueprintCallable)
+    virtual float GetAlertLevel() const { return CurrentAlertLevel; }
+
+    UFUNCTION(BlueprintCallable)
     float GetAlertLevelPercent() const { return CurrentAlertLevel / 100.0f; }
 
 
 protected:
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
     URSAbilitySystem* AbilitySystem;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
@@ -127,11 +161,11 @@ protected:
 
     bool IsEnemyInSight = false;
 
-    UPROPERTY(EditAnywhere, Category = "Alert")
-    FAlertIncreaseData AlertIncreaseData;
+    UPROPERTY(EditAnywhere, DisplayName = "Повышение", Category = "Уровень угрозы")
+    FAlertData AlertIncreaseData;
 
-    UPROPERTY(EditAnywhere, Category = "Alert")
-    FAlertDecreaseData AlertDecreaseData;
+    UPROPERTY(EditAnywhere, DisplayName = "Понижение", Category = "Уровень угрозы")
+    FAlertData AlertDecreaseData;
 
     void IncreaseAlertLevelUpdate();
 
@@ -153,9 +187,6 @@ protected:
     FTimerHandle IncreaseAlertLevelTimer;
     FTimerHandle DecreaseAlertLevelTimer;
     FTimerHandle ClearAlertLevelTimer;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack | Base Config")
-    float AttackDamage = 50.0f;
 
     void ClearAlert();
 
@@ -183,6 +214,9 @@ protected:
 
     UFUNCTION()
     virtual void Revive();
+
+    UPROPERTY(EditAnywhere, Category = "Атака")
+    TArray<FAttackData> AttackList;
 
 #pragma region DEBUG
 
