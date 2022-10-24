@@ -11,8 +11,8 @@ class UNiagaraSystem;
 /**
  * 
  */
-UCLASS(HideCategories=("Rendering", "Collision", "Actor", "Input", "LOD", "Cooking", "Replication", "Actor Tick"),
-    AutoCollapseCategories=("Character", "Camera", "Pawn"))
+UCLASS(HideCategories = ("Variable", "Transform", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
+        "Mobile", "Activation", "Component Replication", "Events", "Asset User Data", "Collision"))
 class RISINGSIGNAL_API ARSAICharacter_Wolf : public ARSAICharacter
 {
     GENERATED_BODY()
@@ -27,12 +27,9 @@ public:
     UFUNCTION()
     void TimelineProgress(float Value);
 
-    UFUNCTION(BlueprintCallable)
-    float GetAlertLevel() const { return CurrentAlertLevel; }
-
     virtual void AIStateChanged(EAIState NewState, EAIState PrevState) override;
 
-    virtual void Attack(AActor* AttackActor) override;
+    virtual void Attack(AActor* ActorToAttack) override;
 
     virtual void ProvideDamage(USkeletalMeshComponent* FromMeshComponent) override;
 

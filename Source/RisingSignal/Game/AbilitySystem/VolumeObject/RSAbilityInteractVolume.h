@@ -96,6 +96,6 @@ private:
      * @param AbilityStType - Type ability in system, that we will changed
      * @param AddValue - Value, that will added plus to changed value in state in ability system
      */
-    void SetStateChangedValue(const AActor* Actor, const EAbilityStatesType AbilityStType, const float AddValue) const;
+    void SetStateChangedValue(const AActor* Actor, const float AddValue) const;
     
 };

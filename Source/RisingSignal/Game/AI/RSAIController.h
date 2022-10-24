@@ -28,7 +28,7 @@ protected:
 
     virtual void Tick(float DeltaSeconds) override;
 
-public: // private:
+public:
 
     //Get from blackboard key, actor to focus on
     AActor* GetActorToFocusOn() const;

@@ -4,7 +4,6 @@
 #include "Game/AI/RSAICharacter.h"
 
 #include "RSAIController.h"
-// #include "Game/AbilitySystem/ActorsComponents/RSHealthComponent.h"
 #include "BrainComponent.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -41,7 +40,7 @@ void ARSAICharacter::AIStateChanged(EAIState NewState, EAIState PrevState)
 {
 }
 
-void ARSAICharacter::Attack(AActor* AttackActor)
+void ARSAICharacter::Attack(AActor* ActorToAttack)
 {
 }
 
@@ -83,7 +82,7 @@ void ARSAICharacter::EnemyInSight(bool IsNoticed)
     {
         if (!IsAlerted())
         {
-            LOG_RS(ELogRSVerb::Warning, "Enemy Found!");
+            LOG_RS(ELogRSVerb::Display, "Enemy Found!");
 
             SetNewAIState(EAIState::Threaten);
 
@@ -93,9 +92,9 @@ void ARSAICharacter::EnemyInSight(bool IsNoticed)
                 IncreaseAlertLevelTimer,
                 this,
                 &ARSAICharacter::IncreaseAlertLevelUpdate,
-                AlertIncreaseData.LevelUpTimerRate,
+                AlertIncreaseData.LevelChangeTimerRate,
                 true,
-                AlertIncreaseData.LevelUpDelay
+                AlertIncreaseData.LevelChangeDelay
                 );
         }
         else
@@ -105,7 +104,7 @@ void ARSAICharacter::EnemyInSight(bool IsNoticed)
     }
     else
     {
-        LOG_RS(ELogRSVerb::Warning, "No Enemy!");
+        LOG_RS(ELogRSVerb::Display, "No Enemy!");
 
         if (IsAlerted())
         {
@@ -119,9 +118,9 @@ void ARSAICharacter::EnemyInSight(bool IsNoticed)
                 DecreaseAlertLevelTimer,
                 this,
                 &ARSAICharacter::DecreaseAlertLevelUpdate,
-                AlertDecreaseData.LevelDownTimerRate,
+                AlertDecreaseData.LevelChangeTimerRate,
                 true,
-                AlertDecreaseData.LevelDownDelay
+                AlertDecreaseData.LevelChangeDelay
                 );
         }
     }
@@ -138,7 +137,7 @@ void ARSAICharacter::IncreaseAlertLevelUpdate()
         return;
     }
 
-    TryToIncreaseAlertLevel(AlertIncreaseData.LevelUpValue);
+    TryToIncreaseAlertLevel(AlertIncreaseData.LevelChangeValue);
 }
 
 void ARSAICharacter::DecreaseAlertLevelUpdate()
@@ -146,11 +145,11 @@ void ARSAICharacter::DecreaseAlertLevelUpdate()
     if (FMath::IsNearlyZero(CurrentAlertLevel))
     {
         GetWorldTimerManager().ClearTimer(DecreaseAlertLevelTimer);
-        SetNewAIState(Patrol);
+        SetNewAIState(EAIState::Patrol);
         return;
     }
 
-    TryToDecreaseAlertLevel(AlertDecreaseData.LevelDownValue);
+    TryToDecreaseAlertLevel(AlertDecreaseData.LevelChangeValue);
 }
 
 bool ARSAICharacter::TryToIncreaseAlertLevel(float Value)
@@ -172,8 +171,6 @@ bool ARSAICharacter::TryToDecreaseAlertLevel(float Value)
 void ARSAICharacter::SetAlertLevel(float NewAlertLevel)
 {
     CurrentAlertLevel = FMath::Clamp(NewAlertLevel, 0.0f, 100.0f);
-
-    //LOG_RS(ELogRSVerb::Warning, "Alert Level = " + FString::SanitizeFloat(CurrentAlertLevel));
 }
 
 bool ARSAICharacter::IsAlerted() const
@@ -212,7 +209,7 @@ void ARSAICharacter::ClearAlert()
     SetNewAIState(EAIState::Patrol);
     GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
     GetCharacterMovement()->RotationRate = FRotator(50);
-    LOG_RS(ELogRSVerb::Warning, "Alert cleared");
+    LOG_RS(ELogRSVerb::Display, "Alert cleared");
 }
 
 void ARSAICharacter::OnDeath()

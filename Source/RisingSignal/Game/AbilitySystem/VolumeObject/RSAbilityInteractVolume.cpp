@@ -85,7 +85,7 @@ void ARSAbilityInteractVolume::OnOverlapBegin(UPrimitiveComponent* OverlappedCom
     int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
     // Call change on overlap begin with params, that set in component
-    SetStateChangedValue(OtherActor, AbilityStateType, AddValueToState);
+    SetStateChangedValue(OtherActor, AddValueToState);
 }
 
 void ARSAbilityInteractVolume::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -93,10 +93,10 @@ void ARSAbilityInteractVolume::OnOverlapEnd(UPrimitiveComponent* OverlappedCompo
 {
 
     // Call change on overlap begin with params, that set in component, with invert (-)
-    SetStateChangedValue(OtherActor, AbilityStateType, -AddValueToState);
+    SetStateChangedValue(OtherActor, -AddValueToState);
 }
 
-void ARSAbilityInteractVolume::SetStateChangedValue(const AActor* Actor, const EAbilityStatesType AbilityStType, const float AddValue) const
+void ARSAbilityInteractVolume::SetStateChangedValue(const AActor* Actor, const float AddValue) const
 {
     if(!Actor) return;
     

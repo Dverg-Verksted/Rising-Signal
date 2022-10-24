@@ -22,5 +22,5 @@ public:
 
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
-    TEnumAsByte<EAIState> NewAIState;
+    EAIState NewAIState;
 };

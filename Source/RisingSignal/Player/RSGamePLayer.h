@@ -6,7 +6,7 @@
 #include "AlsCharacter.h"
 #include "RSGamePlayerController.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
-#include "Game/Craft/RSCraftComponent.h"
+#include "Game/Inventory/RSCraftComponent.h"
 #include "RSGamePLayer.generated.h"
 
 class USpringArmComponent;

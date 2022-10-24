@@ -34,7 +34,7 @@ AActor* URSAIPerceptionComponent::GetClosestEnemy() const
             {
                 BestDistance = CurrentDistance;
                 BestPawn = PercieveActor;
-                // LOG_RS(ELogRSVerb::Display, "New BestPawn = " + BestPawn->GetName());
+                
             }
         }
     }
@@ -43,8 +43,6 @@ AActor* URSAIPerceptionComponent::GetClosestEnemy() const
     {
         LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Distance to closest enemy = %f"), BestDistance));
     }
-
-    // LOG_RS(ELogRSVerb::Display, "BestPawn Set");
 
     return BestPawn;
 }
