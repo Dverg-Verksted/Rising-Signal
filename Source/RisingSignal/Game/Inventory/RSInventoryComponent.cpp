@@ -383,8 +383,8 @@ bool URSInventoryComponent::FindItemsToUse(TArray<FNeededItem>& NeedItems)
             LOG_RS(ELogRSVerb::Warning, Item.Name.ToString()+" "+FString::FromInt(Item.Count)+ " removed");
             RemoveItem(Item, Item.Count, true);
             GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Items found")));
-            return true;
         }
+        return true;
     }
 
     GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Items not found")));
