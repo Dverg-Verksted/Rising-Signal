@@ -97,5 +97,7 @@ private:
      * @param AddValue - Value, that will added plus to changed value in state in ability system
      */
     void SetStateChangedValue(const AActor* Actor, const float AddValue) const;
+
+    void CheckIfCharactersInsideVolume();
     
 };

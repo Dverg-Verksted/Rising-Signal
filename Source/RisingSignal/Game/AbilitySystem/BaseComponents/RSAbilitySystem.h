@@ -106,7 +106,6 @@ public:
     // Getter for return current any state in TArray States
     UFUNCTION(BlueprintCallable, BlueprintPure)
     float GetCurrentStateValue(EAbilityStatesType SearchState) const;
-
     
     UFUNCTION(BlueprintCallable, BlueprintPure)
     FORCEINLINE
@@ -202,5 +201,8 @@ private:
     float TimerCheckStateRate = 0.1f;
 
 #pragma endregion AbilitySystemParams
+
+    void OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
+        class AController* InstigatedBy, AActor* DamageCauser);
     
 };

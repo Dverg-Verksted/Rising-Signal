@@ -6,7 +6,9 @@
 #include "Components/BoxComponent.h"
 #include "Components/ShapeComponent.h"
 #include "Components/SceneComponent.h"
+#include "GameFramework/Character.h"
 #include "Library/RSFunctionLibrary.h"
+#include "Player/RSGamePLayer.h"
 
 // Sets default values
 ARSAbilityInteractVolume::ARSAbilityInteractVolume()
@@ -23,7 +25,7 @@ ARSAbilityInteractVolume::ARSAbilityInteractVolume()
     SphereComponent->bHiddenInGame = IsHiddenInGame && !IsSphereForm;
     SphereComponent->SetupAttachment(SceneComponent);
     
-    BoxComponent= CreateDefaultSubobject<UBoxComponent>("BoxComponent");
+    BoxComponent = CreateDefaultSubobject<UBoxComponent>("BoxComponent");
     BoxComponent->SetBoxExtent(FVector(SphereRadius,SphereRadius,SphereRadius));
     BoxComponent->SetCollisionProfileName("CharacterMesh");
     BoxComponent->SetGenerateOverlapEvents(true);
@@ -41,6 +43,10 @@ void ARSAbilityInteractVolume::BeginPlay()
     SphereComponent->OnComponentEndOverlap.AddDynamic(this, &ARSAbilityInteractVolume::OnOverlapEnd);
     BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &ARSAbilityInteractVolume::OnOverlapBegin);
     BoxComponent->OnComponentEndOverlap.AddDynamic(this, &ARSAbilityInteractVolume::OnOverlapEnd);
+
+    FTimerHandle TempTimerHandle;
+    GetWorldTimerManager().SetTimer(TempTimerHandle, this, &ARSAbilityInteractVolume::CheckIfCharactersInsideVolume, 0.1);
+    
 }
 
 #if UE_EDITOR
@@ -106,4 +112,26 @@ void ARSAbilityInteractVolume::SetStateChangedValue(const AActor* Actor, const f
         AbilitySystem->SetChangeValue(AbilityStateType, AddValue);
     }
     
+}
+
+void ARSAbilityInteractVolume::CheckIfCharactersInsideVolume()
+{
+
+    TArray<AActor*> OverlappingActors;
+    // if(IsSphereForm)
+    // {
+    //     SphereComponent->GetOverlappingActors(OverlappingActors, ACharacter::StaticClass());
+    // } else
+        if(IsBoxForm)
+    {
+        BoxComponent->GetOverlappingActors(OverlappingActors, ACharacter::StaticClass());
+    }
+        
+    for (auto OverlapActor : OverlappingActors)
+    {
+        if (auto OverlapChar = Cast<ACharacter>(OverlapActor))
+        {
+            OverlapActor->UpdateOverlaps(true);
+        }
+    }
 }

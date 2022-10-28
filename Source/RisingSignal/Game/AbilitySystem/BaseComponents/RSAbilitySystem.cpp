@@ -23,6 +23,8 @@ void URSAbilitySystem::BeginPlay()
     
     GetWorld()->GetTimerManager().SetTimer(TStateChange, this, &URSAbilitySystem::CheckStateChanges, TimerCheckStateRate, true);
     GamePlayerRef = Cast<ARSGamePLayer>(GetOwner());
+
+    //GamePlayerRef->OnTakeAnyDamage.AddDynamic(this, &URSAbilitySystem::OnTakeAnyDamageHandle);
     
 }
 
@@ -121,6 +123,13 @@ float URSAbilitySystem::GetHealthChangedValue()
         }
     }
     return ValueOnChangeHealth;
+}
+
+void URSAbilitySystem::OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy,
+    AActor* DamageCauser)
+{
+    ChangeCurrentStateValue(EAbilityStatesType::Health, -Damage);
+    
 }
 
 void URSAbilitySystem::SetChangeValue(EAbilityStatesType AbilityStateType, float ChangedValueModifier)
