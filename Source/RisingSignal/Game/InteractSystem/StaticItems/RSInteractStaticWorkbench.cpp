@@ -34,14 +34,10 @@ void ARSInteractStaticWorkbench::BeginPlay()
 void ARSInteractStaticWorkbench::OnVolumeBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    LOG_RS(ELogRSVerb::Warning, "Entered");
-
     const auto OverlapChar = Cast<ACharacter>(OtherActor);
 
     if (const auto OverlapComp = Cast<UCapsuleComponent>(OtherComp))
     {
-        LOG_RS(ELogRSVerb::Warning, "Entered2");
-
         CharacterInsideVolume(OverlapChar, true);
     }
 }
@@ -49,7 +45,6 @@ void ARSInteractStaticWorkbench::OnVolumeBeginOverlap(UPrimitiveComponent* Overl
 void ARSInteractStaticWorkbench::OnVolumeEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-
     const auto OverlapComp = Cast<UCapsuleComponent>(OtherComp);
     const auto OverlapChar = Cast<ACharacter>(OtherActor);
 
