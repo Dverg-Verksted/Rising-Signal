@@ -7,6 +7,7 @@
 #include "RSGamePlayerController.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
 #include "Game/Inventory/RSCraftComponent.h"
+#include "Game/WeaponSystem/WeaponComponent.h"
 #include "RSGamePLayer.generated.h"
 
 class USpringArmComponent;
@@ -89,6 +90,8 @@ private:
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
     URSCraftComponent* CraftComponent;
 
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+    UWeaponComponent* WeaponComponent;
 
 #pragma endregion
 

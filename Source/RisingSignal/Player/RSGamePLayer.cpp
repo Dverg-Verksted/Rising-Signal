@@ -40,6 +40,7 @@ ARSGamePLayer::ARSGamePLayer()
     InventoryComponent = CreateDefaultSubobject<URSInventoryComponent>("InventoryComponent");
     EquipmentComponent = CreateDefaultSubobject<URSEquipmentComponent>("EquipmentComponent");
     CraftComponent = CreateDefaultSubobject<URSCraftComponent>("CraftComponent");
+    WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("WeaponComponent");
 }
 
 void ARSGamePLayer::BeginPlay()
@@ -95,6 +96,8 @@ void ARSGamePLayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
     PlayerInputComponent->BindAction(TEXT("ActionSlot2"), IE_Pressed, this, &ARSGamePLayer::InputActionSlot2);
     PlayerInputComponent->BindAction(TEXT("ActionSlot3"), IE_Pressed, this, &ARSGamePLayer::InputActionSlot3);
     PlayerInputComponent->BindAction(TEXT("ActionSlot4"), IE_Pressed, this, &ARSGamePLayer::InputActionSlot4);
+
+    PlayerInputComponent->BindAction(TEXT("Attack"), IE_Pressed, WeaponComponent, &UWeaponComponent::StartAttack);
 }
 
 void ARSGamePLayer::InputLookUp(const float Value)
