@@ -26,6 +26,7 @@ enum ESlots
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySignature);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJournalSignature);
 
 /**
@@ -68,7 +69,7 @@ public:
 
     UFUNCTION(BlueprintGetter)
     FORCEINLINE URSCraftComponent* GetCraftComponent() const { return CraftComponent; }
-    
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     URSAbilitySystem* AbilitySystem;
 
@@ -139,13 +140,7 @@ private:
 
     void InputJumpReleased();
 
-    void InputRotationModePressed();
-
     void InputRagdollPressed();
-
-    void InputViewModePressed();
-
-    void InputSwitchShoulderPressed();
 
     void InputActionSlot1();
 
@@ -167,7 +162,6 @@ public:
 #pragma region Extension
 
 public:
-    
     UPROPERTY(BlueprintReadOnly)
     ARSGamePlayerController* GamePlayerController;
 
@@ -177,22 +171,22 @@ public:
     UPROPERTY(BlueprintAssignable)
     FOnJournalSignature JournalOpenClose;
 
-    virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+    virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+        AActor* DamageCauser) override;
 
 private:
-
     bool canRun = true;
-    
+
     /**
      * @brief Open inventory in game HUD
      */
     void OpenCloseInventory();
-    
+
     /**
      * @brief Open Journal in game HUD
      */
     void OpenCloseJournal();
-    
+
     /**
      * @brief Call on ability system states changes
      * @param StateTyp - Type of changed ability state
@@ -200,7 +194,7 @@ private:
      */
     UFUNCTION()
     void CheckSomeState(EAbilityStatesType StateTyp, float Value);
-    
+
     UFUNCTION()
     void RegisterDeath();
 

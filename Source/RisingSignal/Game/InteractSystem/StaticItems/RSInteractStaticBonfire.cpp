@@ -19,6 +19,7 @@ ARSInteractStaticBonfire::ARSInteractStaticBonfire()
     HeatVolume = CreateDefaultSubobject<USphereComponent>("HeatVolume");
     HeatVolume->SetupAttachment(BaseMesh);
     HeatVolume->SetSphereRadius(HeatVolumeRadius);
+    HeatVolume->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
     FireVFX = CreateDefaultSubobject<UParticleSystemComponent>("Fire");
     FireVFX->SetupAttachment(RootComponent);
@@ -42,7 +43,10 @@ void ARSInteractStaticBonfire::BeginPlay()
     if (bIsFired)
     {
         FTimerHandle TempTimerHandle;
-        GetWorldTimerManager().SetTimer(TempTimerHandle, this, &ARSInteractStaticBonfire::CheckIfCharactersInsideVolume, 0.1);
+        GetWorldTimerManager().SetTimer(TempTimerHandle, [&]()
+        {
+            HeatVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+        }, 0.1, false);
     }
 
     SetEnabledVFX(bIsFired);
@@ -162,7 +166,9 @@ void ARSInteractStaticBonfire::SetFire(bool bSetFire)
 
     bIsFired = bSetFire;
 
-    CheckIfCharactersInsideVolume();
+    HeatVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+
+    // CheckIfCharactersInsideVolume();
 }
 
 #if UE_EDITOR
@@ -195,18 +201,3 @@ void ARSInteractStaticBonfire::PostEditChangeProperty(FPropertyChangedEvent& Pro
 
 #endif
 
-void ARSInteractStaticBonfire::CheckIfCharactersInsideVolume()
-{
-    if (!bIsFired) return;
-
-    TArray<AActor*> OverlappingActors;
-    HeatVolume->GetOverlappingActors(OverlappingActors, ACharacter::StaticClass());
-
-    for (auto OverlapActor : OverlappingActors)
-    {
-        if (auto OverlapChar = Cast<ACharacter>(OverlapActor))
-        {
-            CharacterInsideVolume(OverlapChar, true);
-        }
-    }
-}

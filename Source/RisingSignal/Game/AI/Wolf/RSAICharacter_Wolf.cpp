@@ -20,7 +20,12 @@ void ARSAICharacter_Wolf::BeginPlay()
 {
     Super::BeginPlay();
 
-    check(AIController);
+    if (!AIController)
+    {
+        LOG_RS(ELogRSVerb::Error, "No Controller Set for "+GetName());
+        return;
+    }
+
     if (SwitchColorCurve)
     {
         FOnTimelineFloat TimelineProgress;
@@ -111,6 +116,7 @@ void ARSAICharacter_Wolf::InitAnimations()
         const auto BiteNotify = Cast<URSBiteAnimNotify>(NotifyEvent.Notify);
         if (BiteNotify)
         {
+            LOG_RS(ELogRSVerb::Warning, "Done");
             BiteNotify->OnNotified.AddUObject(this, &ARSAICharacter_Wolf::ProvideDamage);
             break;
         }
