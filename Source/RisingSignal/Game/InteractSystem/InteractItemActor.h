@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "InteractDataItem.h"
 #include "Engine/DataTable.h"
-#include "Game/Inventory/RSInventoryComponent.h"
+#include "Game/Inventory/InventoryTypes.h"
 #include "GameFramework/Actor.h"
 #include "InteractItemActor.generated.h"
 
