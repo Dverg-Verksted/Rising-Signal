@@ -366,7 +366,7 @@ bool URSInventoryComponent::FindItemsToUse(TArray<FNeededItem>& NeedItems)
         const FInventoryItem NeedInventoryItem = FindItemData(NeedItem.ItemRowHandle);
         const FInventoryItem* CurrentItem = InventoryItems.FindByPredicate([=](const FInventoryItem& Item)
         {
-            return Item == NeedInventoryItem && NeedItem.ItemCount == Item.Count;
+            return Item == NeedInventoryItem && NeedItem.ItemCount <= Item.Count;
         });
         if (CurrentItem)
         {
