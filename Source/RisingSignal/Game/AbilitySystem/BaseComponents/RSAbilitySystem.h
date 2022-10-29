@@ -58,6 +58,7 @@ struct FStateParams
     UPROPERTY(EditDefaultsOnly,
         meta = (ToolTip = "Значение, на которое будет изменяться значение параметра при восстановлении или убавлении"))
     float ChangedValue = 0.0f;
+    
 };
 
 #pragma region Delegates
@@ -78,11 +79,7 @@ class RISINGSIGNAL_API URSAbilitySystem : public UActorComponent
 public:
     // Sets default values for this component's properties
     URSAbilitySystem();
-
-    // Set new change value in state in ability system with AbilityStateType
-    UFUNCTION()
-    void SetChangeValue(EAbilityStatesType AbilityStateType, float ChangedValueModifier);
-
+    
     UPROPERTY(BlueprintAssignable)
     FOnStateChangedSignature OnStateChangedSignature;
 
@@ -125,6 +122,16 @@ public:
      */
     UFUNCTION(BlueprintCallable)
     void ChangeCurrentStateValue(EAbilityStatesType StateTy, float AddValue);
+    
+    // Set new change value in state in ability system with AbilityStateType
+    UFUNCTION()
+    void SetChangeValue(EAbilityStatesType AbilityStateType, float ChangedValueModifier);
+
+    // Return true if player is dead
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    bool GetIsPlayerDead() const {
+        return GetCurrentStateValue(EAbilityStatesType::Health) == 0.0f;
+    }
 
     /**
      * @brief Need for getting choose state from states in ability system
@@ -133,6 +140,10 @@ public:
      */
     UFUNCTION(BlueprintCallable)
     FStateParams GetState(EAbilityStatesType AbilityStateType);
+
+    UFUNCTION()
+    void OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
+       class AController* InstigatedBy, AActor* DamageCauser);
 
 private:
     // control on state changes, it check all state on new change value
@@ -159,7 +170,7 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Критический уровень здоровья ниже или равен",
         meta = (ToolTip = "Ниже или равно какому значению, у игрока будет критический уровень здоровья"))
     float ValueHealthWhenItCriticalLevel = 20.0f;
-
+    
 
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Регенерация здоровья от Сытости",
         meta = (ToolTip = "Ниже или равно какому значению, у игрока будет регенерироваться здоровье от сытости"))
@@ -207,9 +218,12 @@ private:
     UPROPERTY(EditDefaultsOnly, Category= "Ability states")
     float TimerCheckStateRate = 0.1f;
 
+    // if true, player cannot die
+    UPROPERTY(EditDefaultsOnly,
+            meta = (ToolTip = "Режим бога, ты есть все, ты есть вся"))
+    bool GodMode = false;
+
 #pragma endregion AbilitySystemParams
 
-    UFUNCTION()
-    void OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
-        class AController* InstigatedBy, AActor* DamageCauser);
+   
 };

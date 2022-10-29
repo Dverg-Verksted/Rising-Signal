@@ -25,6 +25,7 @@ void URSAbilitySystem::BeginPlay()
     Super::BeginPlay();
 
     GetWorld()->GetTimerManager().SetTimer(TStateChange, this, &URSAbilitySystem::CheckStateChanges, TimerCheckStateRate, true);
+
     GamePlayerRef = Cast<ARSGamePLayer>(GetOwner());
     OwnerRef = Cast<ACharacter>(GetOwner());
 
@@ -90,58 +91,66 @@ float URSAbilitySystem::GetStaminaChangedValue()
 float URSAbilitySystem::GetHealthChangedValue()
 {
     float ValueOnChangeHealth = 0.0f;
-    bool bHealthIsCriticalLevel = false;
-    for (auto const& State : States)
+    
+    if(GodMode)
     {
-        if (State.StateType == EAbilityStatesType::Health)
+        bool bHealthIsCriticalLevel = false;
+        for (auto const& State : States)
         {
-            if (State.CurrentValue <= ValueHealthWhenItCriticalLevel)
+            if (State.StateType == EAbilityStatesType::Health)
             {
-                bHealthIsCriticalLevel = true;
+                if (State.CurrentValue <= ValueHealthWhenItCriticalLevel)
+                {
+                    bHealthIsCriticalLevel = true;
+                }
             }
-        }
-    }
+        }    
 
-    for (auto const& State : States)
-    {
-        // check relation with hungry state
-        if (State.StateType == EAbilityStatesType::Hungry)
+        for (auto const& State : States)
         {
-            // if player is not hungry, make regeneration hp
-            if (State.CurrentValue <= State.AfterIsDebafHungry)
+            // check relation with hungry state
+            if (State.StateType == EAbilityStatesType::Hungry)
             {
-                ValueOnChangeHealth -= State.ChangedValue * TimerCheckStateRate;
+                // if player is not hungry, make regeneration hp
+                if (State.CurrentValue <= State.AfterIsDebafHungry)
+                {
+                    ValueOnChangeHealth -= State.ChangedValue * TimerCheckStateRate;
+                }
+                // if player is hungry, make decrease hp
+                if (State.CurrentValue <= ValueHungryWhenItNeedToRegeneration && bHealthIsCriticalLevel)
+                {
+                    ValueOnChangeHealth += State.ChangedValue * TimerCheckStateRate;
+                }
             }
-            // if player is hungry, make decrease hp
-            if (State.CurrentValue <= ValueHungryWhenItNeedToRegeneration && bHealthIsCriticalLevel)
+            // check relation with temperature state
+            if (State.StateType == EAbilityStatesType::Temp)
             {
-                ValueOnChangeHealth += State.ChangedValue * TimerCheckStateRate;
-            }
-        }
-        // check relation with temperature state
-        if (State.StateType == EAbilityStatesType::Temp)
-        {
-            if (State.CurrentValue >= State.AfterIsDebafTemp)
-            {
-                ValueOnChangeHealth -= State.ChangedValue * TimerCheckStateRate;
-            }
-            // if player is hungry, make decrease hp
-            if (State.CurrentValue <= ValueTempWhenItNeedToRegeneration && bHealthIsCriticalLevel)
-            {
-                ValueOnChangeHealth += State.ChangedValue * TimerCheckStateRate;
+                if (State.CurrentValue >= State.AfterIsDebafTemp)
+                {
+                    ValueOnChangeHealth -= State.ChangedValue * TimerCheckStateRate;
+                }
+                // if player is hungry, make decrease hp
+                if (State.CurrentValue <= ValueTempWhenItNeedToRegeneration && bHealthIsCriticalLevel)
+                {
+                    ValueOnChangeHealth += State.ChangedValue * TimerCheckStateRate;
+                }
             }
         }
     }
+    
     return ValueOnChangeHealth;
+    
 }
 
 void URSAbilitySystem::OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy,
     AActor* DamageCauser)
 {
-    ChangeCurrentStateValue(EAbilityStatesType::Health, -Damage);
+    
+    if(!GodMode)
+        ChangeCurrentStateValue(EAbilityStatesType::Health, -Damage);
     
     // Death check
-    if (GetCurrentStateValue(EAbilityStatesType::Health) <= 0)
+    if (GetCurrentStateValue(EAbilityStatesType::Health) <= 0 && !GodMode)
     {
         OnDeath.Broadcast();
     }
