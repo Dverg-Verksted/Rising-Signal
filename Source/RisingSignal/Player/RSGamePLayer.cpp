@@ -4,6 +4,7 @@
 #include "AlsCameraComponent.h"
 #include "AlsCharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
@@ -288,6 +289,12 @@ void ARSGamePLayer::CheckSomeState(EAbilityStatesType StateTyp, float Value)
 void ARSGamePLayer::RegisterDeath()
 {
     // some death logic for player
+    this->GetCharacterMovement()->DisableMovement();
+    this->SetLifeSpan(5);
+    this->GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+    this->GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+    this->GetMesh()->SetSimulatePhysics(true);
+    this->DisableInput(this->GetController<APlayerController>());
 }
 
 float ARSGamePLayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

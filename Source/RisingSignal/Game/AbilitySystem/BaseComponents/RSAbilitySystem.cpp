@@ -139,15 +139,11 @@ void URSAbilitySystem::OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage,
     AActor* DamageCauser)
 {
     ChangeCurrentStateValue(EAbilityStatesType::Health, -Damage);
-
+    
+    // Death check
     if (GetCurrentStateValue(EAbilityStatesType::Health) <= 0)
     {
-        OwnerRef->GetCharacterMovement()->DisableMovement();
-        OwnerRef->SetLifeSpan(5);
-        OwnerRef->GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-        OwnerRef->GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-        OwnerRef->GetMesh()->SetSimulatePhysics(true);
-        OwnerRef->DisableInput(OwnerRef->GetController<APlayerController>());
+        OnDeath.Broadcast();
     }
 }
 
