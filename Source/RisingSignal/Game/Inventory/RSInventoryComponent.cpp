@@ -3,6 +3,7 @@
 #include "Game/Inventory/RSCraftComponent.h"
 #include "Game/InteractSystem/InteractItemActor.h"
 #include "Game/InteractSystem/RSInteractStaticItemBase.h"
+#include "Library/RSFunctionLibrary.h"
 
 
 FInventoryItem::FInventoryItem(const FInventoryItem* OtherItem)
@@ -170,7 +171,8 @@ bool URSInventoryComponent::MoveItemInventory(const FInventoryItem& FirstInvento
                 return true;
             }
 
-            if (FirstInventorySlot.InteractRowName == SecondInventorySlot.InteractRowName && FirstInventorySlot.SlotIndex != SecondInventorySlot
+            if (FirstInventorySlot.InteractRowName == SecondInventorySlot.InteractRowName && FirstInventorySlot.SlotIndex !=
+                SecondInventorySlot
                 .SlotIndex &&
                 FirstInventorySlot.bStack)
             {
@@ -178,7 +180,8 @@ bool URSInventoryComponent::MoveItemInventory(const FInventoryItem& FirstInvento
                 return true;
             }
 
-            if (FirstInventorySlot.InteractRowName != SecondInventorySlot.InteractRowName || SecondInventorySlot.InteractRowName == NAME_None)
+            if (FirstInventorySlot.InteractRowName != SecondInventorySlot.InteractRowName || SecondInventorySlot.InteractRowName ==
+                NAME_None)
             {
                 SwapItem(FirstInventorySlot, SecondInventorySlot);
                 return true;
@@ -206,7 +209,7 @@ bool URSInventoryComponent::MoveItemInventory(const FInventoryItem& FirstInvento
             return true;
         }
     }
-    
+
     return false;
 }
 
@@ -279,7 +282,7 @@ bool URSInventoryComponent::MoveItemCraft(const FInventoryItem& FirstInventorySl
 
             CraftComponent->RemoveItem(FirstInventorySlot);
             UpdateSlot(SecondInventorySlot.SlotIndex, FirstInventorySlot, FirstInventorySlot.Count);
-            
+
             for (auto Item : CraftComponent->UsedItems)
             {
                 if (FirstInventorySlot == Item)
@@ -289,7 +292,7 @@ bool URSInventoryComponent::MoveItemCraft(const FInventoryItem& FirstInventorySl
                     break;
                 }
             }
-            
+
             return true;
         }
         case ETypeComponent::Equipment:
@@ -358,24 +361,30 @@ FInventoryItem* URSInventoryComponent::FindFreeSlot()
 bool URSInventoryComponent::FindItemsToUse(TArray<FNeededItem>& NeedItems)
 {
     TArray<FInventoryItem> FoundItems;
-    for(const FNeededItem& NeedItem : NeedItems)
+    for (const FNeededItem& NeedItem : NeedItems)
     {
         const FInventoryItem NeedInventoryItem = FindItemData(NeedItem.ItemRowHandle);
-        const FInventoryItem* CurrentItem = InventoryItems.FindByPredicate([=](const FInventoryItem& Item) { return Item == NeedInventoryItem && NeedItem.ItemCount == Item.Count; });
-        if(CurrentItem)
+        const FInventoryItem* CurrentItem = InventoryItems.FindByPredicate([=](const FInventoryItem& Item)
+        {
+            return Item == NeedInventoryItem && NeedItem.ItemCount <= Item.Count;
+        });
+        if (CurrentItem)
         {
             FoundItems.Add(*CurrentItem);
         }
     }
 
-    if(FoundItems.Num() == NeedItems.Num())
+    if (FoundItems.Num() == NeedItems.Num())
     {
-        for(const FInventoryItem& Item : FoundItems)
+        LOG_RS(ELogRSVerb::Warning, FString::FromInt(FoundItems.Num()) + " " + FString::FromInt(NeedItems.Num()));
+
+        for (const FInventoryItem& Item : FoundItems)
         {
+            LOG_RS(ELogRSVerb::Warning, Item.Name.ToString()+" "+FString::FromInt(Item.Count)+ " removed");
             RemoveItem(Item, Item.Count, true);
             GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Items found")));
-            return true;
         }
+        return true;
     }
 
     GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Items not found")));

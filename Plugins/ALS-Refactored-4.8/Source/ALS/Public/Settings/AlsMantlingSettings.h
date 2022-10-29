@@ -122,4 +122,10 @@ struct ALS_API FAlsGeneralMantlingSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<TEnumAsByte<EObjectTypeQuery>> MantlingTraceObjectTypes;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float MantlingMaxVerticalSpeed{1000.0f};
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float MantlingMinVerticalSpeed{100.0f};    
 };

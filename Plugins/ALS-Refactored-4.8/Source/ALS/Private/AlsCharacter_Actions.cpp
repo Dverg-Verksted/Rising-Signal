@@ -36,7 +36,9 @@ bool AAlsCharacter::IsMantlingAllowedToStart() const
 
 bool AAlsCharacter::TryStartMantling(const FAlsMantlingTraceSettings& TraceSettings)
 {
-	if (!Settings->Mantling.bAllowMantling || GetLocalRole() <= ROLE_SimulatedProxy || !IsMantlingAllowedToStart())
+	if (!Settings->Mantling.bAllowMantling || GetLocalRole() <= ROLE_SimulatedProxy || !IsMantlingAllowedToStart() ||
+	    !(GetCharacterMovement()->Velocity.Z > -Settings->Mantling.MantlingMaxVerticalSpeed &&
+	        GetCharacterMovement()->Velocity.Z < -Settings->Mantling.MantlingMinVerticalSpeed))
 	{
 		return false;
 	}
