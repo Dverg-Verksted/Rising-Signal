@@ -15,8 +15,8 @@ void AGameHUD::DrawHUD()
         // AddInt(TEXT("Test function AddInt"), 228);
         // AddBool(TEXT("Test function AddBool"), false);
         // AddBool(TEXT("Test function AddBool"), true);
-        AddText(TEXT("Inventory"), FText::FromString("Press I - Show Inventory"));
-        AddText(TEXT("Journal"), FText::FromString("Press J - Show Journal"));
+        //AddText(TEXT("Inventory"), FText::FromString("Press I - Show Inventory"));
+        //AddText(TEXT("Journal"), FText::FromString("Press J - Show Journal"));
     }
 }
 
