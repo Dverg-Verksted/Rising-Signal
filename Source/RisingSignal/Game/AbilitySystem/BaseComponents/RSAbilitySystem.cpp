@@ -61,6 +61,11 @@ void URSAbilitySystem::CheckStateChanges()
     {
         State.CurrentValue = FMath::Clamp(State.CurrentValue += State.ChangedValue, State.MinValue, State.MaxValue);
 
+        if(State.StateType == EAbilityStatesType::Health && State.CurrentValue == 0)
+        {
+            OnDeath.Broadcast();
+        }
+        
         if (OnStateChangedSignature.IsBound())
         {
             OnStateChangedSignature.Broadcast(State.StateType, State.CurrentValue);
