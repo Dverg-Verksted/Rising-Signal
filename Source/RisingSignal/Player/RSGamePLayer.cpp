@@ -63,6 +63,29 @@ void ARSGamePLayer::CalcCamera(float DeltaTime, FMinimalViewInfo& ViewInfo)
     Super::CalcCamera(DeltaTime, ViewInfo);
 }
 
+void ARSGamePLayer::Falling()
+{
+    Super::Falling();
+    GetCharacterMovement()->bNotifyApex = true;
+}
+
+void ARSGamePLayer::Landed(const FHitResult& Hit)
+{
+    Super::Landed(Hit);
+    const float FallHeight = (CurrentHeight - GetActorLocation().Z) * 0.01;
+    if(IsValid(FallDamageCurve))
+    {
+        const float DamageAmount = FallDamageCurve->GetFloatValue(FallHeight);
+        AbilitySystem->ChangeCurrentStateValue(EAbilityStatesType::Health, -DamageAmount);
+    }
+}
+
+void ARSGamePLayer::NotifyJumpApex()
+{
+    Super::NotifyJumpApex();
+    CurrentHeight = GetActorLocation().Z;
+}
+
 #pragma endregion
 
 #pragma region PlayerInput

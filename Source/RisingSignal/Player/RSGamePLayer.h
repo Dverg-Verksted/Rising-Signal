@@ -57,6 +57,16 @@ public:
 
     virtual void CalcCamera(float DeltaTime, FMinimalViewInfo& ViewInfo) override;
 
+    virtual void Falling() override;
+    virtual void Landed(const FHitResult& Hit) override;
+    virtual void NotifyJumpApex() override;
+
+    UPROPERTY()
+    float CurrentHeight = 0.0f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Falls")
+    UCurveFloat* FallDamageCurve;
+
 #pragma endregion
 
 #pragma region Components
