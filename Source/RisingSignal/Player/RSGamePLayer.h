@@ -7,6 +7,7 @@
 #include "RSGamePlayerController.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
 #include "Game/Inventory/RSCraftComponent.h"
+#include "Game/WeaponSystem/WeaponComponent.h"
 #include "RSGamePLayer.generated.h"
 
 class USpringArmComponent;
@@ -56,6 +57,16 @@ public:
 
     virtual void CalcCamera(float DeltaTime, FMinimalViewInfo& ViewInfo) override;
 
+    virtual void Falling() override;
+    virtual void Landed(const FHitResult& Hit) override;
+    virtual void NotifyJumpApex() override;
+
+    UPROPERTY()
+    float CurrentHeight = 0.0f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Falls")
+    UCurveFloat* FallDamageCurve;
+
 #pragma endregion
 
 #pragma region Components
@@ -89,6 +100,8 @@ private:
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
     URSCraftComponent* CraftComponent;
 
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+    UWeaponComponent* WeaponComponent;
 
 #pragma endregion
 
