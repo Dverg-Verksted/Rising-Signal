@@ -14,8 +14,7 @@ FInventoryItem::FInventoryItem(const FInventoryItem* OtherItem)
     CostDurability = OtherItem->CostDurability;
     TypeComponent = OtherItem->TypeComponent;
     ImageItem = OtherItem->ImageItem;
-    bCanEquip = OtherItem->bCanEquip;
-    bCanCraft = OtherItem->bCanCraft;
+    bIsWeapon = OtherItem->bIsWeapon;
     bStack = OtherItem->bStack;
     bCanUse = OtherItem->bCanUse;
     MaxCount = OtherItem->MaxCount;
@@ -172,9 +171,7 @@ bool URSInventoryComponent::MoveItemInventory(const FInventoryItem& FirstInvento
             }
 
             if (FirstInventorySlot.InteractRowName == SecondInventorySlot.InteractRowName && FirstInventorySlot.SlotIndex !=
-                SecondInventorySlot
-                .SlotIndex &&
-                FirstInventorySlot.bStack)
+                SecondInventorySlot.SlotIndex && FirstInventorySlot.bStack)
             {
                 CombineItem(FirstInventorySlot, SecondInventorySlot);
                 return true;
@@ -376,11 +373,8 @@ bool URSInventoryComponent::FindItemsToUse(TArray<FNeededItem>& NeedItems)
 
     if (FoundItems.Num() == NeedItems.Num())
     {
-        LOG_RS(ELogRSVerb::Warning, FString::FromInt(FoundItems.Num()) + " " + FString::FromInt(NeedItems.Num()));
-
         for (const FInventoryItem& Item : FoundItems)
         {
-            LOG_RS(ELogRSVerb::Warning, Item.Name.ToString()+" "+FString::FromInt(Item.Count)+ " removed");
             RemoveItem(Item, Item.Count, true);
             GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Items found")));
         }

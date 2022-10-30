@@ -5,9 +5,19 @@
 
 #include "Library/RSFunctionLibrary.h"
 
-void ARSRangedWeapon::StartFire(){}
+void ARSRangedWeapon::StartAiming()
+{
+    //TODO
+}
 
-void ARSRangedWeapon::StopFire(){}
+void ARSRangedWeapon::StopAiming()
+{
+    //TODO
+}
+
+void ARSRangedWeapon::StartAttack(){}
+
+void ARSRangedWeapon::StopAttack(){}
 
 void ARSRangedWeapon::ChangeClip()
 {
@@ -64,7 +74,7 @@ void ARSRangedWeapon::DecreaseAmmo()
 
     if (IsClipEmpty() && !IsAmmoEmpty())
     {
-        StopFire();
+        StopAttack();
         FOnClipEmpty.Broadcast();
     }
 }

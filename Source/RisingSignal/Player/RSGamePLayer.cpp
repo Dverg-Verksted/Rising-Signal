@@ -4,6 +4,7 @@
 #include "AlsCameraComponent.h"
 #include "AlsCharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
@@ -40,6 +41,7 @@ ARSGamePLayer::ARSGamePLayer()
     InventoryComponent = CreateDefaultSubobject<URSInventoryComponent>("InventoryComponent");
     EquipmentComponent = CreateDefaultSubobject<URSEquipmentComponent>("EquipmentComponent");
     CraftComponent = CreateDefaultSubobject<URSCraftComponent>("CraftComponent");
+    WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("WeaponComponent");
 }
 
 void ARSGamePLayer::BeginPlay()
@@ -59,6 +61,29 @@ void ARSGamePLayer::Tick(float DeltaSeconds)
 void ARSGamePLayer::CalcCamera(float DeltaTime, FMinimalViewInfo& ViewInfo)
 {
     Super::CalcCamera(DeltaTime, ViewInfo);
+}
+
+void ARSGamePLayer::Falling()
+{
+    Super::Falling();
+    GetCharacterMovement()->bNotifyApex = true;
+}
+
+void ARSGamePLayer::Landed(const FHitResult& Hit)
+{
+    Super::Landed(Hit);
+    const float FallHeight = (CurrentHeight - GetActorLocation().Z) * 0.01;
+    if(IsValid(FallDamageCurve))
+    {
+        const float DamageAmount = FallDamageCurve->GetFloatValue(FallHeight);
+        AbilitySystem->ChangeCurrentStateValue(EAbilityStatesType::Health, -DamageAmount);
+    }
+}
+
+void ARSGamePLayer::NotifyJumpApex()
+{
+    Super::NotifyJumpApex();
+    CurrentHeight = GetActorLocation().Z;
 }
 
 #pragma endregion
@@ -95,6 +120,8 @@ void ARSGamePLayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
     PlayerInputComponent->BindAction(TEXT("ActionSlot2"), IE_Pressed, this, &ARSGamePLayer::InputActionSlot2);
     PlayerInputComponent->BindAction(TEXT("ActionSlot3"), IE_Pressed, this, &ARSGamePLayer::InputActionSlot3);
     PlayerInputComponent->BindAction(TEXT("ActionSlot4"), IE_Pressed, this, &ARSGamePLayer::InputActionSlot4);
+
+    PlayerInputComponent->BindAction(TEXT("Attack"), IE_Pressed, WeaponComponent, &UWeaponComponent::StartAttack);
 }
 
 void ARSGamePLayer::InputLookUp(const float Value)
@@ -285,12 +312,16 @@ void ARSGamePLayer::CheckSomeState(EAbilityStatesType StateTyp, float Value)
 void ARSGamePLayer::RegisterDeath()
 {
     // some death logic for player
+    this->GetCharacterMovement()->DisableMovement();
+    this->SetLifeSpan(5);
+    this->GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+    this->GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+    this->GetMesh()->SetSimulatePhysics(true);
+    this->DisableInput(this->GetController<APlayerController>());
 }
 
 float ARSGamePLayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-    AbilitySystem->ChangeCurrentStateValue(EAbilityStatesType::Health, -1 * DamageAmount);
-
     return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
