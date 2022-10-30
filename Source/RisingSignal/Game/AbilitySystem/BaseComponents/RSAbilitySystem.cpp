@@ -55,7 +55,10 @@ void URSAbilitySystem::CheckStateChanges()
         {
             State.ChangedValue = GetStaminaChangedValue();
         }
-
+    }
+    
+    for (auto& State : States)
+    {
         State.CurrentValue = FMath::Clamp(State.CurrentValue += State.ChangedValue, State.MinValue, State.MaxValue);
 
         if (OnStateChangedSignature.IsBound())
@@ -91,51 +94,35 @@ float URSAbilitySystem::GetStaminaChangedValue()
 float URSAbilitySystem::GetHealthChangedValue()
 {
     float ValueOnChangeHealth = 0.0f;
+    bool bHealthIsCriticalLevel = false;
     
-    if(GodMode)
+    if(!GodMode)
     {
-        bool bHealthIsCriticalLevel = false;
-        for (auto const& State : States)
+        if (GetState(EAbilityStatesType::Health).CurrentValue <= ValueHealthWhenItCriticalLevel)
         {
-            if (State.StateType == EAbilityStatesType::Health)
-            {
-                if (State.CurrentValue <= ValueHealthWhenItCriticalLevel)
-                {
-                    bHealthIsCriticalLevel = true;
-                }
-            }
-        }    
-
-        for (auto const& State : States)
-        {
-            // check relation with hungry state
-            if (State.StateType == EAbilityStatesType::Hungry)
-            {
-                // if player is not hungry, make regeneration hp
-                if (State.CurrentValue <= State.AfterIsDebafHungry)
-                {
-                    ValueOnChangeHealth -= State.ChangedValue * TimerCheckStateRate;
-                }
-                // if player is hungry, make decrease hp
-                if (State.CurrentValue <= ValueHungryWhenItNeedToRegeneration && bHealthIsCriticalLevel)
-                {
-                    ValueOnChangeHealth += State.ChangedValue * TimerCheckStateRate;
-                }
-            }
-            // check relation with temperature state
-            if (State.StateType == EAbilityStatesType::Temp)
-            {
-                if (State.CurrentValue >= State.AfterIsDebafTemp)
-                {
-                    ValueOnChangeHealth -= State.ChangedValue * TimerCheckStateRate;
-                }
-                // if player is hungry, make decrease hp
-                if (State.CurrentValue <= ValueTempWhenItNeedToRegeneration && bHealthIsCriticalLevel)
-                {
-                    ValueOnChangeHealth += State.ChangedValue * TimerCheckStateRate;
-                }
-            }
+            bHealthIsCriticalLevel = true;
         }
+        
+        if (GetState(EAbilityStatesType::Hungry).CurrentValue >= GetState(EAbilityStatesType::Hungry).AfterIsDebafHungry)
+        {
+            ValueOnChangeHealth -= 10 * TimerCheckStateRate;
+        }
+        
+        if (GetState(EAbilityStatesType::Hungry).CurrentValue <= ValueHungryWhenItNeedToRegeneration && bHealthIsCriticalLevel)
+        {
+            ValueOnChangeHealth += 10 * TimerCheckStateRate;
+        }
+        
+        if (GetState(EAbilityStatesType::Temp).CurrentValue <= GetState(EAbilityStatesType::Temp).AfterIsDebafTemp)
+        {
+            ValueOnChangeHealth -= 10 * TimerCheckStateRate;
+        }
+        
+        if (GetState(EAbilityStatesType::Temp).CurrentValue >= ValueTempWhenItNeedToRegeneration && bHealthIsCriticalLevel)
+        {
+            ValueOnChangeHealth += 10 * TimerCheckStateRate;
+        }
+        
     }
     
     return ValueOnChangeHealth;
@@ -147,7 +134,9 @@ void URSAbilitySystem::OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage,
 {
     
     if(!GodMode)
+    {
         ChangeCurrentStateValue(EAbilityStatesType::Health, -Damage);
+    }
     
     // Death check
     if (GetCurrentStateValue(EAbilityStatesType::Health) <= 0 && !GodMode)
@@ -192,6 +181,8 @@ void URSAbilitySystem::ChangeCurrentStateValue(EAbilityStatesType StateTy, float
     }
 }
 
+
+
 FStateParams URSAbilitySystem::GetState(EAbilityStatesType AbilityStateType)
 {
     for (auto& State : States)
@@ -203,6 +194,7 @@ FStateParams URSAbilitySystem::GetState(EAbilityStatesType AbilityStateType)
     }
 
     return FStateParams();
+
 }
 
 #pragma endregion Functions

@@ -104,61 +104,6 @@ protected:
 
 #pragma endregion Defaults
 
-#pragma region Functions
-
-public:
-    // Getter for return current any state in TArray States
-    UFUNCTION(BlueprintCallable, BlueprintPure)
-    float GetCurrentStateValue(EAbilityStatesType SearchState) const;
-
-    UFUNCTION(BlueprintCallable, BlueprintPure)
-    FORCEINLINE
-    bool GetIsDead() const { return bIsDead; }
-
-    /* Universal func on change any state in TArray States
-     * Has a check for the presence of a parameter
-     * On input get type of state and change value,
-     * if damage (decrease state value) should send parameter with minus
-     */
-    UFUNCTION(BlueprintCallable)
-    void ChangeCurrentStateValue(EAbilityStatesType StateTy, float AddValue);
-    
-    // Set new change value in state in ability system with AbilityStateType
-    UFUNCTION()
-    void SetChangeValue(EAbilityStatesType AbilityStateType, float ChangedValueModifier);
-
-    // Return true if player is dead
-    UFUNCTION(BlueprintCallable, BlueprintPure)
-    bool GetIsPlayerDead() const {
-        return GetCurrentStateValue(EAbilityStatesType::Health) == 0.0f;
-    }
-
-    /**
-     * @brief Need for getting choose state from states in ability system
-     * @param AbilityStateType - state`s type which will be returned
-     * @return - return State from ability system states
-     */
-    UFUNCTION(BlueprintCallable)
-    FStateParams GetState(EAbilityStatesType AbilityStateType);
-
-    UFUNCTION()
-    void OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
-       class AController* InstigatedBy, AActor* DamageCauser);
-
-private:
-    // control on state changes, it check all state on new change value
-    UFUNCTION()
-    void CheckStateChanges();
-
-    // need to count how mach Stamina need to change
-    UFUNCTION()
-    float GetStaminaChangedValue();
-
-    // need to count how mach Health need to change
-    UFUNCTION()
-    float GetHealthChangedValue();
-
-#pragma endregion Functions
 
 #pragma region AbilitySystemParams
 
@@ -224,6 +169,63 @@ private:
     bool GodMode = false;
 
 #pragma endregion AbilitySystemParams
+
+#pragma region Functions
+
+public:
+    // Getter for return current any state in TArray States
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    float GetCurrentStateValue(EAbilityStatesType SearchState) const;
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    FORCEINLINE
+    bool GetIsDead() const { return bIsDead; }
+
+    /* Universal func on change any state in TArray States
+     * Has a check for the presence of a parameter
+     * On input get type of state and change value,
+     * if damage (decrease state value) should send parameter with minus
+     */
+    UFUNCTION(BlueprintCallable)
+    void ChangeCurrentStateValue(EAbilityStatesType StateTy, float AddValue);
+    
+    // Set new change value in state in ability system with AbilityStateType
+    UFUNCTION()
+    void SetChangeValue(EAbilityStatesType AbilityStateType, float ChangedValueModifier);
+
+    // Return true if player is dead
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    bool GetIsPlayerDead() const {
+        return GetCurrentStateValue(EAbilityStatesType::Health) == 0.0f;
+    }
+
+    /**
+     * @brief Need for getting choose state from states in ability system
+     * @param AbilityStateType - state`s type which will be returned
+     * @return - return State from ability system states
+     */
+    UFUNCTION(BlueprintCallable)
+    FStateParams GetState(EAbilityStatesType AbilityStateType);
+
+    UFUNCTION()
+    void OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
+       class AController* InstigatedBy, AActor* DamageCauser);
+
+private:
+    // control on state changes, it check all state on new change value
+    UFUNCTION()
+    void CheckStateChanges();
+
+    // need to count how mach Stamina need to change
+    UFUNCTION()
+    float GetStaminaChangedValue();
+
+    // need to count how mach Health need to change
+    UFUNCTION()
+    float GetHealthChangedValue();
+
+#pragma endregion Functions
+
 
    
 };
