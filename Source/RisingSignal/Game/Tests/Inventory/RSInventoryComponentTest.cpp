@@ -78,7 +78,7 @@ namespace
 
 bool FTestCraft::RunTest(const FString& Parameters)
 {
-    AutomationOpenMap("/Game/RisingSignal/Maps/DevMaps/Map_TEST_InventoryComponent");
+    //AutomationOpenMap("/Game/RisingSignal/Maps/DevMaps/Map_TEST_InventoryComponent");
     
     UWorld* World = GetTestGameWorld();
     if(!TestNotNull("World exists", World)) return false;
