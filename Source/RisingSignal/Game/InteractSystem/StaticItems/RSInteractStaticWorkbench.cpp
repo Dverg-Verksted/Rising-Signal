@@ -65,6 +65,8 @@ void ARSInteractStaticWorkbench::CharacterInsideVolume(ACharacter* Character, co
 
     if (const auto CraftComp = Character->FindComponentByClass<URSCraftComponent>())
     {
+        LOG_RS(ELogRSVerb::Warning, "Workbench near");
+
         CraftComp->SetWorkbenchNearBy(bCharInside);
     }
 }

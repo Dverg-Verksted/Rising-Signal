@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Engine/DataTable.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
+#include "Game/WeaponSystem/RSBaseWeapon.h"
 
 #include "InventoryTypes.generated.h"
 
@@ -79,11 +80,10 @@ struct FInventoryItem : public FTableRowBase
     UTexture2D* ImageItem;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь", DisplayName="Можно снарядить?")
-    bool bCanEquip = false;
+    bool bIsWeapon = false;
 
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
-        DisplayName="Можно использовать в крафте?", meta=(EditCondition = "!bCanEquip", EditConditionHides))
-    bool bCanCraft = false;
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь", DisplayName="Класс оружия", meta=(EditCondition = "bIsWeapon", EditConditionHides))
+    TSoftClassPtr<ARSBaseWeapon> WeaponClassPtr;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
         DisplayName="Стакается предмет?", meta=(EditCondition = "!bCanEquip", EditConditionHides))
@@ -104,8 +104,9 @@ struct FInventoryItem : public FTableRowBase
             EditCondition="bCanUse", EditConditionHides))
     TArray<FItemEffect> ItemEffect;
 
-    UPROPERTY()
-    TArray<float> ItemsDurability;
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь", DisplayName="Прочность",
+        meta=(EditCondition="bIsWeapon", EditConditionHides, UIMin = 0.0f, ClampMin = 0.0f, UIMax = 100.0f, ClampMax = 100.0f))
+    float ItemsDurability = 0.0f;
 
     UPROPERTY()
     FName InteractRowName;
@@ -133,8 +134,7 @@ struct FInventoryItem : public FTableRowBase
         this->CostDurability = Other.CostDurability;
         this->TypeComponent = Other.TypeComponent;
         this->ImageItem = Other.ImageItem;
-        this->bCanEquip = Other.bCanEquip;
-        this->bCanCraft = Other.bCanCraft;
+        this->bIsWeapon = Other.bIsWeapon;
         this->bStack = Other.bStack;
         this->bCanUse = Other.bCanUse;
         this->MaxCount = Other.MaxCount;

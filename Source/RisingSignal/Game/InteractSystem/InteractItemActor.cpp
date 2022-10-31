@@ -1,10 +1,8 @@
 // It is owned by the company Dverg Verksted.
 
 #include "Game/InteractSystem/InteractItemActor.h"
-
 #include "RSInteractStaticItemBase.h"
 #include "Components/WidgetComponent.h"
-#include "Editor.h"
 #include "Components/SphereComponent.h"
 #include "Game/Inventory/RSInventoryComponent.h"
 #include "Kismet/KismetMathLibrary.h"

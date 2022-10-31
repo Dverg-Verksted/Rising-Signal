@@ -7,6 +7,7 @@
 #include "RSGamePlayerController.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
 #include "Game/Inventory/RSCraftComponent.h"
+#include "Game/WeaponSystem/WeaponComponent.h"
 #include "RSGamePLayer.generated.h"
 
 class USpringArmComponent;
@@ -26,6 +27,7 @@ enum ESlots
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySignature);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJournalSignature);
 
 /**
@@ -55,6 +57,16 @@ public:
 
     virtual void CalcCamera(float DeltaTime, FMinimalViewInfo& ViewInfo) override;
 
+    virtual void Falling() override;
+    virtual void Landed(const FHitResult& Hit) override;
+    virtual void NotifyJumpApex() override;
+
+    UPROPERTY()
+    float CurrentHeight = 0.0f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Falls")
+    UCurveFloat* FallDamageCurve;
+
 #pragma endregion
 
 #pragma region Components
@@ -68,7 +80,7 @@ public:
 
     UFUNCTION(BlueprintGetter)
     FORCEINLINE URSCraftComponent* GetCraftComponent() const { return CraftComponent; }
-    
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     URSAbilitySystem* AbilitySystem;
 
@@ -88,6 +100,8 @@ private:
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
     URSCraftComponent* CraftComponent;
 
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+    UWeaponComponent* WeaponComponent;
 
 #pragma endregion
 
@@ -139,13 +153,7 @@ private:
 
     void InputJumpReleased();
 
-    void InputRotationModePressed();
-
     void InputRagdollPressed();
-
-    void InputViewModePressed();
-
-    void InputSwitchShoulderPressed();
 
     void InputActionSlot1();
 
@@ -167,7 +175,6 @@ public:
 #pragma region Extension
 
 public:
-    
     UPROPERTY(BlueprintReadOnly)
     ARSGamePlayerController* GamePlayerController;
 
@@ -177,22 +184,22 @@ public:
     UPROPERTY(BlueprintAssignable)
     FOnJournalSignature JournalOpenClose;
 
-    virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+    virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+        AActor* DamageCauser) override;
 
 private:
-
     bool canRun = true;
-    
+
     /**
      * @brief Open inventory in game HUD
      */
     void OpenCloseInventory();
-    
+
     /**
      * @brief Open Journal in game HUD
      */
     void OpenCloseJournal();
-    
+
     /**
      * @brief Call on ability system states changes
      * @param StateTyp - Type of changed ability state
@@ -200,7 +207,7 @@ private:
      */
     UFUNCTION()
     void CheckSomeState(EAbilityStatesType StateTyp, float Value);
-    
+
     UFUNCTION()
     void RegisterDeath();
 

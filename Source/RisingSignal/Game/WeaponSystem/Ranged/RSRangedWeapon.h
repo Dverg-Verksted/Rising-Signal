@@ -21,7 +21,6 @@ struct FAmmoData
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     bool Infinite;
-    
 };
 
 UCLASS()
@@ -32,8 +31,11 @@ class RISINGSIGNAL_API ARSRangedWeapon : public ARSBaseWeapon
 public:
     FOnClipEmptySignature FOnClipEmpty;
 
-    virtual void StartFire();
-    virtual void StopFire();
+    virtual void StartAiming();
+    virtual void StopAiming();
+    
+    virtual void StartAttack();
+    virtual void StopAttack();
 
     void ChangeClip();
     bool CanReload() const;
@@ -41,14 +43,11 @@ public:
 protected:
     
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
-    float TraceMaxDistance = 1500.0f;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     FAmmoData DefaultAmmo{15,10,false};
 
     virtual void BeginPlay() override;
     virtual void MakeShot();
-    virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
+    virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const override;
 
     void DecreaseAmmo();
     bool IsAmmoEmpty() const;

@@ -65,8 +65,6 @@ protected:
 
 #endif
 
-    void CheckIfCharactersInsideVolume();
-
 #pragma endregion Protected_Defaults
 
 

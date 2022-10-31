@@ -11,17 +11,22 @@ class RISINGSIGNAL_API ARSMeleeWeapon : public ARSBaseWeapon
 {
 	GENERATED_BODY()
 
-    virtual void StartMeleeAttack();
-    virtual void StopMeleeAttack();
+    virtual void StartAttack();
+    virtual void StopAttack();
 
 protected:
     
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
-    float TraceMaxDistance = 500.0f;
+    float TimeBetweenSwing = 2.f;
 
-    virtual void BeginPlay() override;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    float DamageAmount = 25.f;
+
     virtual void MakePunch();
-    virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
+    virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const override;
     
-	
+private:
+    void MakeDamage(const FHitResult& HitResult);
+
+    FTimerHandle MeleeTimerHandle;
 };

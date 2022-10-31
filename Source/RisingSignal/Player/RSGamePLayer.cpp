@@ -4,6 +4,7 @@
 #include "AlsCameraComponent.h"
 #include "AlsCharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
@@ -40,6 +41,7 @@ ARSGamePLayer::ARSGamePLayer()
     InventoryComponent = CreateDefaultSubobject<URSInventoryComponent>("InventoryComponent");
     EquipmentComponent = CreateDefaultSubobject<URSEquipmentComponent>("EquipmentComponent");
     CraftComponent = CreateDefaultSubobject<URSCraftComponent>("CraftComponent");
+    WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("WeaponComponent");
 }
 
 void ARSGamePLayer::BeginPlay()
@@ -48,6 +50,7 @@ void ARSGamePLayer::BeginPlay()
 
     AbilitySystem->OnStateChangedSignature.AddDynamic(this, &ARSGamePLayer::CheckSomeState);
     AbilitySystem->OnDeath.AddDynamic(this, &ARSGamePLayer::RegisterDeath);
+
 }
 
 void ARSGamePLayer::Tick(float DeltaSeconds)
@@ -58,6 +61,29 @@ void ARSGamePLayer::Tick(float DeltaSeconds)
 void ARSGamePLayer::CalcCamera(float DeltaTime, FMinimalViewInfo& ViewInfo)
 {
     Super::CalcCamera(DeltaTime, ViewInfo);
+}
+
+void ARSGamePLayer::Falling()
+{
+    Super::Falling();
+    GetCharacterMovement()->bNotifyApex = true;
+}
+
+void ARSGamePLayer::Landed(const FHitResult& Hit)
+{
+    Super::Landed(Hit);
+    const float FallHeight = (CurrentHeight - GetActorLocation().Z) * 0.01;
+    if(IsValid(FallDamageCurve))
+    {
+        const float DamageAmount = FallDamageCurve->GetFloatValue(FallHeight);
+        AbilitySystem->ChangeCurrentStateValue(EAbilityStatesType::Health, -DamageAmount);
+    }
+}
+
+void ARSGamePLayer::NotifyJumpApex()
+{
+    Super::NotifyJumpApex();
+    CurrentHeight = GetActorLocation().Z;
 }
 
 #pragma endregion
@@ -86,19 +112,16 @@ void ARSGamePLayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
     PlayerInputComponent->BindAction(TEXT("Ragdoll"), IE_Pressed, this, &ThisClass::InputRagdollPressed);
 
-    PlayerInputComponent->BindAction(TEXT("RotationMode"), IE_Pressed, this, &ThisClass::InputRotationModePressed);
-    PlayerInputComponent->BindAction(TEXT("ViewMode"), IE_Pressed, this, &ThisClass::InputViewModePressed);
-    PlayerInputComponent->BindAction(TEXT("SwitchShoulder"), IE_Pressed, this, &ThisClass::InputSwitchShoulderPressed);
-
     PlayerInputComponent->BindAction(TEXT("Inventory"), IE_Pressed, this, &ARSGamePLayer::OpenCloseInventory);
 
     PlayerInputComponent->BindAction(TEXT("Journal"), IE_Pressed, this, &ARSGamePLayer::OpenCloseJournal);
-    
+
     PlayerInputComponent->BindAction(TEXT("ActionSlot1"), IE_Pressed, this, &ARSGamePLayer::InputActionSlot1);
     PlayerInputComponent->BindAction(TEXT("ActionSlot2"), IE_Pressed, this, &ARSGamePLayer::InputActionSlot2);
     PlayerInputComponent->BindAction(TEXT("ActionSlot3"), IE_Pressed, this, &ARSGamePLayer::InputActionSlot3);
     PlayerInputComponent->BindAction(TEXT("ActionSlot4"), IE_Pressed, this, &ARSGamePLayer::InputActionSlot4);
 
+    PlayerInputComponent->BindAction(TEXT("Attack"), IE_Pressed, WeaponComponent, &UWeaponComponent::StartAttack);
 }
 
 void ARSGamePLayer::InputLookUp(const float Value)
@@ -127,7 +150,7 @@ void ARSGamePLayer::InputSprintPressed()
 {
     // Start the sprint with a slight delay to give the player enough time to start the roll with a double click instead.
 
-    if(canRun)
+    if (canRun)
     {
         static constexpr auto StartDelay{0.1f};
 
@@ -137,7 +160,6 @@ void ARSGamePLayer::InputSprintPressed()
                 SetDesiredGait(EAlsGait::Sprinting);
             }), StartDelay, false);
     }
-    
 }
 
 void ARSGamePLayer::InputSprintReleased()
@@ -226,26 +248,6 @@ void ARSGamePLayer::InputRagdollPressed()
     }
 }
 
-void ARSGamePLayer::InputRotationModePressed()
-{
-    SetDesiredRotationMode(GetDesiredRotationMode() != EAlsRotationMode::VelocityDirection
-                               ? EAlsRotationMode::VelocityDirection
-                               : EAlsRotationMode::LookingDirection);
-}
-
-void ARSGamePLayer::InputViewModePressed()
-{
-    SetViewMode(GetViewMode() == EAlsViewMode::FirstPerson
-                    ? EAlsViewMode::ThirdPerson
-                    : EAlsViewMode::FirstPerson);
-}
-
-// ReSharper disable once CppMemberFunctionMayBeConst
-void ARSGamePLayer::InputSwitchShoulderPressed()
-{
-    // AlsCamera->SetRightShoulder(!AlsCamera->IsRightShoulder());
-}
-
 void ARSGamePLayer::InputActionSlot1()
 {
     EquipmentComponent->TakeInHands(Equip_Slot1);
@@ -268,13 +270,13 @@ void ARSGamePLayer::InputActionSlot4()
 
 void ARSGamePLayer::OpenCloseInventory()
 {
-    if(!InventoryOpenClose.IsBound()) return;
+    if (!InventoryOpenClose.IsBound()) return;
     InventoryOpenClose.Broadcast();
 }
 
 void ARSGamePLayer::OpenCloseJournal()
 {
-    if(!JournalOpenClose.IsBound()) return;
+    if (!JournalOpenClose.IsBound()) return;
     JournalOpenClose.Broadcast();
 }
 
@@ -310,12 +312,16 @@ void ARSGamePLayer::CheckSomeState(EAbilityStatesType StateTyp, float Value)
 void ARSGamePLayer::RegisterDeath()
 {
     // some death logic for player
+    this->GetCharacterMovement()->DisableMovement();
+    this->SetLifeSpan(5);
+    this->GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+    this->GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+    this->GetMesh()->SetSimulatePhysics(true);
+    this->DisableInput(this->GetController<APlayerController>());
 }
 
 float ARSGamePLayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-    AbilitySystem->ChangeCurrentStateValue(EAbilityStatesType::Health, -1 * DamageAmount);
-    
     return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
