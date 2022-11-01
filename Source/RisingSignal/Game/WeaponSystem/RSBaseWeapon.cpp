@@ -18,6 +18,19 @@ void ARSBaseWeapon::BeginPlay()
 	Super::BeginPlay();
 }
 
+bool ARSBaseWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
+{
+    FVector ViewLocation;
+    FRotator ViewRotation;
+    if (!GetPlayerViewPoint(ViewLocation, ViewRotation))
+        return false;
+
+    TraceStart = ViewLocation;
+    const FVector ShootDirection = ViewRotation.Vector();
+    TraceEnd = TraceStart + ShootDirection * TraceMaxDistance;
+    return true;
+}
+
 APlayerController* ARSBaseWeapon::GetPlayerController() const
 {
     const auto Player = Cast<ACharacter>(GetOwner());
@@ -25,7 +38,6 @@ APlayerController* ARSBaseWeapon::GetPlayerController() const
         return nullptr;
 
     return Player->GetController<APlayerController>();
-
 }
 
 FVector ARSBaseWeapon::GetMuzzleWorldLocation() const

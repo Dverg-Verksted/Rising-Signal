@@ -66,11 +66,10 @@ protected:
     int32 MaxCraftingSlots = 7;
 
 private:
-    
     bool bIsSmallFireNearBy = false;
     bool bIsCampfireNearBy = false;
     bool bIsWorkbenchNearBy = false;
-    
+
     virtual void UpdateSlot(int32 Index) override;
     void PrepareItemToCraft(FDataTableRowHandle Item);
     void RefreshItems();
@@ -78,7 +77,7 @@ private:
     bool CanCraftRecipe(const FRecipeItem* RecipeItem) const;
 
     void RemoveUsedItems();
-    
+
     bool bIsOutputSlotAvailable = false;
 
     UPROPERTY()

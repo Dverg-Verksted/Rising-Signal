@@ -3,6 +3,7 @@
 
 #include "Game/Inventory/RSCraftComponent.h"
 #include "Algo/StableSort.h"
+#include "Library/RSFunctionLibrary.h"
 
 
 URSCraftComponent::URSCraftComponent()
@@ -156,6 +157,12 @@ void URSCraftComponent::RemoveUsedItems()
 void URSCraftComponent::FindSuitableRecipe()
 {
     const UDataTable* RecipeDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/RisingSignal/Core/Inventory/DT_RecipeItems.DT_RecipeItems"));
+
+    if(!RecipeDataTable)
+    {
+        LOG_RS(ELogRSVerb::Error, "Datatable is null");
+        return;
+    }
     
     TArray<FName> RowNames = SortRecipesByIngredients(RecipeDataTable);
     for (const auto RowName : RowNames)
