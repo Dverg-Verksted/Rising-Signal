@@ -26,7 +26,7 @@ ARSAbilityInteractVolume::ARSAbilityInteractVolume()
     SphereComponent->SetupAttachment(SceneComponent);
 
     BoxComponent = CreateDefaultSubobject<UBoxComponent>("BoxComponent");
-    BoxComponent->SetBoxExtent(FVector(SphereRadius, SphereRadius, SphereRadius));
+    BoxComponent->SetBoxExtent(FVector(BoxX, BoxY, BoxZ));
     BoxComponent->SetCollisionProfileName("CharacterMesh");
     BoxComponent->SetGenerateOverlapEvents(true);
     BoxComponent->bHiddenInGame = IsHiddenInGame && !IsBoxForm;
@@ -90,6 +90,14 @@ void ARSAbilityInteractVolume::PostEditChangeProperty(FPropertyChangedEvent& Pro
         SphereComponent->bHiddenInGame = IsHiddenInGame && !IsSphereForm;
         BoxComponent->bHiddenInGame = IsHiddenInGame && !IsBoxForm;
     }
+
+    if (PropertyChangedEvent.Property->GetName() == TEXT("BoxX") ||
+        PropertyChangedEvent.Property->GetName() == TEXT("BoxY") ||
+        PropertyChangedEvent.Property->GetName() == TEXT("BoxZ"))
+    {
+        BoxComponent->SetBoxExtent(FVector(BoxX, BoxY, BoxZ));
+    }
+    
 }
 
 #endif

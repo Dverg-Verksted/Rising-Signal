@@ -100,27 +100,30 @@ float URSAbilitySystem::GetHealthChangedValue()
     
     if(!GodMode)
     {
+        FStateParams TempHungryPeram = GetState(EAbilityStatesType::Hungry); 
+        FStateParams TempTempPeram = GetState(EAbilityStatesType::Temp); 
+
         if (GetState(EAbilityStatesType::Health).CurrentValue <= ValueHealthWhenItCriticalLevel)
         {
             bHealthIsCriticalLevel = true;
         }
         
-        if (GetState(EAbilityStatesType::Hungry).CurrentValue >= GetState(EAbilityStatesType::Hungry).AfterIsDebafHungry)
+        if (TempHungryPeram.CurrentValue >= TempHungryPeram.AfterIsDebafHungry)
         {
             ValueOnChangeHealth -= 10 * TimerCheckStateRate;
         }
         
-        if (GetState(EAbilityStatesType::Hungry).CurrentValue <= ValueHungryWhenItNeedToRegeneration && bHealthIsCriticalLevel)
+        if (TempHungryPeram.CurrentValue <= ValueHungryWhenItNeedToRegeneration && bHealthIsCriticalLevel)
         {
             ValueOnChangeHealth += 10 * TimerCheckStateRate;
         }
         
-        if (GetState(EAbilityStatesType::Temp).CurrentValue <= GetState(EAbilityStatesType::Temp).AfterIsDebafTemp)
+        if (TempTempPeram.CurrentValue <= TempTempPeram.AfterIsDebafTemp)
         {
             ValueOnChangeHealth -= 10 * TimerCheckStateRate;
         }
         
-        if (GetState(EAbilityStatesType::Temp).CurrentValue >= ValueTempWhenItNeedToRegeneration && bHealthIsCriticalLevel)
+        if (TempTempPeram.CurrentValue >= ValueTempWhenItNeedToRegeneration && bHealthIsCriticalLevel)
         {
             ValueOnChangeHealth += 10 * TimerCheckStateRate;
         }
@@ -143,6 +146,7 @@ void URSAbilitySystem::OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage,
     // Death check
     if (GetCurrentStateValue(EAbilityStatesType::Health) <= 0 && !GodMode)
     {
+        GetWorld()->GetTimerManager().ClearTimer(TStateChange);
         OnDeath.Broadcast();
     }
 }
@@ -181,6 +185,7 @@ void URSAbilitySystem::ChangeCurrentStateValue(EAbilityStatesType StateTy, float
             return;
         }
     }
+    
 }
 
 
