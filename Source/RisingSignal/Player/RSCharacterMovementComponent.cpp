@@ -26,7 +26,7 @@ void URSCharacterMovementComponent::EndMantle()
 
 void URSCharacterMovementComponent::StartRoll()
 {
-    /*const float ComponentScale = CharacterOwner->GetCapsuleComponent()->GetShapeScale();
+    const float ComponentScale = CharacterOwner->GetCapsuleComponent()->GetShapeScale();
     const float OldUnscaledRadius = CharacterOwner->GetCapsuleComponent()->GetUnscaledCapsuleRadius();
     const float OldUnscaledHalfHeight = CharacterOwner->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
     const float ClampedRollHalfHeight = FMath::Max3(0.f, OldUnscaledRadius, RollCapsuleHalfHeight);
@@ -41,12 +41,12 @@ void URSCharacterMovementComponent::StartRoll()
     BaseCharacterOwner->SetIsRolling(true);
 
     BaseCharacterOwner->OnStartRoll(HalfHeightAdjust);
-    SetMovementMode(MOVE_Custom, StaticCast<uint8>(ECustomMovementMode::CMOVE_Rolling));*/
+    SetMovementMode(MOVE_Custom, StaticCast<uint8>(ECustomMovementMode::CMOVE_Rolling));
 }
 
 void URSCharacterMovementComponent::StopRoll()
 {
-    /*const ACharacter* DefaultCharacter = CharacterOwner->GetClass()->GetDefaultObject<ACharacter>();
+    const ACharacter* DefaultCharacter = CharacterOwner->GetClass()->GetDefaultObject<ACharacter>();
     const float DefaultHalfHeight = DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
     const float HalfHeightAdjust = DefaultHalfHeight - CrouchedHalfHeight;
     CharacterOwner->GetCapsuleComponent()->SetCapsuleSize(DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleRadius(), DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight());
@@ -55,12 +55,12 @@ void URSCharacterMovementComponent::StopRoll()
     if (IsEnoughSpaceToStandUp())
     {
         Crouch();
-        BaseCharacterOwner->OnEndRoll(HalfHeightAdjust);
+        BaseCharacterOwner->OnStopRoll(HalfHeightAdjust);
     }
     else
     {
-        BaseCharacterOwner->OnEndRoll(0.0f);
-    }*/
+        BaseCharacterOwner->OnStopRoll(0.0f);
+    }
 }
 
 void URSCharacterMovementComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)
@@ -134,7 +134,7 @@ void URSCharacterMovementComponent::PhysMantle(float DeltaTime, int32 Iterations
 
 void URSCharacterMovementComponent::PhysRolling(float DeltaTime, int32 Iterations)
 {
-    /*Velocity = BaseCharacterOwner->GetActorForwardVector() * RollSpeed;
+    Velocity = BaseCharacterOwner->GetActorForwardVector() * RollSpeed;
 
     FVector StandingLocation = UpdatedComponent->GetComponentLocation();
     StandingLocation.Z -= 2.0f;
@@ -157,12 +157,12 @@ void URSCharacterMovementComponent::PhysRolling(float DeltaTime, int32 Iteration
     FVector Delta = Velocity * DeltaTime;
     Velocity = Delta / DeltaTime;
     FHitResult Hit;
-    SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), true, Hit);*/
+    SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), true, Hit);
 }
 
 bool URSCharacterMovementComponent::IsEnoughSpaceToStandUp()
 {
-    /*FVector StandingLocation = UpdatedComponent->GetComponentLocation();
+    FVector StandingLocation = UpdatedComponent->GetComponentLocation();
     ACharacter* DefaultCharacter = CharacterOwner->GetClass()->GetDefaultObject<ACharacter>();
     float DefaultHalfHeight = DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
     float DefaultCapsuleRadius = DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleRadius();
@@ -177,6 +177,5 @@ bool URSCharacterMovementComponent::IsEnoughSpaceToStandUp()
     bool bIsEnough = false;
     bIsEnough = GetWorld()->OverlapBlockingTestByChannel(LocationWithOffset + Offset * FVector::UpVector, FQuat::Identity, CollisionChannel,
         StandingCapsuleShape, CapsuleParams, ResponseParams);
-    return bIsEnough;*/
-    return false;
+    return bIsEnough;
 }

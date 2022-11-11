@@ -62,6 +62,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySignature);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJournalSignature);
 
+DECLARE_DELEGATE(FOnSlideSignature);
+
 UCLASS()
 class RISINGSIGNAL_API ARSBaseCharacter : public ACharacter
 {
@@ -71,12 +73,24 @@ public:
 	
 	ARSBaseCharacter(const FObjectInitializer& ObjectInitializer);
 
+    FOnSlideSignature OnSlide; 
+
     virtual void Falling() override;
     virtual void Landed(const FHitResult& Hit) override;
     virtual void NotifyJumpApex() override;
 
+    virtual void Jump() override;
+
+    FORCEINLINE URSCharacterMovementComponent* GetBaseCharacterMovementComponent() const { return RSCharacterMovementComponent; }
+
     FORCEINLINE bool GetIsMantling() const;
     void SetIsMantling(bool NewValue);
+
+    FORCEINLINE bool GetIsRolling() const;
+    void SetIsRolling(bool NewValue);
+
+    void OnStartRoll(float HalfHeightAdjust);
+    void OnStopRoll(float HalfHeightAdjust);
 
 protected:
 	
@@ -88,6 +102,7 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Falls")
     UCurveFloat* FallDamageCurve;
 
+#pragma region Components
 protected:
 
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
@@ -117,6 +132,9 @@ protected:
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
     URSLedgeDetectorComponent* LedgeDetectorComponent;
 
+#pragma endregion
+
+#pragma region MantlingSettings
 protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Mantling")
@@ -128,12 +146,15 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Mantling")
     float LowMantleMaxHeight = 125.0f;
 
+#pragma endregion
+    
 public:	
 	
 	virtual void Tick(float DeltaTime) override;
     
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+#pragma region Input
 private:
 
     void InputLookUp(float Value);
@@ -186,6 +207,8 @@ private:
         Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "deg"))
     float LookRightRate{90.0f};
 
+#pragma endregion 
+
 #pragma region Extension
 
 public:
@@ -233,4 +256,5 @@ private:
     const FMantlingSettings& GetMantlingSettings(float LedgeHeight) const;
 
     bool bIsMantling;
+    bool bIsRolling;
 };

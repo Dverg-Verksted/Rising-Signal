@@ -17,13 +17,7 @@ bool URSLedgeDetectorComponent::LedgeDetect(FLedgeDescription& LedgeDescription)
 	FCollisionQueryParams QueryParams;
 	QueryParams.bTraceComplex = true;
 	QueryParams.AddIgnoredActor(GetOwner());
-	
-#if ENABLE_DRAW_DEBUG
-	UDebugSubsystem* DebugSubsystem = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UDebugSubsystem>();
-	bool bIsDebugEnabled = DebugSubsystem->IsCategoryEnabled(DebugCategoryLedgeDetection);
-#else
-	bool bIsDebugEnabled = false;
-#endif
+    
 	float DrawTime = 2.0f;
 	
 	float BotoomZOffset = 2.0f;
@@ -35,7 +29,7 @@ bool URSLedgeDetectorComponent::LedgeDetect(FLedgeDescription& LedgeDescription)
 	FVector ForwardStartLocation = CharacterBotoom + (MinimumLedgeHeight + ForwardCheckCapsuleHalfHeight) * FVector::UpVector;
 	FVector ForwardEndLocation = ForwardStartLocation + CachedCharacterOwner->GetActorForwardVector() * ForwardCheckDistance;
 
-	if(!RSTraceUtility::SweepCapsuleSingleByChanel(GetWorld(), ForwardHitResult, ForwardStartLocation, ForwardEndLocation, FQuat::Identity, ForwardCheckCapsuleRadius, ForwardCheckCapsuleHalfHeight, ECC_Climbing, QueryParams, FCollisionResponseParams::DefaultResponseParam, bIsDebugEnabled, DrawTime))
+	if(!RSTraceUtility::SweepCapsuleSingleByChanel(GetWorld(), ForwardHitResult, ForwardStartLocation, ForwardEndLocation, FQuat::Identity, ForwardCheckCapsuleRadius, ForwardCheckCapsuleHalfHeight, ECC_GameTraceChannel1, QueryParams, FCollisionResponseParams::DefaultResponseParam, DrawTime))
 	{
 		return false;
 	}
@@ -48,7 +42,7 @@ bool URSLedgeDetectorComponent::LedgeDetect(FLedgeDescription& LedgeDescription)
 	DownwardStartLocation.Z = CharacterBotoom.Z + MaximumLedgeHeight + DownwardSphereRadius;
 	FVector DownwardEndLocation(DownwardStartLocation.X, DownwardStartLocation.Y, CharacterBotoom.Z);
 
-	if(!RSTraceUtility::SweepSphereSingleByChanel(GetWorld(), DownwardHitResult, DownwardStartLocation, DownwardEndLocation, DownwardSphereRadius, ECC_GameTraceChannel1, QueryParams, FCollisionResponseParams::DefaultResponseParam, bIsDebugEnabled, DrawTime))
+	if(!RSTraceUtility::SweepSphereSingleByChanel(GetWorld(), DownwardHitResult, DownwardStartLocation, DownwardEndLocation, DownwardSphereRadius, ECC_GameTraceChannel1, QueryParams, FCollisionResponseParams::DefaultResponseParam, DrawTime))
 	{
 		return false;
 	}
@@ -56,10 +50,10 @@ bool URSLedgeDetectorComponent::LedgeDetect(FLedgeDescription& LedgeDescription)
 	float OverlapCapsuleRadius = CapsuleComponent->GetScaledCapsuleRadius();
 	float OverlapCapsuleHalfHeight = DefaultCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	
-	float OverlapCapsuleFloorOffset = 10.0f;
+	float OverlapCapsuleFloorOffset = 2.0f;
 	FVector OverlapStartLocation = DownwardHitResult.ImpactPoint + (OverlapCapsuleHalfHeight + OverlapCapsuleFloorOffset) * FVector::UpVector;
 
-	if(RSTraceUtility::OverlapCapsuleBlockingByProfile(GetWorld(), OverlapStartLocation, OverlapCapsuleRadius, OverlapCapsuleHalfHeight, FQuat::Identity, FName("Pawn"), QueryParams, bIsDebugEnabled, DrawTime))
+	if(RSTraceUtility::OverlapCapsuleBlockingByProfile(GetWorld(), OverlapStartLocation, OverlapCapsuleRadius, OverlapCapsuleHalfHeight, FQuat::Identity, FName("Pawn"), QueryParams, DrawTime))
 	{
 		return false;
 	}

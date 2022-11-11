@@ -69,6 +69,11 @@ void ARSBaseCharacter::NotifyJumpApex()
     CurrentHeight = GetActorLocation().Z;
 }
 
+void ARSBaseCharacter::Jump()
+{
+    Super::Jump();
+}
+
 bool ARSBaseCharacter::GetIsMantling() const
 {
     return bIsMantling;
@@ -77,6 +82,55 @@ bool ARSBaseCharacter::GetIsMantling() const
 void ARSBaseCharacter::SetIsMantling(bool NewValue)
 {
     bIsMantling = NewValue;
+}
+
+bool ARSBaseCharacter::GetIsRolling() const
+{
+    return bIsRolling;
+}
+
+void ARSBaseCharacter::SetIsRolling(bool NewValue)
+{
+    bIsRolling = NewValue;
+}
+
+void ARSBaseCharacter::OnStartRoll(float HalfHeightAdjust)
+{
+    RecalculateBaseEyeHeight();
+
+    if(OnSlide.IsBound())
+    {
+        OnSlide.Execute();
+    }
+
+    const ACharacter* DefaultChar = GetDefault<ACharacter>(GetClass());
+    if(GetMesh() && DefaultChar->GetMesh())
+    {
+        FVector& MeshRelativeLocation = GetMesh()->GetRelativeLocation_DirectMutable();
+        MeshRelativeLocation.Z = DefaultChar->GetMesh()->GetRelativeLocation().Z + HalfHeightAdjust + RSCharacterMovementComponent->GetRollCapsuleHalfHeight();
+        BaseTranslationOffset.Z = MeshRelativeLocation.Z;
+    }
+    else
+    {
+        BaseTranslationOffset.Z = DefaultChar->GetBaseTranslationOffset().Z + HalfHeightAdjust + RSCharacterMovementComponent->GetRollCapsuleHalfHeight();
+    }
+}
+
+void ARSBaseCharacter::OnStopRoll(float HalfHeightAdjust)
+{
+    RecalculateBaseEyeHeight();
+
+    const ACharacter* DefaultChar = GetDefault<ACharacter>(GetClass());
+    if(GetMesh() && DefaultChar->GetMesh())
+    {
+        FVector& MeshRelativeLocation = GetMesh()->GetRelativeLocation_DirectMutable();
+        MeshRelativeLocation.Z = DefaultChar->GetMesh()->GetRelativeLocation().Z + HalfHeightAdjust;
+        BaseTranslationOffset.Z = MeshRelativeLocation.Z;
+    }
+    else
+    {
+        BaseTranslationOffset.Z = DefaultChar->GetBaseTranslationOffset().Z + HalfHeightAdjust;
+    }
 }
 
 void ARSBaseCharacter::BeginPlay()
@@ -116,6 +170,7 @@ void ARSBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
     PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &ThisClass::InputJumpReleased);
 
     PlayerInputComponent->BindAction(TEXT("Ragdoll"), IE_Pressed, this, &ThisClass::InputRagdollPressed);
+    PlayerInputComponent->BindAction(TEXT("Roll"), IE_Pressed, this, &ARSBaseCharacter::InputRoll);
 
     PlayerInputComponent->BindAction(TEXT("Inventory"), IE_Pressed, this, &ThisClass::OpenCloseInventory);
 
@@ -163,6 +218,7 @@ void ARSBaseCharacter::InputSprintReleased()
 
 void ARSBaseCharacter::InputRoll()
 {
+    RSCharacterMovementComponent->StartRoll();
 }
 
 void ARSBaseCharacter::InputWalk()
@@ -221,6 +277,7 @@ void ARSBaseCharacter::InputMantle()
 
 void ARSBaseCharacter::InputJumpPressed()
 {
+    Jump();
 }
 
 void ARSBaseCharacter::InputJumpReleased()

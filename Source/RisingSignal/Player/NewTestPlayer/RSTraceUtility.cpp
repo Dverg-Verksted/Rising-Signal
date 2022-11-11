@@ -5,7 +5,7 @@
 
 bool RSTraceUtility::SweepCapsuleSingleByChanel(const UWorld* World, FHitResult& OutHit, const FVector& Start, const FVector& End,
     const FQuat& Rot, float CapsuleRadius, float CapsuleHalfHeight, ECollisionChannel TraceChanel, const FCollisionQueryParams& QueryParams,
-    const FCollisionResponseParams& ResponseParams, bool bDrawDebug, float DrawTime, FColor TraceColor, FColor HitColor)
+    const FCollisionResponseParams& ResponseParams, float DrawTime, FColor TraceColor, FColor HitColor)
 {
     bool bResult;
     	FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(CapsuleRadius, CapsuleHalfHeight);
@@ -31,7 +31,7 @@ bool RSTraceUtility::SweepCapsuleSingleByChanel(const UWorld* World, FHitResult&
 
 bool RSTraceUtility::SweepSphereSingleByChanel(const UWorld* World, FHitResult& OutHit, const FVector& Start, const FVector& End,
     float Radius, ECollisionChannel TraceChanel, const FCollisionQueryParams& QueryParams, const FCollisionResponseParams& ResponseParams,
-    bool bDrawDebug, float DrawTime, FColor TraceColor, FColor HitColor)
+    float DrawTime, FColor TraceColor, FColor HitColor)
 {
     bool bResult;
     FCollisionShape CollisionShape = FCollisionShape::MakeSphere(Radius);
@@ -59,7 +59,7 @@ bool RSTraceUtility::SweepSphereSingleByChanel(const UWorld* World, FHitResult& 
 }
 
 bool RSTraceUtility::OverlapCapsuleAnyByProfile(const UWorld* World, const FVector Pos, float CapsuleRadius, float CapsuleHalfHeight,
-    FQuat Rotation, FName ProfileName, const FCollisionQueryParams& QueryParams, bool bDrawDebug, float DrawTime, FColor HitColor)
+    FQuat Rotation, FName ProfileName, const FCollisionQueryParams& QueryParams, float DrawTime, FColor HitColor)
 {
     bool bResult;
     FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(CapsuleRadius, CapsuleHalfHeight);
@@ -76,7 +76,7 @@ bool RSTraceUtility::OverlapCapsuleAnyByProfile(const UWorld* World, const FVect
 }
 
 bool RSTraceUtility::OverlapCapsuleBlockingByProfile(const UWorld* World, const FVector Pos, float CapsuleRadius, float CapsuleHalfHeight,
-    FQuat Rotation, FName ProfileName, const FCollisionQueryParams& QueryParams, bool bDrawDebug, float DrawTime, FColor HitColor)
+    FQuat Rotation, FName ProfileName, const FCollisionQueryParams& QueryParams, float DrawTime, FColor HitColor)
 {
     bool bResult;
     FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(CapsuleRadius, CapsuleHalfHeight);
