@@ -22,7 +22,11 @@ void URSBaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
         return;
     }
 
-    
+    const URSCharacterMovementComponent* CharacterMovementComponent = CachedBaseCharacter->GetBaseCharacterMovementComponent();
+
+    Speed = FMath::Lerp(Speed, CharacterMovementComponent->Velocity.Size(), LerpAlpha);
+    Direction = CalculateDirection(CharacterMovementComponent->Velocity, CachedBaseCharacter->GetActorRotation());
+    bIsFalling = CharacterMovementComponent->IsFalling();
 }
 
 void URSBaseCharacterAnimInstance::PlayRollMontage()

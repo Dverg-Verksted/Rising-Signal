@@ -27,6 +27,18 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Slide animations")
     UAnimMontage* RollMontage;
 
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+    float Speed;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+    float Direction;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+    bool bIsFalling = false;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    float LerpAlpha = 0.07f;
+
 private:
 
     TWeakObjectPtr<ARSBaseCharacter> CachedBaseCharacter;
