@@ -180,8 +180,6 @@ void ARSBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
     PlayerInputComponent->BindAction(TEXT("ActionSlot2"), IE_Pressed, this, &ThisClass::InputActionSlot2);
     PlayerInputComponent->BindAction(TEXT("ActionSlot3"), IE_Pressed, this, &ThisClass::InputActionSlot3);
     PlayerInputComponent->BindAction(TEXT("ActionSlot4"), IE_Pressed, this, &ThisClass::InputActionSlot4);
-
-    PlayerInputComponent->BindAction(TEXT("Attack"), IE_Pressed, WeaponComponent, &UWeaponComponent::StartAttack);
 }
 
 void ARSBaseCharacter::InputLookUp(float Value)

@@ -17,6 +17,7 @@ class UAlsCameraComponent;
 class URSAbilitySystem;
 class URSInventoryComponent;
 class URSEquipmentComponent;
+class UWeaponComponent;
 
 enum ESlots
 {
