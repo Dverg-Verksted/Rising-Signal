@@ -8,6 +8,7 @@
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
 #include "Game/Inventory/RSCraftComponent.h"
 #include "Game/WeaponSystem/WeaponComponent.h"
+#include "NewTestPlayer/RSLedgeDetectorComponent.h"
 #include "RSGamePLayer.generated.h"
 
 class USpringArmComponent;
@@ -19,16 +20,16 @@ class URSEquipmentComponent;
 
 enum ESlots
 {
-    Equip_Slot1,
-    Equip_Slot2,
-    Equip_Slot3,
-    Equip_Slot4
+    Slot1,
+    Slot2,
+    Slot3,
+    Slot4
 };
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOpenInventorySignature);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJournalSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOpenJournalSignature);
 
 /**
  * @class Own player (^_^)
@@ -179,10 +180,10 @@ public:
     ARSGamePlayerController* GamePlayerController;
 
     UPROPERTY(BlueprintAssignable)
-    FOnInventorySignature InventoryOpenClose;
+    FOnOpenInventorySignature InventoryOpenClose;
 
     UPROPERTY(BlueprintAssignable)
-    FOnJournalSignature JournalOpenClose;
+    FOnOpenJournalSignature JournalOpenClose;
 
     virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
         AActor* DamageCauser) override;

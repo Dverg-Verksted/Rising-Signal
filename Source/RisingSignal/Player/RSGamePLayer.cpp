@@ -250,22 +250,22 @@ void ARSGamePLayer::InputRagdollPressed()
 
 void ARSGamePLayer::InputActionSlot1()
 {
-    EquipmentComponent->TakeInHands(Equip_Slot1);
+    EquipmentComponent->TakeInHands(Slot1);
 }
 
 void ARSGamePLayer::InputActionSlot2()
 {
-    EquipmentComponent->TakeInHands(Equip_Slot2);
+    EquipmentComponent->TakeInHands(Slot2);
 }
 
 void ARSGamePLayer::InputActionSlot3()
 {
-    EquipmentComponent->TakeInHands(Equip_Slot3);
+    EquipmentComponent->TakeInHands(Slot3);
 }
 
 void ARSGamePLayer::InputActionSlot4()
 {
-    EquipmentComponent->TakeInHands(Equip_Slot4);
+    EquipmentComponent->TakeInHands(Slot4);
 }
 
 void ARSGamePLayer::OpenCloseInventory()
