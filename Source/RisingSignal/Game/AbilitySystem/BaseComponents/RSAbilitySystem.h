@@ -38,7 +38,7 @@ struct FStateParams
     UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Минимальное значение параметра"))
     float MinValue = 0.0f;
 
-    // Ability State type 
+    // Ability State type
     UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Тип параметра"))
     EAbilityStatesType StateType = EAbilityStatesType::Health;
 
@@ -90,6 +90,8 @@ public:
 
     // Timer for control how often need to check state changes
     FTimerHandle TStateChange;
+
+    FTimerHandle TRegenHealth;
 
     // Just player references for take ability system or some another component/params
     UPROPERTY()
@@ -210,6 +212,8 @@ public:
     UFUNCTION()
     void OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
        class AController* InstigatedBy, AActor* DamageCauser);
+
+    void RegenHealth();
 
 private:
     // control on state changes, it check all state on new change value

@@ -100,33 +100,33 @@ float URSAbilitySystem::GetHealthChangedValue()
     
     if(!GodMode)
     {
-        FStateParams TempHungryPeram = GetState(EAbilityStatesType::Hungry); 
-        FStateParams TempTempPeram = GetState(EAbilityStatesType::Temp); 
-
+        FStateParams TempHungryParam = GetState(EAbilityStatesType::Hungry); 
+        FStateParams TempTempParam = GetState(EAbilityStatesType::Temp);
+        
         if (GetState(EAbilityStatesType::Health).CurrentValue <= ValueHealthWhenItCriticalLevel)
         {
             bHealthIsCriticalLevel = true;
         }
         
-        if (TempHungryPeram.CurrentValue >= TempHungryPeram.AfterIsDebafHungry)
+        if (TempHungryParam.CurrentValue >= TempHungryParam.AfterIsDebafHungry && !bHealthIsCriticalLevel)
         {
             ValueOnChangeHealth -= 10 * TimerCheckStateRate;
         }
         
-        if (TempHungryPeram.CurrentValue <= ValueHungryWhenItNeedToRegeneration && bHealthIsCriticalLevel)
-        {
-            ValueOnChangeHealth += 10 * TimerCheckStateRate;
-        }
-        
-        if (TempTempPeram.CurrentValue <= TempTempPeram.AfterIsDebafTemp)
+        if (TempTempParam.CurrentValue <= TempTempParam.AfterIsDebafTemp && !bHealthIsCriticalLevel)
         {
             ValueOnChangeHealth -= 10 * TimerCheckStateRate;
         }
         
-        if (TempTempPeram.CurrentValue >= ValueTempWhenItNeedToRegeneration && bHealthIsCriticalLevel)
-        {
-            ValueOnChangeHealth += 10 * TimerCheckStateRate;
-        }
+        // if (TempHungryParam.CurrentValue < ValueHungryWhenItNeedToRegeneration && bHealthIsCriticalLevel)
+        // {
+        //     ValueOnChangeHealth += 10 * TimerCheckStateRate;
+        // }
+        
+        // if (TempTempParam.CurrentValue > ValueTempWhenItNeedToRegeneration && bHealthIsCriticalLevel)
+        // {
+        //     ValueOnChangeHealth += 10 * TimerCheckStateRate;
+        // }
         
     }
     
@@ -141,6 +141,10 @@ void URSAbilitySystem::OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage,
     if(!GodMode)
     {
         ChangeCurrentStateValue(EAbilityStatesType::Health, -Damage);
+        if(GetState(EAbilityStatesType::Health).CurrentValue <= ValueHealthWhenItCriticalLevel)
+        {
+            GetWorld()->GetTimerManager().SetTimer(TRegenHealth, this, &URSAbilitySystem::RegenHealth, TimerCheckStateRate, true);
+        }
     }
     
     // Death check
@@ -150,6 +154,13 @@ void URSAbilitySystem::OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage,
         OnDeath.Broadcast();
     }
 }
+
+void URSAbilitySystem::RegenHealth()
+{
+    if(GetState(EAbilityStatesType::Health).CurrentValue < ValueHealthWhenItCriticalLevel)
+    ChangeCurrentStateValue(EAbilityStatesType::Health, 10);
+}
+
 
 void URSAbilitySystem::SetChangeValue(EAbilityStatesType AbilityStateType, float ChangedValueModifier)
 {
@@ -187,8 +198,6 @@ void URSAbilitySystem::ChangeCurrentStateValue(EAbilityStatesType StateTy, float
     }
     
 }
-
-
 
 FStateParams URSAbilitySystem::GetState(EAbilityStatesType AbilityStateType)
 {
