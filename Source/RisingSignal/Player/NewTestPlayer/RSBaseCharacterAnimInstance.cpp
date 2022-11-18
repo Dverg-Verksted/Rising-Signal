@@ -9,7 +9,8 @@ void URSBaseCharacterAnimInstance::NativeBeginPlay()
     CachedBaseCharacter = Cast<ARSBaseCharacter>(TryGetPawnOwner());
     if(CachedBaseCharacter.IsValid())
     {
-        CachedBaseCharacter->OnSlide.BindUObject(this, &URSBaseCharacterAnimInstance::PlayRollMontage);   
+        CachedBaseCharacter->OnSlide.BindUObject(this, &URSBaseCharacterAnimInstance::PlayRollMontage);
+        CachedBaseCharacter->OnLanded.AddUObject(this, &URSBaseCharacterAnimInstance::SetFallHeight);
     }
 }
 
@@ -32,4 +33,9 @@ void URSBaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 void URSBaseCharacterAnimInstance::PlayRollMontage()
 {
     Montage_Play(RollMontage,1.0f, EMontagePlayReturnType::Duration);
+}
+
+void URSBaseCharacterAnimInstance::SetFallHeight(float NewValue)
+{
+    FallHeight = NewValue;
 }

@@ -37,9 +37,20 @@ protected:
     bool bIsFalling = false;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    float LowHeight = 3.0f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    float HighHeight = 50.0f;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+    float FallHeight = 0.0f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     float LerpAlpha = 0.07f;
 
 private:
+
+    void SetFallHeight(float NewValue);
 
     TWeakObjectPtr<ARSBaseCharacter> CachedBaseCharacter;
 };

@@ -39,6 +39,11 @@ void URSCharacterMovementComponent::StartRoll()
     const ACharacter* DefaultCharacter = CharacterOwner->GetClass()->GetDefaultObject<ACharacter>();
     HalfHeightAdjust = (DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() - RollCapsuleHalfHeight - ClampedRollHalfHeight);
     BaseCharacterOwner->SetIsRolling(true);
+    float MinRange;
+    float MaxRange;
+    
+    CurrentRollingParameters.RollingCurve->GetTimeRange(MinRange, MaxRange);
+    CurrentRollingParameters.Duration = MaxRange - MinRange;
 
     BaseCharacterOwner->OnStartRoll(HalfHeightAdjust);
     SetMovementMode(MOVE_Custom, StaticCast<uint8>(ECustomMovementMode::CMOVE_Rolling));
@@ -76,6 +81,10 @@ void URSCharacterMovementComponent::OnMovementModeChanged(EMovementMode Previous
             {
                 GetWorld()->GetTimerManager().SetTimer(MantlingTimer, this, &URSCharacterMovementComponent::EndMantle,
                     CurrentMantlingParameters.Duration, false);
+            }
+            case (uint8)ECustomMovementMode::CMOVE_Rolling:
+            {
+                GetWorld()->GetTimerManager().SetTimer(RollingTimer, this, &URSCharacterMovementComponent::StopRoll, CurrentRollingParameters.Duration , false);
             }
             default: break;
         }
@@ -134,8 +143,9 @@ void URSCharacterMovementComponent::PhysMantle(float DeltaTime, int32 Iterations
 
 void URSCharacterMovementComponent::PhysRolling(float DeltaTime, int32 Iterations)
 {
-    Velocity = BaseCharacterOwner->GetActorForwardVector() * RollSpeed;
-
+    const float ElapsedTime = GetWorld()->GetTimerManager().GetTimerElapsed(RollingTimer);
+    Velocity = BaseCharacterOwner->GetActorForwardVector() * CurrentRollingParameters.RollingCurve->GetFloatValue(ElapsedTime);
+    
     FVector StandingLocation = UpdatedComponent->GetComponentLocation();
     StandingLocation.Z -= 2.0f;
     float DefaultHalfHeight = CharacterOwner->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();

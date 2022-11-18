@@ -56,6 +56,10 @@ void ARSBaseCharacter::Landed(const FHitResult& Hit)
 {
     Super::Landed(Hit);
     const float FallHeight = (CurrentHeight - GetActorLocation().Z) * 0.01;
+    if(OnLanded.IsBound())
+    {
+        OnLanded.Broadcast(FallHeight);
+    }
     if(IsValid(FallDamageCurve))
     {
         const float DamageAmount = FallDamageCurve->GetFloatValue(FallHeight);

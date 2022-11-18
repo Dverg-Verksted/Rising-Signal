@@ -27,6 +27,17 @@ struct FMantlingMovementParameters
     FVector PrimitiveComponentInitialLocation;
 };
 
+USTRUCT(BlueprintType)
+struct FRollingMovementaParamaters
+{
+    GENERATED_BODY()
+    
+    float Duration = 1.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    UCurveFloat* RollingCurve;
+};
+
 UENUM()
 enum class ECustomMovementMode : uint8
 {
@@ -62,6 +73,9 @@ protected:
 
     bool IsEnoughSpaceToStandUp();
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    FRollingMovementaParamaters CurrentRollingParameters;
+    
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Roll parameters")
     float RollCapsuleHalfHeight = 40.0f;
 
@@ -73,4 +87,6 @@ private:
 
     FMantlingMovementParameters CurrentMantlingParameters;
     FTimerHandle MantlingTimer;
+    FTimerHandle RollingTimer;
+    float RollDuration;
 };

@@ -64,6 +64,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJournalSignature);
 
 DECLARE_DELEGATE(FOnSlideSignature);
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnLandedSignature, float);
+
 UCLASS()
 class RISINGSIGNAL_API ARSBaseCharacter : public ACharacter
 {
@@ -73,7 +75,8 @@ public:
 	
 	ARSBaseCharacter(const FObjectInitializer& ObjectInitializer);
 
-    FOnSlideSignature OnSlide; 
+    FOnSlideSignature OnSlide;
+    FOnLandedSignature OnLanded;
 
     virtual void Falling() override;
     virtual void Landed(const FHitResult& Hit) override;
@@ -92,12 +95,13 @@ public:
     void OnStartRoll(float HalfHeightAdjust);
     void OnStopRoll(float HalfHeightAdjust);
 
+    UPROPERTY()
+    float CurrentHeight = 0.0f;
+    
 protected:
 	
 	virtual void BeginPlay() override;
     
-    UPROPERTY()
-    float CurrentHeight = 0.0f;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Falls")
     UCurveFloat* FallDamageCurve;
