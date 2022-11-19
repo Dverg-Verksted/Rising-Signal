@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "../Plugins/FMODStudio/Source/FMODStudio/Classes/FMODEvent.h"
 #include "Game/InteractSystem/RSInteractStaticItemBase.h"
 #include "RSInteractStaticBonfire.generated.h"
 
@@ -128,4 +129,7 @@ protected:
     FText FireOnText;
 
 #pragma endregion Protected_Properties
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings", DisplayName = "Тип костра")
+    UFMODEvent* EventIgnition;
 };

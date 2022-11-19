@@ -34,8 +34,9 @@ public:
     UBoxComponent* BoxComponent;
 
     // Shape radius
-    UPROPERTY(EditAnywhere, Category = "Shape Component", DisplayName = "Размер коллизии",
-        meta=(ToolTip="Если сфера, то это значение будет радиусов, если коробка, то это половина грани и тд"))
+    UPROPERTY(EditAnywhere, Category = "Shape Component", DisplayName = "Размер Сферы",
+        meta=(EditCondition = "IsSphereForm", EditConditionHides,
+            ToolTip="Если сфера, то это значение будет радиусов, если коробка, то это половина грани и тд"))
     float SphereRadius = 100.0f;
 
     // that value determine SPHERE collision shape
@@ -48,6 +49,21 @@ public:
         meta=(ToolTip=""))
     bool IsBoxForm = true;
 
+    UPROPERTY(EditAnywhere, Category= "Shape Component",
+            meta = (ToolTip = "Размер коробки по X", EditCondition =
+                "IsBoxForm", EditConditionHides))
+    float BoxX = 100.0f;
+    
+    UPROPERTY(EditAnywhere, Category= "Shape Component",
+            meta = (ToolTip = "Размер коробки по Y", EditCondition =
+                "IsBoxForm", EditConditionHides))
+    float BoxY = 100.0f;
+    
+    UPROPERTY(EditAnywhere, Category= "Shape Component",
+            meta = (ToolTip = "Размер коробки по Y", EditCondition =
+                "IsBoxForm", EditConditionHides))
+    float BoxZ = 1000.f;
+    
 
     // Type ability system state, which will be changed when actor overlap
     UPROPERTY(EditAnywhere, Category = "Params", DisplayName = "Тип параметра",
@@ -64,6 +80,7 @@ public:
         meta=(ToolTip="При 'ложь' коллизия объекта будет показана в мире"))
     bool IsHiddenInGame = true;
 
+    
 
 protected:
     virtual void BeginPlay() override;

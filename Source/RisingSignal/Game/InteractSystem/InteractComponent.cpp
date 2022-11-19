@@ -226,7 +226,7 @@ void UInteractComponent::RegisterInteractEvent()
             }
             case ETypeItem::InvItem:
             {
-                if (DataInteract->RowRuleInvItem.DataTable && InteractRowHandle.RowName != "")
+                if (DataInteract->RowRuleInvItem.DataTable && InteractRowHandle.RowName != "None")
                 {
                     InventoryComp->AddDataItem(DataInteract->RowRuleInvItem, InteractRowHandle.RowName, TargetInteractItem->GetItemCount());
                     RemoveItem(TargetInteractItem);
