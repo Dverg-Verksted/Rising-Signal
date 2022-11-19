@@ -2,9 +2,7 @@
 
 
 #include "Game/WeaponSystem/WeaponComponent.h"
-#include "Ranged/RSRangedWeapon.h"
 #include "GameFramework/Character.h"
-#include "Melee/RSMeleeWeapon.h"
 #include "RSBaseWeapon.h"
 
 
@@ -22,8 +20,9 @@ void UWeaponComponent::StopAiming()
 {
 }
 
-void UWeaponComponent::StartAttack()
+void UWeaponComponent::Attack()
 {
+    CurrentWeapon->StartAttack();
 }
 
 void UWeaponComponent::StopAttack()
@@ -42,6 +41,8 @@ void UWeaponComponent::Reload()
 void UWeaponComponent::BeginPlay()
 {
 	Super::BeginPlay();
+    
+    SpawnWeapons();
 }
 
 void UWeaponComponent::SpawnWeapons()
@@ -49,47 +50,31 @@ void UWeaponComponent::SpawnWeapons()
     ACharacter* Character = Cast<ACharacter>(GetOwner());
     if (!Character || !GetWorld()) return;
 
-    for ( auto OneWeaponData :  WeaponData)
-    {
-        auto Weapon = GetWorld()->SpawnActor<ARSBaseWeapon>(OneWeaponData.WeaponClass);
-        if (!Weapon) continue;
-
-        if (Cast<ARSRangedWeapon>(Weapon))
-        {
-            Cast<ARSRangedWeapon>(Weapon)->FOnClipEmpty.AddUObject(this, &UWeaponComponent::OnEmptyClip);
-        }        
-        Weapon->SetOwner(Character);
-        Weapons.Add(Weapon);
-
-        AttachWeaponToSocket(Weapon, Character->GetMesh(), WeaponArmorySocketName);
-    }
+    CurrentWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(WeaponClass);
+    if (!CurrentWeapon) return;
+    FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget,false);
+    CurrentWeapon->AttachToComponent(Character->GetMesh(), AttachmentRules, WeaponEquipSocketName);
+    CurrentWeapon->SetOwner(Character);
 }
 
 void UWeaponComponent::AttachWeaponToSocket(ARSBaseWeapon* Weapon, USceneComponent* SceneComponent, const FName& SocketName)
 {
 }
 
+
 bool UWeaponComponent::CanAim() const
 {
-    return CurrentWeapon && Cast<ARSRangedWeapon>(CurrentWeapon);
+    return true;
 }
 
 bool UWeaponComponent::CanFire() const
 {
-    if (Cast<ARSRangedWeapon>(CurrentWeapon))
-    {
-        return true;
-    }
-    return false;
+    return true;
 }
 
 bool UWeaponComponent::CanMeleeAttack() const
 {
-    if (Cast<ARSMeleeWeapon>(CurrentWeapon))
-    {
-        return true;
-    }
-    return false;
+    return true;
 }
 
 bool UWeaponComponent::CanEquip() const
@@ -110,9 +95,6 @@ void UWeaponComponent::OnEmptyClip()
 void UWeaponComponent::ChangeClip()
 {
     if (!CanReload()) return;
-    if (!Cast<ARSRangedWeapon>(CurrentWeapon)) return;
-    Cast<ARSRangedWeapon>(CurrentWeapon)->StopAttack();
-    Cast<ARSRangedWeapon>(CurrentWeapon)->ChangeClip();
 }
 
 

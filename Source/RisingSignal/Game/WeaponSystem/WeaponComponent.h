@@ -8,18 +8,6 @@
 
 class ARSBaseWeapon;
 
-USTRUCT(BlueprintType)
-struct FWeaponData
-{
-    GENERATED_USTRUCT_BODY()
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
-    TSubclassOf<ARSBaseWeapon> WeaponClass;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
-    UAnimMontage* AnimMontage;
-};
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class RISINGSIGNAL_API UWeaponComponent : public UActorComponent
 {
@@ -30,7 +18,7 @@ public:
 
     void StartAiming();
     void StopAiming();
-    void StartAttack();
+    void Attack();
     void StopAttack();
     
     void NextWeapon();
@@ -38,27 +26,24 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
-    UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-    TArray<FWeaponData> WeaponData;
-
+    
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
     FName WeaponEquipSocketName = "WeaponSocket";
 
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
     FName WeaponArmorySocketName = "ArmorySocket";
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    TSubclassOf<ARSBaseWeapon> WeaponClass;
+
     UPROPERTY(EditDefaultsOnly, Category = "Animation")
     UAnimMontage* EquipAnimMontage;
-
+    
 private:
 
     UPROPERTY()
     ARSBaseWeapon* CurrentWeapon = nullptr;
-
-    UPROPERTY()
-    TArray<ARSBaseWeapon*> Weapons;
-
+    
     void SpawnWeapons();
     void AttachWeaponToSocket(ARSBaseWeapon* Weapon, USceneComponent* SceneComponent, const FName& SocketName);
 

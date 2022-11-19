@@ -2,7 +2,7 @@
 
 
 #include "Game/InteractSystem/StaticItems/RSInteractStaticBonfire.h"
-
+#include "../Plugins/FMODStudio/Source/FMODStudio/Classes/FMODBlueprintStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Game/InteractSystem/InteractItemActor.h"
@@ -140,6 +140,8 @@ void ARSInteractStaticBonfire::SetEnabledVFX(bool bEnable)
 void ARSInteractStaticBonfire::Interact(ACharacter* InteractingCharacter)
 {
     Super::Interact(InteractingCharacter);
+
+    UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), EventIgnition, GetActorTransform(), true);
 
     if (bNeedItem) return;
 
