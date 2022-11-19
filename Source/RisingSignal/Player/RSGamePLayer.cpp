@@ -6,13 +6,14 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
 #include "Game/HUD/GameHUD.h"
 #include "Game/Inventory/RSEquipmentComponent.h"
+#include "Game/WeaponSystem/WeaponComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/GameSession.h"
-#include "Library/RSFunctionLibrary.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Library/RSFunctionLibrary.h"
 
 #pragma region Default
 
@@ -121,7 +122,7 @@ void ARSGamePLayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
     PlayerInputComponent->BindAction(TEXT("ActionSlot3"), IE_Pressed, this, &ARSGamePLayer::InputActionSlot3);
     PlayerInputComponent->BindAction(TEXT("ActionSlot4"), IE_Pressed, this, &ARSGamePLayer::InputActionSlot4);
 
-    PlayerInputComponent->BindAction(TEXT("Attack"), IE_Pressed, WeaponComponent, &UWeaponComponent::StartAttack);
+    PlayerInputComponent->BindAction(TEXT("Attack"), IE_Pressed, WeaponComponent, &UWeaponComponent::Attack);
 }
 
 void ARSGamePLayer::InputLookUp(const float Value)
@@ -250,22 +251,22 @@ void ARSGamePLayer::InputRagdollPressed()
 
 void ARSGamePLayer::InputActionSlot1()
 {
-    EquipmentComponent->TakeInHands(Equip_Slot1);
+    EquipmentComponent->TakeInHands(Slot1);
 }
 
 void ARSGamePLayer::InputActionSlot2()
 {
-    EquipmentComponent->TakeInHands(Equip_Slot2);
+    EquipmentComponent->TakeInHands(Slot2);
 }
 
 void ARSGamePLayer::InputActionSlot3()
 {
-    EquipmentComponent->TakeInHands(Equip_Slot3);
+    EquipmentComponent->TakeInHands(Slot3);
 }
 
 void ARSGamePLayer::InputActionSlot4()
 {
-    EquipmentComponent->TakeInHands(Equip_Slot4);
+    EquipmentComponent->TakeInHands(Slot4);
 }
 
 void ARSGamePLayer::OpenCloseInventory()

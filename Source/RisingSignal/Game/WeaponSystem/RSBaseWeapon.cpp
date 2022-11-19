@@ -3,7 +3,12 @@
 
 #include "Game/WeaponSystem/RSBaseWeapon.h"
 
+#include "AlsCharacter.h"
+#include "DrawDebugHelpers.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Character.h"
+#include "Engine/World.h"
+#include "Library/RSFunctionLibrary.h"
 
 ARSBaseWeapon::ARSBaseWeapon()
 {
@@ -13,9 +18,18 @@ ARSBaseWeapon::ARSBaseWeapon()
     SetRootComponent(WeaponMesh);
 }
 
+void ARSBaseWeapon::StartAiming() {}
+
+void ARSBaseWeapon::StopAiming() {}
+
+void ARSBaseWeapon::StartAttack() {}
+
+void ARSBaseWeapon::StopAttack() {}
+
 void ARSBaseWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+    check(WeaponMesh);
 }
 
 bool ARSBaseWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
@@ -33,9 +47,12 @@ bool ARSBaseWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
 
 APlayerController* ARSBaseWeapon::GetPlayerController() const
 {
-    const auto Player = Cast<ACharacter>(GetOwner());
+    const auto Player = Cast<AAlsCharacter>(GetOwner());
     if (!Player)
+    {
+        LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("no player")));
         return nullptr;
+    }
 
     return Player->GetController<APlayerController>();
 }
@@ -49,7 +66,10 @@ bool ARSBaseWeapon::GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRota
 {
     const auto Controller = GetPlayerController();
     if (!Controller)
+    {
+        LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("no controller")));
         return false;
+    }
 
     Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
     return true;
@@ -64,6 +84,5 @@ void ARSBaseWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart, co
     CollisionParams.AddIgnoredActor(GetOwner());
 
     GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, CollisionParams);
+    LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("Make hit was here")));
 }
-
-

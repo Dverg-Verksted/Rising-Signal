@@ -15,22 +15,30 @@ class RISINGSIGNAL_API ARSBaseWeapon : public AActor
 	
 public:	
 	ARSBaseWeapon();
+    
+    virtual void StartAiming();
+    virtual void StopAiming();
+    virtual void StartAttack();
+    virtual void StopAttack();
+    APlayerController* GetPlayerController() const;
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     USkeletalMeshComponent* WeaponMesh;
-
+    
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     FName MuzzleSocketName = "MuzzleSocket";
-
+    
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     float TraceMaxDistance = 1000.0f;
 
+
+
 	virtual void BeginPlay() override;
     virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
-
-    APlayerController* GetPlayerController() const;
-    FVector GetMuzzleWorldLocation() const;
     bool GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRotation) const;
+
+    FVector GetMuzzleWorldLocation() const;
+    
     void MakeHit(FHitResult& HitResult, const FVector& TraceStart, const FVector& TraceEnd);
 };
