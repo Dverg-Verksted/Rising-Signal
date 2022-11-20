@@ -64,11 +64,11 @@ void UWeaponComponent::SpawnWeapons(ARSBaseWeapon* BaseWeapon)
     ACharacter* Character = Cast<ACharacter>(GetOwner());
     if (!Character || !GetWorld()) return;
 
-    CurrentWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(WeaponClass);
-    if (!CurrentWeapon) return;
+    BaseWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(WeaponClass);
+    if (!BaseWeapon) return;
     FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget,false);
-    CurrentWeapon->AttachToComponent(Character->GetMesh(), AttachmentRules, WeaponEquipSocketName);
-    CurrentWeapon->SetOwner(Character);
+    BaseWeapon->AttachToComponent(Character->GetMesh(), AttachmentRules, WeaponEquipSocketName);
+    BaseWeapon->SetOwner(Character);
 }
 
 
