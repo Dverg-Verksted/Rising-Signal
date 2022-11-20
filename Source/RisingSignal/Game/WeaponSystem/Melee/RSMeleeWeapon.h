@@ -21,9 +21,6 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Оружие", DisplayName="Время между взмахами")
     float TimeBetweenSwing = 2.f;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Оружие", DisplayName="Урон")
-    float DamageAmount = 25.f;
-
     UPROPERTY(EditDefaultsOnly, Category = "Анимация")
     UAnimMontage* AttackAnimMontage;
 

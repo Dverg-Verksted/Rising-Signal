@@ -39,6 +39,9 @@ protected:
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь", DisplayName="Можно снарядить?")
     bool bIsWeapon = true;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Оружие", DisplayName="Урон")
+    float DamageAmount = 25.f;
+
 	virtual void BeginPlay() override;
     virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
     bool GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRotation) const;
