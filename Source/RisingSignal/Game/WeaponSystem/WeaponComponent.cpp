@@ -1,4 +1,4 @@
-// It is owned by the company Dverg Verksted.
+﻿// It is owned by the company Dverg Verksted.
 
 
 #include "Game/WeaponSystem/WeaponComponent.h"
@@ -51,8 +51,10 @@ void UWeaponComponent::SpawnWeapons()
     if (!Character || !GetWorld()) return;
 
     CurrentWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(WeaponClass);
+    
     if (!CurrentWeapon) return;
     FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget,false);
+    
     CurrentWeapon->AttachToComponent(Character->GetMesh(), AttachmentRules, WeaponEquipSocketName);
     CurrentWeapon->SetOwner(Character);
 }

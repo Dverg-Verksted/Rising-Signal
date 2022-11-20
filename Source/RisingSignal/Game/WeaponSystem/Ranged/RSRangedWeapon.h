@@ -1,4 +1,4 @@
-// It is owned by the company Dverg Verksted.
+﻿// It is owned by the company Dverg Verksted.
 
 #pragma once
 
@@ -13,13 +13,13 @@ struct FAmmoData
 {
     GENERATED_USTRUCT_BODY();
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Оружие")
     int32 Bullets;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon", meta=(EditCondition = "!Infinite"))
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Оружие", meta=(EditCondition = "!Infinite"))
     int32 Clips;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Оружие")
     bool Infinite;
 };
 
@@ -42,7 +42,7 @@ public:
 
 protected:
     
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Оружие")
     FAmmoData DefaultAmmo{15,10,false};
 
     virtual void BeginPlay() override;

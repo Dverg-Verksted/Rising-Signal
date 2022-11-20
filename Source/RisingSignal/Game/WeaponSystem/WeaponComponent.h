@@ -1,4 +1,4 @@
-// It is owned by the company Dverg Verksted.
+﻿// It is owned by the company Dverg Verksted.
 
 #pragma once
 
@@ -27,16 +27,16 @@ public:
 protected:
 	virtual void BeginPlay() override;
     
-    UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+    UPROPERTY(EditDefaultsOnly, Category = "Оружие")
     FName WeaponEquipSocketName = "WeaponSocket";
 
-    UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+    UPROPERTY(EditDefaultsOnly, Category = "Оружие")
     FName WeaponArmorySocketName = "ArmorySocket";
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Оружие")
     TSubclassOf<ARSBaseWeapon> WeaponClass;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Animation")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Анимация")
     UAnimMontage* EquipAnimMontage;
     
 private:

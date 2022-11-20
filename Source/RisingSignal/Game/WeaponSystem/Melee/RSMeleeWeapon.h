@@ -1,4 +1,4 @@
-// It is owned by the company Dverg Verksted.
+﻿// It is owned by the company Dverg Verksted.
 
 #pragma once
 
@@ -18,13 +18,13 @@ public:
 protected:
     void MakePunch();
     
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Оружие", DisplayName="Время между взмахами")
     float TimeBetweenSwing = 2.f;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Оружие", DisplayName="Урон")
     float DamageAmount = 25.f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Animation")
+    UPROPERTY(EditDefaultsOnly, Category = "Анимация")
     UAnimMontage* AttackAnimMontage;
 
     virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const override;
@@ -33,6 +33,5 @@ private:
     void MakeDamage(const FHitResult& HitResult);
     void PlayAnimMontage(UAnimMontage* Animation);
     
-
     FTimerHandle MeleeTimerHandle;
 };

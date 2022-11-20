@@ -1,4 +1,4 @@
-// It is owned by the company Dverg Verksted.
+﻿// It is owned by the company Dverg Verksted.
 
 
 #include "Game/WeaponSystem/Ranged/RSRangedWeapon.h"
