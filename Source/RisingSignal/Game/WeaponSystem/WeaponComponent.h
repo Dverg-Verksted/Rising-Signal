@@ -45,6 +45,7 @@ private:
     ARSBaseWeapon* CurrentWeapon = nullptr;
     
     void SpawnWeapons();
+    void SpawnWeapons(ARSBaseWeapon* BaseWeapon);
     void AttachWeaponToSocket(ARSBaseWeapon* Weapon, USceneComponent* SceneComponent, const FName& SocketName);
 
     bool CanAim() const;
