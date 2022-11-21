@@ -24,7 +24,7 @@ void URSAbilitySystem::BeginPlay()
 {
     Super::BeginPlay();
 
-    GetWorld()->GetTimerManager().SetTimer(TStateChange, this, &URSAbilitySystem::CheckStateChanges, TimerCheckStateRate, true);
+    GetWorld()->GetTimerManager().SetTimer(TStateChange, this, &URSAbilitySystem::CheckStateChanges, TimerUpdateState, true);
 
     GamePlayerRef = Cast<ARSGamePLayer>(GetOwner());
     OwnerRef = Cast<ACharacter>(GetOwner());
@@ -75,19 +75,19 @@ float URSAbilitySystem::GetStaminaChangedValue()
     if (GamePlayerRef)
     {
         float const CurrentPlayerSpeed = GamePlayerRef->GetVelocity().Size();
-        if (CurrentPlayerSpeed <= ValueSpeedWhenPlayerStay)
+        if (CurrentPlayerSpeed <= SpeedStay)
         {
-            return ValueStaminaActorStay * TimerCheckStateRate;
+            return StaminaStay * TimerUpdateState;
         }
         // if player walk, make decrease stamina
         if (GamePlayerRef->GetDesiredGait() == EAlsGait::Walking)
         {
-            return ValueStaminaActorWalk * TimerCheckStateRate;
+            return StaminaWalk * TimerUpdateState;
         }
         // if player run, make more decrease stamina
-        if (CurrentPlayerSpeed >= ValueSpeedWhenPlayerRun)
+        if (CurrentPlayerSpeed >= SpeedRun)
         {
-            return ValueStaminaActorRun * TimerCheckStateRate;
+            return StaminaRun * TimerUpdateState;
         }
     }
     return 0.0f;
@@ -103,29 +103,29 @@ float URSAbilitySystem::GetHealthChangedValue()
         FStateParams TempHungryParam = GetState(EAbilityStatesType::Hungry); 
         FStateParams TempTempParam = GetState(EAbilityStatesType::Temp);
         
-        if (GetState(EAbilityStatesType::Health).CurrentValue <= ValueHealthWhenItCriticalLevel)
+        if (GetState(EAbilityStatesType::Health).CurrentValue <= HpCritLvl)
         {
             bHealthIsCriticalLevel = true;
         }
         
         if (TempHungryParam.CurrentValue >= TempHungryParam.AfterIsDebafHungry && !bHealthIsCriticalLevel)
         {
-            ValueOnChangeHealth -= 10 * TimerCheckStateRate;
+            ValueOnChangeHealth -= 10 * TimerUpdateState;
         }
         
         if (TempTempParam.CurrentValue <= TempTempParam.AfterIsDebafTemp && !bHealthIsCriticalLevel)
         {
-            ValueOnChangeHealth -= 10 * TimerCheckStateRate;
+            ValueOnChangeHealth -= 10 * TimerUpdateState;
         }
         
-        // if (TempHungryParam.CurrentValue < ValueHungryWhenItNeedToRegeneration && bHealthIsCriticalLevel)
+        // if (TempHungryParam.CurrentValue < RegenHungry && bHealthIsCriticalLevel)
         // {
-        //     ValueOnChangeHealth += 10 * TimerCheckStateRate;
+        //     ValueOnChangeHealth += 10 * TimerUpdateState;
         // }
         
-        // if (TempTempParam.CurrentValue > ValueTempWhenItNeedToRegeneration && bHealthIsCriticalLevel)
+        // if (TempTempParam.CurrentValue > RegenTemp && bHealthIsCriticalLevel)
         // {
-        //     ValueOnChangeHealth += 10 * TimerCheckStateRate;
+        //     ValueOnChangeHealth += 10 * TimerUpdateState;
         // }
         
     }
@@ -141,9 +141,9 @@ void URSAbilitySystem::OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage,
     if(!GodMode)
     {
         ChangeCurrentStateValue(EAbilityStatesType::Health, -Damage);
-        if(GetState(EAbilityStatesType::Health).CurrentValue <= ValueHealthWhenItCriticalLevel)
+        if(GetState(EAbilityStatesType::Health).CurrentValue <= HpCritLvl)
         {
-            GetWorld()->GetTimerManager().SetTimer(TRegenHealth, this, &URSAbilitySystem::RegenHealth, TimerCheckStateRate, true);
+            GetWorld()->GetTimerManager().SetTimer(TRegenHealth, this, &URSAbilitySystem::RegenHealth, TimerUpdateState, true);
         }
     }
     
@@ -157,7 +157,7 @@ void URSAbilitySystem::OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage,
 
 void URSAbilitySystem::RegenHealth()
 {
-    if(GetState(EAbilityStatesType::Health).CurrentValue < ValueHealthWhenItCriticalLevel)
+    if(GetState(EAbilityStatesType::Health).CurrentValue < HpCritLvl)
     ChangeCurrentStateValue(EAbilityStatesType::Health, 10);
 }
 
