@@ -11,16 +11,15 @@ FInventoryItem::FInventoryItem(const FInventoryItem* OtherItem)
     InteractRowName = OtherItem->InteractRowName;
     Name = OtherItem->Name;
     Description = OtherItem->Description;
-    CostDurability = OtherItem->CostDurability;
     TypeComponent = OtherItem->TypeComponent;
     ImageItem = OtherItem->ImageItem;
     bIsWeapon = OtherItem->bIsWeapon;
+    WeaponSettings = OtherItem->WeaponSettings;
     bStack = OtherItem->bStack;
     bCanUse = OtherItem->bCanUse;
     MaxCount = OtherItem->MaxCount;
     ItemEffect = OtherItem->ItemEffect;
     ItemCategory = OtherItem->ItemCategory;
-    ItemsDurability = OtherItem->ItemsDurability;
     bIsChecked = OtherItem->bIsChecked;
 }
 

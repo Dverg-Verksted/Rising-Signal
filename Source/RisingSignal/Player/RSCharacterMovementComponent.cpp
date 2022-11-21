@@ -20,7 +20,7 @@ void URSCharacterMovementComponent::StartMantle(const FMantlingMovementParameter
 
 void URSCharacterMovementComponent::EndMantle()
 {
-    BaseCharacterOwner->SetIsMantling(false);
+    //BaseCharacterOwner->SetIsMantling(false);
     SetMovementMode(MOVE_Walking);
 }
 
@@ -53,10 +53,11 @@ void URSCharacterMovementComponent::StopRoll()
 {
     const ACharacter* DefaultCharacter = CharacterOwner->GetClass()->GetDefaultObject<ACharacter>();
     const float DefaultHalfHeight = DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
+    const float DefaultRadius = DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleRadius();
     const float HalfHeightAdjust = DefaultHalfHeight - CrouchedHalfHeight;
-    CharacterOwner->GetCapsuleComponent()->SetCapsuleSize(DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleRadius(), DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight());
+    
+    CharacterOwner->GetCapsuleComponent()->SetCapsuleSize(DefaultRadius, DefaultHalfHeight);
     BaseCharacterOwner->SetIsRolling(false);
-    SetMovementMode(MOVE_Walking);
     if (IsEnoughSpaceToStandUp())
     {
         Crouch();
@@ -64,8 +65,9 @@ void URSCharacterMovementComponent::StopRoll()
     }
     else
     {
-        BaseCharacterOwner->OnStopRoll(0.0f);
+        BaseCharacterOwner->OnStopRoll(6.0f);
     }
+    SetMovementMode(MOVE_Walking);
 }
 
 void URSCharacterMovementComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)

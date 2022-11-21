@@ -52,5 +52,7 @@ private:
 
     void SetFallHeight(float NewValue);
 
+    void OnRollStateChanged(bool State);
+
     TWeakObjectPtr<ARSBaseCharacter> CachedBaseCharacter;
 };

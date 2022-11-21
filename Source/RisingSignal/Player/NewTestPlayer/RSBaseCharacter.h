@@ -66,6 +66,8 @@ DECLARE_DELEGATE(FOnSlideSignature);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLandedSignature, float);
 
+DECLARE_DELEGATE_OneParam(FOnRollStateChangedSignature, bool);
+
 UCLASS()
 class RISINGSIGNAL_API ARSBaseCharacter : public ACharacter
 {
@@ -77,6 +79,7 @@ public:
 
     FOnSlideSignature OnSlide;
     FOnLandedSignature OnLanded;
+    FOnRollStateChangedSignature OnRollStateChangedSignature;
 
     virtual void Falling() override;
     virtual void Landed(const FHitResult& Hit) override;
@@ -258,6 +261,9 @@ private:
 private:
 
     const FMantlingSettings& GetMantlingSettings(float LedgeHeight) const;
+
+    bool CanMove();
+    bool CanMantle();
 
     bool bIsMantling;
     bool bIsRolling;

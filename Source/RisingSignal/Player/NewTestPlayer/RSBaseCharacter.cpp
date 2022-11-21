@@ -100,7 +100,7 @@ void ARSBaseCharacter::SetIsRolling(bool NewValue)
 
 void ARSBaseCharacter::OnStartRoll(float HalfHeightAdjust)
 {
-    RecalculateBaseEyeHeight();
+    //RecalculateBaseEyeHeight();
 
     if(OnSlide.IsBound())
     {
@@ -124,16 +124,17 @@ void ARSBaseCharacter::OnStopRoll(float HalfHeightAdjust)
 {
     RecalculateBaseEyeHeight();
 
+    if(OnRollStateChangedSignature.IsBound())
+    {
+        OnRollStateChangedSignature.Execute(false);
+    }
+
     const ACharacter* DefaultChar = GetDefault<ACharacter>(GetClass());
     if(GetMesh() && DefaultChar->GetMesh())
     {
         FVector& MeshRelativeLocation = GetMesh()->GetRelativeLocation_DirectMutable();
         MeshRelativeLocation.Z = DefaultChar->GetMesh()->GetRelativeLocation().Z + HalfHeightAdjust;
         BaseTranslationOffset.Z = MeshRelativeLocation.Z;
-    }
-    else
-    {
-        BaseTranslationOffset.Z = DefaultChar->GetBaseTranslationOffset().Z + HalfHeightAdjust;
     }
 }
 
@@ -198,16 +199,22 @@ void ARSBaseCharacter::InputLookRight(float Value)
 
 void ARSBaseCharacter::InputMoveForward(float Value)
 {
-    FRotator YawRotator(0.0f, GetControlRotation().Yaw, 0.0f);
-    FVector ForwardVector = YawRotator.RotateVector(FVector::ForwardVector);
-    AddMovementInput(ForwardVector, Value);
+    if(CanMove())
+    {
+        FRotator YawRotator(0.0f, GetControlRotation().Yaw, 0.0f);
+        FVector ForwardVector = YawRotator.RotateVector(FVector::ForwardVector);
+        AddMovementInput(ForwardVector, Value);
+    }
 }
 
 void ARSBaseCharacter::InputMoveRight(float Value)
 {
-    FRotator YawRotator(0.0f, GetControlRotation().Yaw, 0.0f);
-    FVector RightVector = YawRotator.RotateVector(FVector::RightVector);
-    AddMovementInput(RightVector, Value);
+    if(CanMove())
+    {
+        FRotator YawRotator(0.0f, GetControlRotation().Yaw, 0.0f);
+        FVector RightVector = YawRotator.RotateVector(FVector::RightVector);
+        AddMovementInput(RightVector, Value);
+    }
 }
 
 void ARSBaseCharacter::InputSprintPressed()
@@ -220,6 +227,10 @@ void ARSBaseCharacter::InputSprintReleased()
 
 void ARSBaseCharacter::InputRoll()
 {
+    if(OnRollStateChangedSignature.IsBound())
+    {
+        OnRollStateChangedSignature.Execute(true);
+    }
     RSCharacterMovementComponent->StartRoll();
 }
 
@@ -233,6 +244,11 @@ void ARSBaseCharacter::InputCrouch()
 
 void ARSBaseCharacter::InputMantle()
 {
+    if(!CanMantle())
+    {
+        return;
+    }
+    
     FLedgeDescription LedgeDescription;
 	if(LedgeDetectorComponent->LedgeDetect(LedgeDescription))
 	{
@@ -357,5 +373,30 @@ void ARSBaseCharacter::RegisterDeath()
 const FMantlingSettings& ARSBaseCharacter::GetMantlingSettings(float LedgeHeight) const
 {
 	    return LedgeHeight > LowMantleMaxHeight ? HighMantlingSettings : LowMantlingSettings;
+}
+
+bool ARSBaseCharacter::CanMove()
+{
+    if(bIsMantling)
+    {
+        return false;
+    }
+    if(bIsRolling)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+
+bool ARSBaseCharacter::CanMantle()
+{
+    if(bIsMantling)
+    {
+        return false;
+    }
+
+    return true;
 }
 
