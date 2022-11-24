@@ -4,8 +4,6 @@
 #include "RSAbilitySystem.h"
 
 #include "TimerManager.h"
-#include "../../../../../Plugins/ElectronicNodes/Source/ElectronicNodes/Private/Lib/HotPatch.h"
-#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Library/RSFunctionLibrary.h"
@@ -25,7 +23,7 @@ void URSAbilitySystem::BeginPlay()
     Super::BeginPlay();
 
     GetWorld()->GetTimerManager().SetTimer(TStateChange, this, &URSAbilitySystem::CheckStateChanges, TimerUpdateState, true);
-
+    
     GamePlayerRef = Cast<ARSGamePLayer>(GetOwner());
     OwnerRef = Cast<ACharacter>(GetOwner());
 
@@ -132,6 +130,98 @@ float URSAbilitySystem::GetHealthChangedValue()
     
     return ValueOnChangeHealth;
     
+}
+
+void URSAbilitySystem::AddEffect(float AddTime, float AddHealth, float AddStamina, float AddStress, float AddHungry, float AddTemp)
+{
+
+    if(GetEffect(AddHealth,  AddStamina,  AddStress, AddHungry, AddTemp))
+    {
+        for (FEffect& Effect : Effects)
+        {
+            if(Effect.Health == AddHealth && Effect.Stamina == AddStamina &&
+                Effect.Stress == AddStress && Effect.Hungry == AddHungry)
+            {
+                Effect.Time += AddTime;
+            }
+        }
+    }
+    else
+    {
+        if(!GetWorld()->GetTimerManager().IsTimerActive(TEffectCheck))
+        {
+            GetWorld()->GetTimerManager().SetTimer(TEffectCheck, this,
+                &URSAbilitySystem::UpdateEffects, 1.0f, true);
+        }
+        FEffect Effect = {AddTime, AddHealth,  AddStamina,  AddStress, AddHungry, AddTemp};
+        Effects.Add(Effect);
+    }
+}
+
+bool URSAbilitySystem::GetEffect(float Health, float Stamina, float Stress, float Hungry, float Temp)
+{
+    FEffect Effect = {Health,  Stamina,  Stress, Hungry, Temp};
+    return FindEffect(Effect);
+}
+
+void URSAbilitySystem::UpdateEffects()
+{
+    
+    for (FEffect& Effect : Effects)
+    {
+        ChangeCurrentStateValue(EAbilityStatesType::Health, Effect.Health);
+        ChangeCurrentStateValue(EAbilityStatesType::Stamina, Effect.Stamina);
+        ChangeCurrentStateValue(EAbilityStatesType::Stress, Effect.Stress);
+        ChangeCurrentStateValue(EAbilityStatesType::Hungry, Effect.Hungry);
+        ChangeCurrentStateValue(EAbilityStatesType::Temp, Effect.Temp);
+
+        if(Effect.Time != 0.0f)
+        {
+            Effect.Time--;
+        }
+        
+        if(Effect.Time == 0.0f)
+        {
+            //Effects.RemoveAt()
+        }
+    }
+}
+
+bool URSAbilitySystem::FindEffect(const FEffect FinEffect)
+{
+    bool Answer = false;
+    for (const FEffect Effect : Effects)
+    {
+        if(Effect.Health == FinEffect.Health && Effect.Stamina == FinEffect.Stamina &&
+                Effect.Stress == FinEffect.Stress && Effect.Hungry == FinEffect.Hungry)
+        {
+            Answer = true;
+        }
+    }
+    return Answer;
+}
+
+void URSAbilitySystem::RemoveEffect(FEffect RemEffect)
+{
+    if(FindEffect(RemEffect) && Effects.Num() > 0)
+    {
+        int i = 0;
+        for (FEffect Effect : Effects)
+        {
+            if(Effect.Health == RemEffect.Health && Effect.Stamina == RemEffect.Stamina &&
+                Effect.Stress == RemEffect.Stress && Effect.Hungry == RemEffect.Hungry)
+            {
+                Effects.RemoveAt(i);
+                break;
+            }
+            i++;
+        }
+    }
+
+    if(Effects.Num() == 0)
+    {
+        GetWorld()->GetTimerManager().ClearTimer(TEffectCheck);
+    }
 }
 
 void URSAbilitySystem::OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy,

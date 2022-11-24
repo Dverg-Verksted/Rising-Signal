@@ -61,6 +61,20 @@ struct FStateParams
     
 };
 
+USTRUCT(BlueprintType)
+struct FEffect
+{
+    GENERATED_USTRUCT_BODY()
+
+    float Time;
+    float Health;
+    float Stamina;
+    float Stress;
+    float Hungry;
+    float Temp;
+    
+};
+
 #pragma region Delegates
 // Universal delegate for all changed Params
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStateChangedSignature, EAbilityStatesType, StateType, float, NewValue);
@@ -91,7 +105,10 @@ public:
     // Timer for control how often need to check state changes
     FTimerHandle TStateChange;
 
+    // Timer for control Health Regeneration
     FTimerHandle TRegenHealth;
+
+    FTimerHandle TEffectCheck;
 
     // Just player references for take ability system or some another component/params
     UPROPERTY()
@@ -105,7 +122,6 @@ protected:
     virtual void BeginPlay() override;
 
 #pragma endregion Defaults
-
 
 #pragma region AbilitySystemParams
 
@@ -230,6 +246,31 @@ private:
 
 #pragma endregion Functions
 
+#pragma region Effects
 
+    UPROPERTY(EditDefaultsOnly, Category = "Effect")
+    TArray<FEffect> Effects;
+     
+    /**
+     * @brief 
+     * @param AddHealth 
+     * @param AddStamina 
+     * @param AddStress 
+     * @param AddHungry 
+     * @param AddTemp 
+     */
+    void AddEffect(float AddTime, float AddHealth, float AddStamina, float AddStress,
+        float AddHungry, float AddTemp);
+
+    bool GetEffect(float Health, float Stamina, float Stress, float Hungry, float Temp);
+
+    void UpdateEffects();
+
+    bool FindEffect(FEffect FindEffect);
+
+    void RemoveEffect(FEffect RemEffect);
+
+
+#pragma endregion Effects
    
 };
