@@ -61,6 +61,20 @@ struct FStateParams
     
 };
 
+USTRUCT(BlueprintType)
+struct FEffect
+{
+    GENERATED_USTRUCT_BODY()
+
+    float Time;
+    float Health;
+    float Stamina;
+    float Stress;
+    float Hungry;
+    float Temp;
+    
+};
+
 #pragma region Delegates
 // Universal delegate for all changed Params
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStateChangedSignature, EAbilityStatesType, StateType, float, NewValue);
@@ -91,7 +105,10 @@ public:
     // Timer for control how often need to check state changes
     FTimerHandle TStateChange;
 
+    // Timer for control Health Regeneration
     FTimerHandle TRegenHealth;
+
+    FTimerHandle TEffectCheck;
 
     // Just player references for take ability system or some another component/params
     UPROPERTY()
@@ -106,7 +123,6 @@ protected:
 
 #pragma endregion Defaults
 
-
 #pragma region AbilitySystemParams
 
 private:
@@ -116,45 +132,45 @@ private:
 
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Критический уровень здоровья ниже или равен",
         meta = (ToolTip = "Ниже или равно какому значению, у игрока будет критический уровень здоровья"))
-    float ValueHealthWhenItCriticalLevel = 20.0f;
+    float HpCritLvl = 20.0f;
     
 
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Регенерация здоровья от Сытости",
         meta = (ToolTip = "Ниже или равно какому значению, у игрока будет регенерироваться здоровье от сытости"))
-    float ValueHungryWhenItNeedToRegeneration = 30.0f;
+    float RegenHungry = 30.0f;
 
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Регенерация здоровья от Тепла",
         meta = (ToolTip = "Ниже или равно какому значению, у игрока будет регенерироваться здоровье от тепла"))
-    float ValueTempWhenItNeedToRegeneration = 30.0f;
+    float RegenTemp = 30.0f;
 
 
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Игрок стоит при скорости",
         meta = (ToolTip = "Ниже или равно какой скорости, у игрока будет фиксироваться что он стоит"))
-    float ValueSpeedWhenPlayerStay = 0.0f;
+    float SpeedStay = 0.0f;
 
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Игрок идет при скорости",
         meta = (ToolTip = "Ниже или равно какой скорости, у игрока будет фиксироваться ходьба"))
-    float ValueSpeedWhenPlayerWalk = 360.f;
+    float SpeedWalk = 360.f;
 
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Игрок бежит при скорости",
         meta = (ToolTip = "Выше или равно какой скорости, у игрока будет фиксироваться бег"))
-    float ValueSpeedWhenPlayerRun = 410.0f;
+    float SpeedRun = 410.0f;
 
 
     // Value which add plus to stamina state, when it changes
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Размер изменения выносливости, если игрок стоит",
         meta = (ToolTip = "На сколько изменяется выносливость, если игрок стоит"))
-    float ValueStaminaActorStay = 7.0f;
+    float StaminaStay = 7.0f;
 
     // Value which add plus to stamina state, when it changes
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Размер изменения выносливости, если игрок идет",
         meta = (ToolTip = "На сколько изменяется выносливость, если игрок идет"))
-    float ValueStaminaActorWalk = 5.0f;
+    float StaminaWalk = 5.0f;
 
     // Value which add plus to stamina state, when it changes
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Размер изменения выносливости, если игрок бежит",
         meta = (ToolTip = "На сколько изменяется выносливость, если игрок бежит"))
-    float ValueStaminaActorRun = -7.0f;
+    float StaminaRun = -7.0f;
 
 
     // Value for control player dead, хз зачем оно
@@ -163,7 +179,7 @@ private:
 
     // Value is how often need update timer
     UPROPERTY(EditDefaultsOnly, Category= "Ability states")
-    float TimerCheckStateRate = 0.1f;
+    float TimerUpdateState = 0.1f;
 
     // if true, player cannot die
     UPROPERTY(EditDefaultsOnly,
@@ -230,6 +246,31 @@ private:
 
 #pragma endregion Functions
 
+#pragma region Effects
 
+    UPROPERTY(EditDefaultsOnly, Category = "Effect")
+    TArray<FEffect> Effects;
+     
+    /**
+     * @brief 
+     * @param AddHealth 
+     * @param AddStamina 
+     * @param AddStress 
+     * @param AddHungry 
+     * @param AddTemp 
+     */
+    void AddEffect(float AddTime, float AddHealth, float AddStamina, float AddStress,
+        float AddHungry, float AddTemp);
+
+    bool GetEffect(float Health, float Stamina, float Stress, float Hungry, float Temp);
+
+    void UpdateEffects();
+
+    bool FindEffect(FEffect FindEffect);
+
+    void RemoveEffect(FEffect RemEffect);
+
+
+#pragma endregion Effects
    
 };
