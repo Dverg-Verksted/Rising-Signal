@@ -1,8 +1,8 @@
 ﻿#pragma once
+
 #include "Engine/DataTable.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
 #include "Game/WeaponSystem/RSBaseWeapon.h"
-
 #include "InventoryTypes.generated.h"
 
 UENUM()
@@ -44,6 +44,23 @@ struct FItemEffect
 };
 
 USTRUCT(BlueprintType)
+struct FWeaponSettings
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь", DisplayName="Класс оружия")
+    TSoftClassPtr<ARSBaseWeapon> WeaponClassPtr;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь", DisplayName="Прочность",
+        meta=(UIMin = 0.0f, ClampMin = 0.0f, UIMax = 100.0f, ClampMax = 100.0f))
+    float ItemsDurability = 0.0f;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category= "Инвентарь",
+        DisplayName = "Трата прочности", meta=(ToolTip = "Трата прочности при использовании предмета", ClampMin = 0.0f, UIMin = 0.0f))
+    float CostDurability = 0.0f;
+};
+
+USTRUCT(BlueprintType)
 struct FInventoryItem : public FTableRowBase
 {
     GENERATED_BODY()
@@ -71,10 +88,6 @@ struct FInventoryItem : public FTableRowBase
     UPROPERTY(BlueprintReadWrite, Category = "Инвентарь", DisplayName = "Количество")
     int32 Count = 0;
 
-    UPROPERTY(BlueprintReadWrite, Category= "Инвентарь",
-        DisplayName = "Трата прочности", meta=(ToolTip = "Трата прочности при использовании предмета", ClampMin = 0.0f, UIMin = 0.0f))
-    float CostDurability = 0.0f;
-
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
         DisplayName = "Изображение", meta=(ToolTip = "Изображение, которое будет отображаться в слотах инвентаря"))
     UTexture2D* ImageItem;
@@ -82,8 +95,8 @@ struct FInventoryItem : public FTableRowBase
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь", DisplayName="Можно снарядить?")
     bool bIsWeapon = false;
 
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь", DisplayName="Класс оружия", meta=(EditCondition = "bIsWeapon", EditConditionHides))
-    TSoftClassPtr<ARSBaseWeapon> WeaponClassPtr;
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь", DisplayName="Настройки оружия", meta=(EditCondition = "bIsWeapon", EditConditionHides))
+    FWeaponSettings WeaponSettings;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
         DisplayName="Стакается предмет?", meta=(EditCondition = "!bCanEquip", EditConditionHides))
@@ -103,10 +116,6 @@ struct FInventoryItem : public FTableRowBase
         meta=(ToolTip = "Настройки эффектов накладываемые на игрока, которые изменяют значения выбранных атрибутов игрока при использовании предмета.",
             EditCondition="bCanUse", EditConditionHides))
     TArray<FItemEffect> ItemEffect;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь", DisplayName="Прочность",
-        meta=(EditCondition="bIsWeapon", EditConditionHides, UIMin = 0.0f, ClampMin = 0.0f, UIMax = 100.0f, ClampMax = 100.0f))
-    float ItemsDurability = 0.0f;
 
     UPROPERTY()
     FName InteractRowName;
@@ -131,16 +140,15 @@ struct FInventoryItem : public FTableRowBase
         this->Description = Other.Description;
         this->SlotIndex = Other.SlotIndex;
         this->Count = Other.Count;
-        this->CostDurability = Other.CostDurability;
         this->TypeComponent = Other.TypeComponent;
         this->ImageItem = Other.ImageItem;
         this->bIsWeapon = Other.bIsWeapon;
+        this->WeaponSettings = Other.WeaponSettings;
         this->bStack = Other.bStack;
         this->bCanUse = Other.bCanUse;
         this->MaxCount = Other.MaxCount;
         this->ItemEffect = Other.ItemEffect;
         this->ItemCategory = Other.ItemCategory;
-        this->ItemsDurability = Other.ItemsDurability;
         this->bIsChecked = Other.bIsChecked;
         return *this;
     }
