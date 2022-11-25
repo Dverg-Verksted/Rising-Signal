@@ -1,4 +1,4 @@
-// It is owned by the company Dverg Verksted.
+﻿// It is owned by the company Dverg Verksted.
 
 #pragma once
 
@@ -23,16 +23,24 @@ public:
     APlayerController* GetPlayerController() const;
 
 protected:
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Компоненты", DisplayName="Скелетал меш оружия" )
     USkeletalMeshComponent* WeaponMesh;
     
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Оружие", DisplayName="Сокет оружия")
     FName MuzzleSocketName = "MuzzleSocket";
     
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Оружие", DisplayName="Максимальная дальность трейс луча")
     float TraceMaxDistance = 1000.0f;
 
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь", DisplayName="Прочность",
+            meta=(EditCondition="bIsWeapon", EditConditionHides, UIMin = 0.0f, ClampMin = 0.0f, UIMax = 100.0f, ClampMax = 100.0f))
+    float ItemsDurability = 0.0f;
 
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Инвентарь", DisplayName="Можно снарядить?")
+    bool bIsWeapon = true;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Оружие", DisplayName="Урон")
+    float DamageAmount = 25.f;
 
 	virtual void BeginPlay() override;
     virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
