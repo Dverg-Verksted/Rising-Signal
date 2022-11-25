@@ -4,6 +4,7 @@
 #include "Game/Inventory/RSEquipmentComponent.h"
 
 #include "Library/RSFunctionLibrary.h"
+#include "Player/RSGamePLayer.h"
 
 URSEquipmentComponent::URSEquipmentComponent()
 {
@@ -73,6 +74,12 @@ void URSEquipmentComponent::CombineItem(const FInventoryItem& FirstInventorySlot
 void URSEquipmentComponent::TakeInHands(int32 Index)
 {
     CurrentItemInHand = Index;
+
+    if(EquipmentSlots[CurrentItemInHand].bIsWeapon)
+    {
+        /*ARSGamePLayer* GamePlayer = Cast<ARSGamePLayer>(GetOwner());
+        GamePlayer->GetWeaponComponent()->*/
+    }
 
     if (EquipmentSlots.Contains(CurrentItemInHand))
     {

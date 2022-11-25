@@ -98,6 +98,11 @@ void ARSBaseCharacter::SetIsRolling(bool NewValue)
     bIsRolling = NewValue;
 }
 
+bool ARSBaseCharacter::GetIsSprinting() const
+{
+    return bIsSprinting;
+}
+
 void ARSBaseCharacter::OnStartRoll(float HalfHeightAdjust)
 {
     RecalculateBaseEyeHeight();
@@ -124,16 +129,17 @@ void ARSBaseCharacter::OnStopRoll(float HalfHeightAdjust)
 {
     RecalculateBaseEyeHeight();
 
+    if(OnRollStateChangedSignature.IsBound())
+    {
+        OnRollStateChangedSignature.Execute(false);
+    }
+
     const ACharacter* DefaultChar = GetDefault<ACharacter>(GetClass());
     if(GetMesh() && DefaultChar->GetMesh())
     {
         FVector& MeshRelativeLocation = GetMesh()->GetRelativeLocation_DirectMutable();
         MeshRelativeLocation.Z = DefaultChar->GetMesh()->GetRelativeLocation().Z + HalfHeightAdjust;
         BaseTranslationOffset.Z = MeshRelativeLocation.Z;
-    }
-    else
-    {
-        BaseTranslationOffset.Z = DefaultChar->GetBaseTranslationOffset().Z + HalfHeightAdjust;
     }
 }
 
@@ -170,6 +176,9 @@ void ARSBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
     PlayerInputComponent->BindAction(TEXT("Mantle"), IE_Pressed, this, &ThisClass::InputMantle);
 
+    PlayerInputComponent->BindAction(TEXT("Sprint"), IE_Pressed, this, &ARSBaseCharacter::InputSprintPressed);
+    PlayerInputComponent->BindAction(TEXT("Sprint"), IE_Released, this, &ARSBaseCharacter::InputSprintReleased);
+
     PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ThisClass::InputJumpPressed);
     PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &ThisClass::InputJumpReleased);
 
@@ -198,28 +207,40 @@ void ARSBaseCharacter::InputLookRight(float Value)
 
 void ARSBaseCharacter::InputMoveForward(float Value)
 {
-    FRotator YawRotator(0.0f, GetControlRotation().Yaw, 0.0f);
-    FVector ForwardVector = YawRotator.RotateVector(FVector::ForwardVector);
-    AddMovementInput(ForwardVector, Value);
+    if(CanMove())
+    {
+        FRotator YawRotator(0.0f, GetControlRotation().Yaw, 0.0f);
+        FVector ForwardVector = YawRotator.RotateVector(FVector::ForwardVector);
+        AddMovementInput(ForwardVector, Value);
+    }
 }
 
 void ARSBaseCharacter::InputMoveRight(float Value)
 {
-    FRotator YawRotator(0.0f, GetControlRotation().Yaw, 0.0f);
-    FVector RightVector = YawRotator.RotateVector(FVector::RightVector);
-    AddMovementInput(RightVector, Value);
+    if(CanMove())
+    {
+        FRotator YawRotator(0.0f, GetControlRotation().Yaw, 0.0f);
+        FVector RightVector = YawRotator.RotateVector(FVector::RightVector);
+        AddMovementInput(RightVector, Value);
+    }
 }
 
 void ARSBaseCharacter::InputSprintPressed()
 {
+    bIsSprinting = true;
 }
 
 void ARSBaseCharacter::InputSprintReleased()
 {
+    bIsSprinting = false;
 }
 
 void ARSBaseCharacter::InputRoll()
 {
+    if(OnRollStateChangedSignature.IsBound())
+    {
+        OnRollStateChangedSignature.Execute(true);
+    }
     RSCharacterMovementComponent->StartRoll();
 }
 
@@ -229,10 +250,23 @@ void ARSBaseCharacter::InputWalk()
 
 void ARSBaseCharacter::InputCrouch()
 {
+    if(GetBaseCharacterMovementComponent()->IsCrouching())
+    {
+        UnCrouch();
+    }
+    else
+    {
+        Crouch();
+    }
 }
 
 void ARSBaseCharacter::InputMantle()
 {
+    if(!CanMantle())
+    {
+        return;
+    }
+    
     FLedgeDescription LedgeDescription;
 	if(LedgeDetectorComponent->LedgeDetect(LedgeDescription))
 	{
@@ -357,5 +391,30 @@ void ARSBaseCharacter::RegisterDeath()
 const FMantlingSettings& ARSBaseCharacter::GetMantlingSettings(float LedgeHeight) const
 {
 	    return LedgeHeight > LowMantleMaxHeight ? HighMantlingSettings : LowMantlingSettings;
+}
+
+bool ARSBaseCharacter::CanMove()
+{
+    if(bIsMantling)
+    {
+        return false;
+    }
+    if(bIsRolling)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+
+bool ARSBaseCharacter::CanMantle()
+{
+    if(bIsMantling)
+    {
+        return false;
+    }
+
+    return true;
 }
 
