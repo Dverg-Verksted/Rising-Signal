@@ -12,6 +12,21 @@ void URSCharacterMovementComponent::BeginPlay()
     BaseCharacterOwner = StaticCast<ARSBaseCharacter*>(GetOwner());
 }
 
+float URSCharacterMovementComponent::GetMaxSpeed() const
+{
+    float Result = Super::GetMaxSpeed();
+    if(BaseCharacterOwner->GetIsSprinting())
+    {
+        Result = SprintSpeed;
+    }
+    if(IsCrouching())
+    {
+        Result = CrouchSpeed;
+    }
+
+    return Result;
+}
+
 void URSCharacterMovementComponent::StartMantle(const FMantlingMovementParameters& MantlingMovementParameters)
 {
     CurrentMantlingParameters = MantlingMovementParameters;
@@ -20,7 +35,6 @@ void URSCharacterMovementComponent::StartMantle(const FMantlingMovementParameter
 
 void URSCharacterMovementComponent::EndMantle()
 {
-    //BaseCharacterOwner->SetIsMantling(false);
     SetMovementMode(MOVE_Walking);
 }
 
@@ -52,20 +66,25 @@ void URSCharacterMovementComponent::StartRoll()
 void URSCharacterMovementComponent::StopRoll()
 {
     const ACharacter* DefaultCharacter = CharacterOwner->GetClass()->GetDefaultObject<ACharacter>();
+    const float ComponentScale = CharacterOwner->GetCapsuleComponent()->GetShapeScale();
     const float DefaultHalfHeight = DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
     const float DefaultRadius = DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleRadius();
-    const float HalfHeightAdjust = DefaultHalfHeight - CrouchedHalfHeight;
+    float HalfHeightAdjust = DefaultHalfHeight - RollCapsuleHalfHeight;
+    const float ScaledHalfHeightAdjust = HalfHeightAdjust * ComponentScale;
     
     CharacterOwner->GetCapsuleComponent()->SetCapsuleSize(DefaultRadius, DefaultHalfHeight);
     BaseCharacterOwner->SetIsRolling(false);
     if (IsEnoughSpaceToStandUp())
     {
+        HalfHeightAdjust = DefaultHalfHeight - CrouchedHalfHeight;
         Crouch();
         BaseCharacterOwner->OnStopRoll(HalfHeightAdjust);
     }
     else
     {
-        BaseCharacterOwner->OnStopRoll(6.0f);
+        UpdatedComponent->MoveComponent(FVector(0.f, 0.f, ScaledHalfHeightAdjust), UpdatedComponent->GetComponentQuat(), true, nullptr,
+            MOVECOMP_NoFlags, ETeleportType::TeleportPhysics);
+        BaseCharacterOwner->OnStopRoll(0.0f);
     }
     SetMovementMode(MOVE_Walking);
 }
@@ -83,10 +102,12 @@ void URSCharacterMovementComponent::OnMovementModeChanged(EMovementMode Previous
             {
                 GetWorld()->GetTimerManager().SetTimer(MantlingTimer, this, &URSCharacterMovementComponent::EndMantle,
                     CurrentMantlingParameters.Duration, false);
+                break;
             }
             case (uint8)ECustomMovementMode::CMOVE_Rolling:
             {
                 GetWorld()->GetTimerManager().SetTimer(RollingTimer, this, &URSCharacterMovementComponent::StopRoll, CurrentRollingParameters.Duration , false);
+                break;
             }
             default: break;
         }

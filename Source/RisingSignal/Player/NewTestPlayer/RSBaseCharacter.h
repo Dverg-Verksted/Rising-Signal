@@ -34,9 +34,6 @@ struct FMantlingSettings
     class UAnimMontage* MantlingMontage;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    class UAnimMontage* FPMantlingMontage;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     class UCurveVector* MantlingCurve;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -94,6 +91,8 @@ public:
 
     FORCEINLINE bool GetIsRolling() const;
     void SetIsRolling(bool NewValue);
+
+    FORCEINLINE bool GetIsSprinting() const;
 
     void OnStartRoll(float HalfHeightAdjust);
     void OnStopRoll(float HalfHeightAdjust);
@@ -267,4 +266,5 @@ private:
 
     bool bIsMantling;
     bool bIsRolling;
+    bool bIsSprinting;
 };

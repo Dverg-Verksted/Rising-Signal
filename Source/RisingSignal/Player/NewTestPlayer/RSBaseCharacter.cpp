@@ -98,9 +98,14 @@ void ARSBaseCharacter::SetIsRolling(bool NewValue)
     bIsRolling = NewValue;
 }
 
+bool ARSBaseCharacter::GetIsSprinting() const
+{
+    return bIsSprinting;
+}
+
 void ARSBaseCharacter::OnStartRoll(float HalfHeightAdjust)
 {
-    //RecalculateBaseEyeHeight();
+    RecalculateBaseEyeHeight();
 
     if(OnSlide.IsBound())
     {
@@ -171,6 +176,9 @@ void ARSBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
     PlayerInputComponent->BindAction(TEXT("Mantle"), IE_Pressed, this, &ThisClass::InputMantle);
 
+    PlayerInputComponent->BindAction(TEXT("Sprint"), IE_Pressed, this, &ARSBaseCharacter::InputSprintPressed);
+    PlayerInputComponent->BindAction(TEXT("Sprint"), IE_Released, this, &ARSBaseCharacter::InputSprintReleased);
+
     PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ThisClass::InputJumpPressed);
     PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &ThisClass::InputJumpReleased);
 
@@ -219,10 +227,12 @@ void ARSBaseCharacter::InputMoveRight(float Value)
 
 void ARSBaseCharacter::InputSprintPressed()
 {
+    bIsSprinting = true;
 }
 
 void ARSBaseCharacter::InputSprintReleased()
 {
+    bIsSprinting = false;
 }
 
 void ARSBaseCharacter::InputRoll()
@@ -240,6 +250,14 @@ void ARSBaseCharacter::InputWalk()
 
 void ARSBaseCharacter::InputCrouch()
 {
+    if(GetBaseCharacterMovementComponent()->IsCrouching())
+    {
+        UnCrouch();
+    }
+    else
+    {
+        Crouch();
+    }
 }
 
 void ARSBaseCharacter::InputMantle()
