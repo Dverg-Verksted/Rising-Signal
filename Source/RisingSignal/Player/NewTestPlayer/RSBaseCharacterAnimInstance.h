@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "RSBaseCharacter.h"
 #include "Animation/AnimInstance.h"
+#include "Settings/AlsInAirSettings.h"
 #include "RSBaseCharacterAnimInstance.generated.h"
 
 /**
@@ -20,8 +21,6 @@ public:
     virtual void NativeBeginPlay() override;
     virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
-    void PlayRollMontage();
-
 protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Slide animations")
@@ -36,6 +35,12 @@ protected:
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
     bool bIsFalling = false;
 
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+    bool bIsSprinting = false;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+    bool bIsCrouching = false;
+    
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     float LowHeight = 3.0f;
 
@@ -51,6 +56,8 @@ protected:
 private:
 
     void SetFallHeight(float NewValue);
+
+    void OnRollStateChanged(bool State);
 
     TWeakObjectPtr<ARSBaseCharacter> CachedBaseCharacter;
 };

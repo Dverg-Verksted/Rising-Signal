@@ -54,6 +54,11 @@ class RISINGSIGNAL_API URSCharacterMovementComponent : public UCharacterMovement
 public:
     virtual void BeginPlay() override;
 
+    void StartSprint();
+    void StopSprint();
+
+    virtual float GetMaxSpeed() const override;
+
     void StartMantle(const FMantlingMovementParameters& MantlingMovementParameters);
     void EndMantle();
 
@@ -79,8 +84,14 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Roll parameters")
     float RollCapsuleHalfHeight = 40.0f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Roll parameters")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Speed parameters")
     float RollSpeed = 600.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Speed parameters")
+    float SprintSpeed = 600.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Speed parameters")
+    float CrouchSpeed = 200.0f;
 
 private:
     TSoftObjectPtr<ARSBaseCharacter> BaseCharacterOwner;
