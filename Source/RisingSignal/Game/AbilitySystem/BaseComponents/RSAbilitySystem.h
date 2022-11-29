@@ -252,6 +252,12 @@ public:
 
     void RegenHealth();
 
+    UFUNCTION()
+    void StressOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+    UFUNCTION()
+    void StressOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 private:
     // control on state changes, it check all state on new change value
     UFUNCTION()

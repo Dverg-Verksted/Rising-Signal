@@ -15,19 +15,21 @@
 URSAbilitySystem::URSAbilitySystem()
 {
     PrimaryComponentTick.bCanEverTick = false;
+    SphereCollision = CreateDefaultSubobject<USphereComponent>("StressCollision");
+    if(SphereCollision) SphereCollision->InitSphereRadius(100.0f);
 }
 
 // Called when the game starts
 void URSAbilitySystem::BeginPlay()
 {
     Super::BeginPlay();
-
-    // SphereCollision = CreateDefaultSubobject<USphereComponent>("SphereComponent");
-    // SphereCollision->InitSphereRadius(100.0f);
-    // SphereCollision->SetCollisionProfileName("CharacterMesh");
-    // SphereCollision->SetGenerateOverlapEvents(true);
-    // SphereCollision->bHiddenInGame = false;
-    // SphereCollision->SetupAttachment(GetOwner()->GetRootComponent());
+    
+    SphereCollision->SetCollisionProfileName("OverlapAllDynamic");
+    SphereCollision->SetGenerateOverlapEvents(true);
+    SphereCollision->bHiddenInGame = false;
+    SphereCollision->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+    SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &URSAbilitySystem::StressOverlapBegin);
+    SphereCollision->OnComponentEndOverlap.AddDynamic(this, &URSAbilitySystem::StressOverlapEnd);
     
     GetWorld()->GetTimerManager().SetTimer(TStateChange, this, &URSAbilitySystem::CheckStateChanges, TimerUpdateState, true);
     
@@ -263,6 +265,35 @@ void URSAbilitySystem::RegenHealth()
 {
     if(GetState(EAbilityStatesType::Health).CurrentValue < HpCritLvl)
     ChangeCurrentStateValue(EAbilityStatesType::Health, 10);
+}
+
+void URSAbilitySystem::StressOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+    UActorComponent* TempAbilitySys = OtherActor->GetComponentByClass(URSAbilitySystem::StaticClass());
+    if(OtherActor->GetComponentByClass(URSAbilitySystem::StaticClass()))
+    {
+        if(!IsMonster)
+        {
+            SetChangeValue(EAbilityStatesType::Stress,
+                Cast<URSAbilitySystem>(TempAbilitySys)->GetState(EAbilityStatesType::Stress).StressDamageOut);
+        }
+    }
+}
+
+void URSAbilitySystem::StressOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp,int32 OtherBodyIndex)
+{
+    UActorComponent* TempAbilitySys = OtherActor->GetComponentByClass(URSAbilitySystem::StaticClass());
+    if(OtherActor->GetComponentByClass(URSAbilitySystem::StaticClass()))
+    {
+        if(!IsMonster)
+        {
+            SetChangeValue(EAbilityStatesType::Stress,
+                Cast<URSAbilitySystem>(TempAbilitySys)->
+                GetState(EAbilityStatesType::Stress).StressDamageOut * -1.0f);
+        }
+    }
 }
 
 
