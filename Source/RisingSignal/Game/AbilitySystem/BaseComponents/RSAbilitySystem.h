@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/SphereComponent.h"
 #include "RSAbilitySystem.generated.h"
 
 class ARSGamePLayer;
@@ -56,8 +57,13 @@ struct FStateParams
 
     // How much changes state per time
     UPROPERTY(EditDefaultsOnly,
-        meta = (ToolTip = "Значение, на которое будет изменяться значение параметра при восстановлении или убавлении"))
+        meta = (ToolTip = "Значение, изменения параметра"))
     float ChangedValue = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Struct",
+    meta = (ToolTip = "Эффект стресса на других", EditCondition =
+        "StateType == EAbilityStatesType::Stress", EditConditionHides))
+    float StressEffect = 0.0f;
     
 };
 
@@ -83,12 +89,11 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStateChangedSignature, EAbilityS
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathSignature);
 #pragma endregion Delegates
 
+#pragma region Defaults
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class RISINGSIGNAL_API URSAbilitySystem : public UActorComponent
 {
     GENERATED_BODY()
-
-#pragma region Defaults
 
 public:
     // Sets default values for this component's properties
@@ -117,6 +122,9 @@ public:
     UPROPERTY()
     ACharacter* OwnerRef;
 
+    UPROPERTY()
+    USphereComponent* SphereCollision;
+
 protected:
     // Called when the game starts
     virtual void BeginPlay() override;
@@ -125,11 +133,12 @@ protected:
 
 #pragma region AbilitySystemParams
 
+public:
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Ability states")
+    TArray<FStateParams> States;
+    
 private:
     // Array of Ability states
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states")
-    TArray<FStateParams> States;
-
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Критический уровень здоровья ниже или равен",
         meta = (ToolTip = "Ниже или равно какому значению, у игрока будет критический уровень здоровья"))
     float HpCritLvl = 20.0f;
@@ -159,20 +168,22 @@ private:
 
     // Value which add plus to stamina state, when it changes
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Размер изменения выносливости, если игрок стоит",
-        meta = (ToolTip = "На сколько изменяется выносливость, если игрок стоит"))
+        meta = (ToolTip = "Расход выносливости, если стоит"))
     float StaminaStay = 7.0f;
 
     // Value which add plus to stamina state, when it changes
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Размер изменения выносливости, если игрок идет",
-        meta = (ToolTip = "На сколько изменяется выносливость, если игрок идет"))
+        meta = (ToolTip = "Расход выносливости, если идет"))
     float StaminaWalk = 5.0f;
 
     // Value which add plus to stamina state, when it changes
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Размер изменения выносливости, если игрок бежит",
-        meta = (ToolTip = "На сколько изменяется выносливость, если игрок бежит"))
+        meta = (ToolTip = "Расход выносливости, если бежит"))
     float StaminaRun = -7.0f;
 
-
+    UPROPERTY(EditDefaultsOnly, Category="AbilityStates")
+    bool IsMonster = false;
+    
     // Value for control player dead, хз зачем оно
     UPROPERTY(VisibleDefaultsOnly, Category = "Ability states")
     bool bIsDead = false;
@@ -199,6 +210,10 @@ public:
     FORCEINLINE
     bool GetIsDead() const { return bIsDead; }
 
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    FORCEINLINE
+    bool GetIsMonstr() {return  IsMonster;}
+
     /* Universal func on change any state in TArray States
      * Has a check for the presence of a parameter
      * On input get type of state and change value,
@@ -208,7 +223,7 @@ public:
     void ChangeCurrentStateValue(EAbilityStatesType StateTy, float AddValue);
     
     // Set new change value in state in ability system with AbilityStateType
-    UFUNCTION()
+    UFUNCTION(BlueprintCallable)
     void SetChangeValue(EAbilityStatesType AbilityStateType, float ChangedValueModifier);
 
     // Return true if player is dead

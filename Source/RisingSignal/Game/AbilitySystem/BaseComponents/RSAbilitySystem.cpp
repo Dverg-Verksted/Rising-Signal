@@ -22,6 +22,13 @@ void URSAbilitySystem::BeginPlay()
 {
     Super::BeginPlay();
 
+    // SphereCollision = CreateDefaultSubobject<USphereComponent>("SphereComponent");
+    // SphereCollision->InitSphereRadius(100.0f);
+    // SphereCollision->SetCollisionProfileName("CharacterMesh");
+    // SphereCollision->SetGenerateOverlapEvents(true);
+    // SphereCollision->bHiddenInGame = false;
+    // SphereCollision->SetupAttachment(GetOwner()->GetRootComponent());
+    
     GetWorld()->GetTimerManager().SetTimer(TStateChange, this, &URSAbilitySystem::CheckStateChanges, TimerUpdateState, true);
     
     GamePlayerRef = Cast<ARSGamePLayer>(GetOwner());
@@ -115,16 +122,6 @@ float URSAbilitySystem::GetHealthChangedValue()
         {
             ValueOnChangeHealth -= 10 * TimerUpdateState;
         }
-        
-        // if (TempHungryParam.CurrentValue < RegenHungry && bHealthIsCriticalLevel)
-        // {
-        //     ValueOnChangeHealth += 10 * TimerUpdateState;
-        // }
-        
-        // if (TempTempParam.CurrentValue > RegenTemp && bHealthIsCriticalLevel)
-        // {
-        //     ValueOnChangeHealth += 10 * TimerUpdateState;
-        // }
         
     }
     
