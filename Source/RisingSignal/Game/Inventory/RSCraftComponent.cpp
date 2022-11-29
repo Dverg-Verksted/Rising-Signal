@@ -111,7 +111,6 @@ bool URSCraftComponent::CanCraftRecipe(const FRecipeItem* RecipeItem) const
         {
             return true;
         }
-        return false;
     }
     if(RecipeItem->bIsNeedCampFire)
     {
@@ -119,7 +118,6 @@ bool URSCraftComponent::CanCraftRecipe(const FRecipeItem* RecipeItem) const
         {
             return true;
         }
-        return false;
     }
     if(RecipeItem->bIsNeedWorkbench)
     {
@@ -127,10 +125,9 @@ bool URSCraftComponent::CanCraftRecipe(const FRecipeItem* RecipeItem) const
         {
             return true;
         }
-        return false;
     }
 
-    return true;
+    return false;
 }
 
 void URSCraftComponent::ClearOutputSlot()
