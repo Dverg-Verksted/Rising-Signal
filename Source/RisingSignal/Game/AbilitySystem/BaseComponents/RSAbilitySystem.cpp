@@ -107,6 +107,7 @@ float URSAbilitySystem::GetHealthChangedValue()
     {
         FStateParams TempHungryParam = GetState(EAbilityStatesType::Hungry); 
         FStateParams TempTempParam = GetState(EAbilityStatesType::Temp);
+        FStateParams TempStressParam = GetState(EAbilityStatesType::Stress);
         
         if (GetState(EAbilityStatesType::Health).CurrentValue <= HpCritLvl)
         {
@@ -122,6 +123,22 @@ float URSAbilitySystem::GetHealthChangedValue()
         {
             ValueOnChangeHealth -= 10 * TimerUpdateState;
         }
+
+        // if (TempHungryParam.CurrentValue < RegenHungry && bHealthIsCriticalLevel)
+        // {
+        //     ValueOnChangeHealth += 10 * TimerUpdateState;
+        // }
+        
+        // if (TempTempParam.CurrentValue > RegenTemp && bHealthIsCriticalLevel)
+        // {
+        //     ValueOnChangeHealth += 10 * TimerUpdateState;
+        // }
+
+        if (TempStressParam.CurrentValue  >= TempStressParam.AfterIsDebafStress && !bHealthIsCriticalLevel)
+        {
+            ValueOnChangeHealth -= 10 * TimerUpdateState;
+        }
+        
         
     }
     

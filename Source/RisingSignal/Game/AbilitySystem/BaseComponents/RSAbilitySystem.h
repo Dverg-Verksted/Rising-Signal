@@ -45,15 +45,21 @@ struct FStateParams
 
     // Value for Hungry, when system should make damage on health
     UPROPERTY(EditDefaultsOnly,
-        meta = (ToolTip = "Значение, после которого голод будет убавлять здоровье", EditCondition =
+        meta = (ToolTip = "Значение, после которого голод убавляет здоровье", EditCondition =
             "StateType == EAbilityStatesType::Hungry", EditConditionHides))
     float AfterIsDebafHungry = 0.0f;
 
     // Value for Temp, when system should make damage on health
     UPROPERTY(EditDefaultsOnly,
-        meta = (ToolTip = "Значение, после которого замерзание будет убавлять здоровье", EditCondition =
+        meta = (ToolTip = "Значение, после которого замерзание убавляет здоровье", EditCondition =
             "StateType == EAbilityStatesType::Temp", EditConditionHides))
     float AfterIsDebafTemp = 0.0f;
+
+    // Value for Stress, when system should make damage on health
+    UPROPERTY(EditDefaultsOnly,
+        meta = (ToolTip = "Значение, после которого стресс убавляет здоровье", EditCondition =
+            "StateType == EAbilityStatesType::Stress", EditConditionHides))
+    float AfterIsDebafStress = 0.0f;
 
     // How much changes state per time
     UPROPERTY(EditDefaultsOnly,
@@ -63,7 +69,7 @@ struct FStateParams
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Struct",
     meta = (ToolTip = "Эффект стресса на других", EditCondition =
         "StateType == EAbilityStatesType::Stress", EditConditionHides))
-    float StressEffect = 0.0f;
+    float StressDamageOut = 0.0f;
     
 };
 
@@ -153,31 +159,31 @@ private:
     float RegenTemp = 30.0f;
 
 
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Игрок стоит при скорости",
-        meta = (ToolTip = "Ниже или равно какой скорости, у игрока будет фиксироваться что он стоит"))
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Скорость на месте",
+        meta = (ToolTip = "Скорость на месте"))
     float SpeedStay = 0.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Игрок идет при скорости",
-        meta = (ToolTip = "Ниже или равно какой скорости, у игрока будет фиксироваться ходьба"))
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Скорость ходьбы",
+        meta = (ToolTip = "Скорость ходьбы"))
     float SpeedWalk = 360.f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Игрок бежит при скорости",
-        meta = (ToolTip = "Выше или равно какой скорости, у игрока будет фиксироваться бег"))
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Скорость бега",
+        meta = (ToolTip = "Скорость бега"))
     float SpeedRun = 410.0f;
 
 
     // Value which add plus to stamina state, when it changes
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Размер изменения выносливости, если игрок стоит",
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Расход выносливости, если стоит",
         meta = (ToolTip = "Расход выносливости, если стоит"))
     float StaminaStay = 7.0f;
 
     // Value which add plus to stamina state, when it changes
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Размер изменения выносливости, если игрок идет",
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Расход выносливости, если идет",
         meta = (ToolTip = "Расход выносливости, если идет"))
     float StaminaWalk = 5.0f;
 
     // Value which add plus to stamina state, when it changes
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Размер изменения выносливости, если игрок бежит",
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Расход выносливости, если бежит",
         meta = (ToolTip = "Расход выносливости, если бежит"))
     float StaminaRun = -7.0f;
 
