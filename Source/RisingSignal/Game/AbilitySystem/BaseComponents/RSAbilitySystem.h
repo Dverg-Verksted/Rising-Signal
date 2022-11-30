@@ -159,34 +159,35 @@ private:
     float SpeedRun = 410.0f;
 
     // Value which add plus to stamina state, when it changes
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Расход выносливости, если стоит",
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Расход стамины стоя",
         meta = (ToolTip = "Расход выносливости, если стоит"))
     float StaminaStay = 7.0f;
 
     // Value which add plus to stamina state, when it changes
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Расход выносливости, если идет",
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Расход стамины идя",
         meta = (ToolTip = "Расход выносливости, если идет"))
     float StaminaWalk = 5.0f;
 
     // Value which add plus to stamina state, when it changes
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Расход выносливости, если бежит",
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Расход стамины бег",
         meta = (ToolTip = "Расход выносливости, если бежит"))
     float StaminaRun = -7.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category="AbilityStates")
+    UPROPERTY(EditDefaultsOnly, Category="Ability states", DisplayName="это Монстр?")
     bool IsMonster = false;
     
     // Value for control player dead, хз зачем оно
-    UPROPERTY(VisibleDefaultsOnly, Category = "Ability states")
+    UPROPERTY()
     bool bIsDead = false;
 
     // Value is how often need update timer
-    UPROPERTY(EditDefaultsOnly, Category= "Ability states")
+    UPROPERTY(EditDefaultsOnly, Category= "Ability states", DisplayName="ЧОК Стат")
     float TimerUpdateState = 0.1f;
 
     // if true, player cannot die
     UPROPERTY(EditDefaultsOnly,
-            meta = (ToolTip = "Режим бога, ты есть все, ты есть вся"))
+            meta = (ToolTip = "Режим бога, ты есть все, ты есть вся"),
+            DisplayName="Режим Бога")
     bool GodMode = false;
 
 #pragma endregion AbilitySystemParams
