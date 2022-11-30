@@ -149,18 +149,14 @@ private:
         meta = (ToolTip = "Ниже или равно какому значению, у игрока будет критический уровень здоровья"))
     float HpCritLvl = 20.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Скорость на месте",
-        meta = (ToolTip = "Скорость на месте"))
+    UPROPERTY()
     float SpeedStay = 0.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Скорость ходьбы",
-        meta = (ToolTip = "Скорость ходьбы"))
+    UPROPERTY()
     float SpeedWalk = 360.f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Скорость бега",
-        meta = (ToolTip = "Скорость бега"))
+    UPROPERTY()
     float SpeedRun = 410.0f;
-
 
     // Value which add plus to stamina state, when it changes
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Расход выносливости, если стоит",
