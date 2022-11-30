@@ -145,19 +145,9 @@ public:
     
 private:
     // Array of Ability states
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Критический уровень здоровья ниже или равен",
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Крит здоровье",
         meta = (ToolTip = "Ниже или равно какому значению, у игрока будет критический уровень здоровья"))
     float HpCritLvl = 20.0f;
-    
-
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Регенерация здоровья от Сытости",
-        meta = (ToolTip = "Ниже или равно какому значению, у игрока будет регенерироваться здоровье от сытости"))
-    float RegenHungry = 30.0f;
-
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Регенерация здоровья от Тепла",
-        meta = (ToolTip = "Ниже или равно какому значению, у игрока будет регенерироваться здоровье от тепла"))
-    float RegenTemp = 30.0f;
-
 
     UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Скорость на месте",
         meta = (ToolTip = "Скорость на месте"))

@@ -126,16 +126,6 @@ float URSAbilitySystem::GetHealthChangedValue()
             ValueOnChangeHealth -= 10 * TimerUpdateState;
         }
 
-        // if (TempHungryParam.CurrentValue < RegenHungry && bHealthIsCriticalLevel)
-        // {
-        //     ValueOnChangeHealth += 10 * TimerUpdateState;
-        // }
-        
-        // if (TempTempParam.CurrentValue > RegenTemp && bHealthIsCriticalLevel)
-        // {
-        //     ValueOnChangeHealth += 10 * TimerUpdateState;
-        // }
-
         if (TempStressParam.CurrentValue  >= TempStressParam.AfterIsDebafStress && !bHealthIsCriticalLevel)
         {
             ValueOnChangeHealth -= 10 * TimerUpdateState;
