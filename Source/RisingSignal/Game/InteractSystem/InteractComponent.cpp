@@ -42,7 +42,7 @@ void UInteractComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-    OwnerPlayer = Cast<ARSGamePLayer>(GetOwner());
+    OwnerPlayer = Cast<ARSBaseCharacter>(GetOwner());
     if (!OwnerPlayer)
     {
         LOG_INTERACT(ELogRSVerb::Error, "Owner player is nullptr");
@@ -191,7 +191,7 @@ void UInteractComponent::RegisterInteractEvent()
 {
     LOG_INTERACT(ELogRSVerb::Display, "Pressed button interact");
 
-    const ARSGamePLayer* Player = GetOwner<ARSGamePLayer>();
+    const ARSBaseCharacter* Player = GetOwner<ARSBaseCharacter>();
     if (!Player || Player->GetCharacterMovement()->IsFalling()) // TODO: Add check for rolling
     {
         LOG_INTERACT(ELogRSVerb::Warning, "Can't interact, Player is Falling");

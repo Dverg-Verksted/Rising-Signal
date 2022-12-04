@@ -8,6 +8,7 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "Library/RSFunctionLibrary.h"
 #include "Player/RSGamePLayer.h"
+#include "Player/NewTestPlayer/RSBaseCharacter.h"
 
 
 #pragma region Defaults
@@ -33,7 +34,7 @@ void URSAbilitySystem::BeginPlay()
     
     GetWorld()->GetTimerManager().SetTimer(TStateChange, this, &URSAbilitySystem::CheckStateChanges, TimerUpdateState, true);
     
-    GamePlayerRef = Cast<ARSGamePLayer>(GetOwner());
+    GamePlayerRef = Cast<ARSBaseCharacter>(GetOwner());
     OwnerRef = Cast<ACharacter>(GetOwner());
 
     if (OwnerRef)
@@ -87,7 +88,7 @@ float URSAbilitySystem::GetStaminaChangedValue()
             return StaminaStay * TimerUpdateState;
         }
         // if player walk, make decrease stamina
-        if (GamePlayerRef->GetDesiredGait() == EAlsGait::Walking)
+        if (CurrentPlayerSpeed > SpeedStay)
         {
             return StaminaWalk * TimerUpdateState;
         }

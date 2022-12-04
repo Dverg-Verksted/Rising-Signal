@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Library/RSFunctionLibrary.h"
+#include "Player/NewTestPlayer/RSBaseCharacter.h"
+//#include "Player/NewTestPlayer/RSBaseCharacter.h"
 #include "InteractComponent.generated.h"
 
 class URSInventoryComponent;
@@ -63,7 +65,7 @@ private:
 
     // @private Owner Actor component
     UPROPERTY()
-    ARSGamePLayer* OwnerPlayer;
+    ARSBaseCharacter* OwnerPlayer;
 
     // @private Owner Controller actor
     UPROPERTY()

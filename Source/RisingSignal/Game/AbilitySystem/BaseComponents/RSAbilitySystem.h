@@ -8,6 +8,7 @@
 #include "RSAbilitySystem.generated.h"
 
 class ARSGamePLayer;
+class ARSBaseCharacter;
 
 // Enum for ability state types
 UENUM(BlueprintType)
@@ -123,7 +124,7 @@ public:
 
     // Just player references for take ability system or some another component/params
     UPROPERTY()
-    ARSGamePLayer* GamePlayerRef;
+    ARSBaseCharacter* GamePlayerRef;
 
     UPROPERTY()
     ACharacter* OwnerRef;
