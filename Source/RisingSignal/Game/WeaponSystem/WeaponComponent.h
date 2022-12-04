@@ -26,8 +26,8 @@ public:
     void NextWeapon();
     void Reload();
 
-    void SpawnWeapons();
-    void SpawnWeapons(ARSBaseWeapon* BaseWeapon);
+    // void SpawnWeapons();
+    void EquipWeapon(TSoftClassPtr<ARSBaseWeapon> BaseWeapon);
 
     FWeaponSettings GetWeaponSettings() const {return WeaponSettings;}
 
@@ -40,9 +40,9 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Оружие")
     FName WeaponArmorySocketName = "ArmorySocket";
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Оружие")
-    TSubclassOf<ARSBaseWeapon> WeaponClass;
-
+    // UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Оружие")
+    // TSubclassOf<ARSBaseWeapon> WeaponClass;
+    
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Оружие")
     FWeaponSettings WeaponSettings;
 
@@ -53,8 +53,11 @@ private:
 
     UPROPERTY()
     ARSBaseWeapon* CurrentWeapon = nullptr;
+
+    UPROPERTY()
+    ARSBaseWeapon* EquipedWeapon = nullptr;
     
-    void AttachWeaponToSocket(ARSBaseWeapon* Weapon, USceneComponent* SceneComponent, const FName& SocketName);
+    void AttachWeaponToSocket(TSoftClassPtr<ARSBaseWeapon> BaseWeapon, USceneComponent* SceneComponent, const FName& SocketName);
 
     bool CanAim() const;
     bool CanFire() const;
