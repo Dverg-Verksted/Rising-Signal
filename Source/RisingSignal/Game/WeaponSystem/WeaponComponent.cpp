@@ -25,6 +25,10 @@ void UWeaponComponent::Attack()
     CurrentWeapon->StartAttack();
 }
 
+void UWeaponComponent::HeavyAttack()
+{
+}
+
 void UWeaponComponent::StopAttack()
 {
 }
