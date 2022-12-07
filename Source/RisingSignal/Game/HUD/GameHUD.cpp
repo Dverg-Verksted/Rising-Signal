@@ -2,6 +2,8 @@
 
 #include "Game/HUD/GameHUD.h"
 #include "Player/RSGamePLayer.h"
+#include "Player/NewTestPlayer/RSBaseCharacter.h"
+//#include "Player/NewTestPlayer/RSBaseCharacter.h"
 
 void AGameHUD::DrawHUD()
 {
@@ -22,7 +24,7 @@ void AGameHUD::BeginPlay()
 {
     Super::BeginPlay();
 
-    this->GamePlayer = Cast<ARSGamePLayer>(GetOwningPlayerController()->GetPawn());
+    this->GamePlayer = Cast<ARSBaseCharacter>(GetOwningPlayerController()->GetPawn());
     check(this->GamePlayer);
 
     

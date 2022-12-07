@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Game/Inventory/InventoryTypes.h"
 #include "WeaponComponent.generated.h"
 
 class ARSBaseWeapon;
@@ -19,10 +20,16 @@ public:
     void StartAiming();
     void StopAiming();
     void Attack();
+    void HeavyAttack();
     void StopAttack();
     
     void NextWeapon();
     void Reload();
+
+    // void SpawnWeapons();
+    void EquipWeapon(TSoftClassPtr<ARSBaseWeapon> BaseWeapon);
+
+    FWeaponSettings GetWeaponSettings() const {return WeaponSettings;}
 
 protected:
 	virtual void BeginPlay() override;
@@ -33,8 +40,11 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Оружие")
     FName WeaponArmorySocketName = "ArmorySocket";
 
+    // UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Оружие")
+    // TSubclassOf<ARSBaseWeapon> WeaponClass;
+    
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Оружие")
-    TSubclassOf<ARSBaseWeapon> WeaponClass;
+    FWeaponSettings WeaponSettings;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Анимация")
     UAnimMontage* EquipAnimMontage;
@@ -43,10 +53,11 @@ private:
 
     UPROPERTY()
     ARSBaseWeapon* CurrentWeapon = nullptr;
+
+    UPROPERTY()
+    ARSBaseWeapon* EquipedWeapon = nullptr;
     
-    void SpawnWeapons();
-    void SpawnWeapons(ARSBaseWeapon* BaseWeapon);
-    void AttachWeaponToSocket(ARSBaseWeapon* Weapon, USceneComponent* SceneComponent, const FName& SocketName);
+    void AttachWeaponToSocket(TSoftClassPtr<ARSBaseWeapon> BaseWeapon, USceneComponent* SceneComponent, const FName& SocketName);
 
     bool CanAim() const;
     bool CanFire() const;

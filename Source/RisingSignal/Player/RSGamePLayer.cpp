@@ -123,6 +123,7 @@ void ARSGamePLayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
     PlayerInputComponent->BindAction(TEXT("ActionSlot4"), IE_Pressed, this, &ARSGamePLayer::InputActionSlot4);
 
     PlayerInputComponent->BindAction(TEXT("Attack"), IE_Pressed, WeaponComponent, &UWeaponComponent::Attack);
+    PlayerInputComponent->BindAction(TEXT("HeavyAttack"), IE_Released, WeaponComponent, &UWeaponComponent::HeavyAttack);
 }
 
 void ARSGamePLayer::InputLookUp(const float Value)

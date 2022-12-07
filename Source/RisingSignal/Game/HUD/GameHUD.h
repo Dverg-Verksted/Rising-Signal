@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Game/HUD/DebugHUD.h"
+#include "Player/NewTestPlayer/RSBaseCharacter.h"
+//#include "Player/NewTestPlayer/RSBaseCharacter.h"
 #include "GameHUD.generated.h"
 
 class ARSGamePLayer;
@@ -25,5 +27,5 @@ protected:
 private:
     // Current pointer on Character
     UPROPERTY()
-    ARSGamePLayer* GamePlayer;
+    ARSBaseCharacter* GamePlayer;
 };

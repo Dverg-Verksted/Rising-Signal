@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Library/RSFunctionLibrary.h"
 #include "Player/RSGamePLayer.h"
+#include "Player/NewTestPlayer/RSBaseCharacter.h"
 
 ARSAICharacter_Wolf::ARSAICharacter_Wolf()
 {
@@ -74,7 +75,7 @@ void ARSAICharacter_Wolf::ProvideDamage(USkeletalMeshComponent* FromMeshComponen
 {
     if (GetMesh() != FromMeshComponent) return;
 
-    ARSGamePLayer* Player = GetWorld()->GetFirstPlayerController()->GetPawn<ARSGamePLayer>();
+    ARSBaseCharacter* Player = GetWorld()->GetFirstPlayerController()->GetPawn<ARSBaseCharacter>();
 
     const FVector EnemyLocation = Player->GetActorLocation();
 

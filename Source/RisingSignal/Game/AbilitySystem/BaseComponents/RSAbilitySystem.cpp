@@ -8,6 +8,7 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "Library/RSFunctionLibrary.h"
 #include "Player/RSGamePLayer.h"
+#include "Player/NewTestPlayer/RSBaseCharacter.h"
 
 
 #pragma region Defaults
@@ -15,16 +16,25 @@
 URSAbilitySystem::URSAbilitySystem()
 {
     PrimaryComponentTick.bCanEverTick = false;
+    SphereCollision = CreateDefaultSubobject<USphereComponent>("StressCollision");
+    if(SphereCollision) SphereCollision->InitSphereRadius(100.0f);
 }
 
 // Called when the game starts
 void URSAbilitySystem::BeginPlay()
 {
     Super::BeginPlay();
-
+    
+    SphereCollision->SetCollisionProfileName("OverlapAllDynamic");
+    SphereCollision->SetGenerateOverlapEvents(true);
+    SphereCollision->bHiddenInGame = false;
+    SphereCollision->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+    SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &URSAbilitySystem::StressOverlapBegin);
+    SphereCollision->OnComponentEndOverlap.AddDynamic(this, &URSAbilitySystem::StressOverlapEnd);
+    
     GetWorld()->GetTimerManager().SetTimer(TStateChange, this, &URSAbilitySystem::CheckStateChanges, TimerUpdateState, true);
     
-    GamePlayerRef = Cast<ARSGamePLayer>(GetOwner());
+    GamePlayerRef = Cast<ARSBaseCharacter>(GetOwner());
     OwnerRef = Cast<ACharacter>(GetOwner());
 
     if (OwnerRef)
@@ -78,7 +88,7 @@ float URSAbilitySystem::GetStaminaChangedValue()
             return StaminaStay * TimerUpdateState;
         }
         // if player walk, make decrease stamina
-        if (GamePlayerRef->GetDesiredGait() == EAlsGait::Walking)
+        if (CurrentPlayerSpeed > SpeedStay)
         {
             return StaminaWalk * TimerUpdateState;
         }
@@ -100,6 +110,7 @@ float URSAbilitySystem::GetHealthChangedValue()
     {
         FStateParams TempHungryParam = GetState(EAbilityStatesType::Hungry); 
         FStateParams TempTempParam = GetState(EAbilityStatesType::Temp);
+        FStateParams TempStressParam = GetState(EAbilityStatesType::Stress);
         
         if (GetState(EAbilityStatesType::Health).CurrentValue <= HpCritLvl)
         {
@@ -115,16 +126,12 @@ float URSAbilitySystem::GetHealthChangedValue()
         {
             ValueOnChangeHealth -= 10 * TimerUpdateState;
         }
+
+        if (TempStressParam.CurrentValue  >= TempStressParam.AfterIsDebafStress && !bHealthIsCriticalLevel)
+        {
+            ValueOnChangeHealth -= 10 * TimerUpdateState;
+        }
         
-        // if (TempHungryParam.CurrentValue < RegenHungry && bHealthIsCriticalLevel)
-        // {
-        //     ValueOnChangeHealth += 10 * TimerUpdateState;
-        // }
-        
-        // if (TempTempParam.CurrentValue > RegenTemp && bHealthIsCriticalLevel)
-        // {
-        //     ValueOnChangeHealth += 10 * TimerUpdateState;
-        // }
         
     }
     
@@ -249,6 +256,35 @@ void URSAbilitySystem::RegenHealth()
 {
     if(GetState(EAbilityStatesType::Health).CurrentValue < HpCritLvl)
     ChangeCurrentStateValue(EAbilityStatesType::Health, 10);
+}
+
+void URSAbilitySystem::StressOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+    UActorComponent* TempAbilitySys = OtherActor->GetComponentByClass(URSAbilitySystem::StaticClass());
+    if(OtherActor->GetComponentByClass(URSAbilitySystem::StaticClass()))
+    {
+        if(!IsMonster)
+        {
+            SetChangeValue(EAbilityStatesType::Stress,
+                Cast<URSAbilitySystem>(TempAbilitySys)->GetState(EAbilityStatesType::Stress).StressDamageOut);
+        }
+    }
+}
+
+void URSAbilitySystem::StressOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp,int32 OtherBodyIndex)
+{
+    UActorComponent* TempAbilitySys = OtherActor->GetComponentByClass(URSAbilitySystem::StaticClass());
+    if(OtherActor->GetComponentByClass(URSAbilitySystem::StaticClass()))
+    {
+        if(!IsMonster)
+        {
+            SetChangeValue(EAbilityStatesType::Stress,
+                Cast<URSAbilitySystem>(TempAbilitySys)->
+                GetState(EAbilityStatesType::Stress).StressDamageOut * -1.0f);
+        }
+    }
 }
 
 
