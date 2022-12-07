@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/SphereComponent.h"
 #include "RSAbilitySystem.generated.h"
 
 class ARSGamePLayer;
+class ARSBaseCharacter;
 
 // Enum for ability state types
 UENUM(BlueprintType)
@@ -44,20 +46,31 @@ struct FStateParams
 
     // Value for Hungry, when system should make damage on health
     UPROPERTY(EditDefaultsOnly,
-        meta = (ToolTip = "Значение, после которого голод будет убавлять здоровье", EditCondition =
+        meta = (ToolTip = "Значение, после которого голод убавляет здоровье", EditCondition =
             "StateType == EAbilityStatesType::Hungry", EditConditionHides))
     float AfterIsDebafHungry = 0.0f;
 
     // Value for Temp, when system should make damage on health
     UPROPERTY(EditDefaultsOnly,
-        meta = (ToolTip = "Значение, после которого замерзание будет убавлять здоровье", EditCondition =
+        meta = (ToolTip = "Значение, после которого замерзание убавляет здоровье", EditCondition =
             "StateType == EAbilityStatesType::Temp", EditConditionHides))
     float AfterIsDebafTemp = 0.0f;
 
+    // Value for Stress, when system should make damage on health
+    UPROPERTY(EditDefaultsOnly,
+        meta = (ToolTip = "Значение, после которого стресс убавляет здоровье", EditCondition =
+            "StateType == EAbilityStatesType::Stress", EditConditionHides))
+    float AfterIsDebafStress = 0.0f;
+
     // How much changes state per time
     UPROPERTY(EditDefaultsOnly,
-        meta = (ToolTip = "Значение, на которое будет изменяться значение параметра при восстановлении или убавлении"))
+        meta = (ToolTip = "Значение, изменения параметра"))
     float ChangedValue = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Struct",
+    meta = (ToolTip = "Эффект стресса на других", EditCondition =
+        "StateType == EAbilityStatesType::Stress", EditConditionHides))
+    float StressDamageOut = 0.0f;
     
 };
 
@@ -83,12 +96,11 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStateChangedSignature, EAbilityS
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathSignature);
 #pragma endregion Delegates
 
+#pragma region Defaults
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class RISINGSIGNAL_API URSAbilitySystem : public UActorComponent
 {
     GENERATED_BODY()
-
-#pragma region Defaults
 
 public:
     // Sets default values for this component's properties
@@ -112,10 +124,13 @@ public:
 
     // Just player references for take ability system or some another component/params
     UPROPERTY()
-    ARSGamePLayer* GamePlayerRef;
+    ARSBaseCharacter* GamePlayerRef;
 
     UPROPERTY()
     ACharacter* OwnerRef;
+
+    UPROPERTY()
+    USphereComponent* SphereCollision;
 
 protected:
     // Called when the game starts
@@ -125,65 +140,55 @@ protected:
 
 #pragma region AbilitySystemParams
 
+public:
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Ability states")
+    TArray<FStateParams> States;
+    
 private:
     // Array of Ability states
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states")
-    TArray<FStateParams> States;
-
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Критический уровень здоровья ниже или равен",
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Крит здоровье",
         meta = (ToolTip = "Ниже или равно какому значению, у игрока будет критический уровень здоровья"))
     float HpCritLvl = 20.0f;
-    
 
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Регенерация здоровья от Сытости",
-        meta = (ToolTip = "Ниже или равно какому значению, у игрока будет регенерироваться здоровье от сытости"))
-    float RegenHungry = 30.0f;
-
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Регенерация здоровья от Тепла",
-        meta = (ToolTip = "Ниже или равно какому значению, у игрока будет регенерироваться здоровье от тепла"))
-    float RegenTemp = 30.0f;
-
-
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Игрок стоит при скорости",
-        meta = (ToolTip = "Ниже или равно какой скорости, у игрока будет фиксироваться что он стоит"))
+    UPROPERTY()
     float SpeedStay = 0.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Игрок идет при скорости",
-        meta = (ToolTip = "Ниже или равно какой скорости, у игрока будет фиксироваться ходьба"))
+    UPROPERTY()
     float SpeedWalk = 360.f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Игрок бежит при скорости",
-        meta = (ToolTip = "Выше или равно какой скорости, у игрока будет фиксироваться бег"))
+    UPROPERTY()
     float SpeedRun = 410.0f;
 
-
     // Value which add plus to stamina state, when it changes
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Размер изменения выносливости, если игрок стоит",
-        meta = (ToolTip = "На сколько изменяется выносливость, если игрок стоит"))
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Расход стамины стоя",
+        meta = (ToolTip = "Расход выносливости, если стоит"))
     float StaminaStay = 7.0f;
 
     // Value which add plus to stamina state, when it changes
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Размер изменения выносливости, если игрок идет",
-        meta = (ToolTip = "На сколько изменяется выносливость, если игрок идет"))
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Расход стамины идя",
+        meta = (ToolTip = "Расход выносливости, если идет"))
     float StaminaWalk = 5.0f;
 
     // Value which add plus to stamina state, when it changes
-    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Размер изменения выносливости, если игрок бежит",
-        meta = (ToolTip = "На сколько изменяется выносливость, если игрок бежит"))
+    UPROPERTY(EditDefaultsOnly, Category = "Ability states", DisplayName = "Расход стамины бег",
+        meta = (ToolTip = "Расход выносливости, если бежит"))
     float StaminaRun = -7.0f;
 
-
+    UPROPERTY(EditDefaultsOnly, Category="Ability states", DisplayName="это Монстр?")
+    bool IsMonster = false;
+    
     // Value for control player dead, хз зачем оно
-    UPROPERTY(VisibleDefaultsOnly, Category = "Ability states")
+    UPROPERTY()
     bool bIsDead = false;
 
     // Value is how often need update timer
-    UPROPERTY(EditDefaultsOnly, Category= "Ability states")
+    UPROPERTY(EditDefaultsOnly, Category= "Ability states", DisplayName="ЧОК Стат")
     float TimerUpdateState = 0.1f;
 
     // if true, player cannot die
     UPROPERTY(EditDefaultsOnly,
-            meta = (ToolTip = "Режим бога, ты есть все, ты есть вся"))
+            meta = (ToolTip = "Режим бога, ты есть все, ты есть вся"),
+            DisplayName="Режим Бога")
     bool GodMode = false;
 
 #pragma endregion AbilitySystemParams
@@ -199,6 +204,10 @@ public:
     FORCEINLINE
     bool GetIsDead() const { return bIsDead; }
 
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    FORCEINLINE
+    bool GetIsMonstr() {return  IsMonster;}
+
     /* Universal func on change any state in TArray States
      * Has a check for the presence of a parameter
      * On input get type of state and change value,
@@ -208,7 +217,7 @@ public:
     void ChangeCurrentStateValue(EAbilityStatesType StateTy, float AddValue);
     
     // Set new change value in state in ability system with AbilityStateType
-    UFUNCTION()
+    UFUNCTION(BlueprintCallable)
     void SetChangeValue(EAbilityStatesType AbilityStateType, float ChangedValueModifier);
 
     // Return true if player is dead
@@ -230,6 +239,12 @@ public:
        class AController* InstigatedBy, AActor* DamageCauser);
 
     void RegenHealth();
+
+    UFUNCTION()
+    void StressOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+    UFUNCTION()
+    void StressOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 private:
     // control on state changes, it check all state on new change value

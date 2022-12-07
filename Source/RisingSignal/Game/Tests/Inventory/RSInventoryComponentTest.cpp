@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Misc/AutomationTest.h"
 #include "Player/RSGamePLayer.h"
+#include "Player/NewTestPlayer/RSBaseCharacter.h"
 #include "Tests/AutomationCommon.h"
 
 
@@ -83,7 +84,7 @@ bool FTestCraft::RunTest(const FString& Parameters)
     UWorld* World = GetTestGameWorld();
     if(!TestNotNull("World exists", World)) return false;
 
-    ARSGamePLayer* Character = StaticCast<ARSGamePLayer*>(UGameplayStatics::GetPlayerCharacter(World, 0));
+    ARSBaseCharacter* Character = StaticCast<ARSBaseCharacter*>(UGameplayStatics::GetPlayerCharacter(World, 0));
     if(!TestNotNull("Character exists", Character)) return false;
 
     URSInventoryComponent* InventoryComponent = Character->GetInventoryComponent();

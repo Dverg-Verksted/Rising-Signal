@@ -22,7 +22,11 @@ void UWeaponComponent::StopAiming()
 
 void UWeaponComponent::Attack()
 {
-    CurrentWeapon->StartAttack();
+    // CurrentWeapon->StartAttack();
+}
+
+void UWeaponComponent::HeavyAttack()
+{
 }
 
 void UWeaponComponent::StopAttack()
@@ -42,37 +46,38 @@ void UWeaponComponent::BeginPlay()
 {
 	Super::BeginPlay();
     
-    SpawnWeapons();
+    // SpawnWeapons();
 }
 
-void UWeaponComponent::SpawnWeapons()
+// void UWeaponComponent::SpawnWeapons()
+// {
+//     ACharacter* Character = Cast<ACharacter>(GetOwner());
+//     if (!Character || !GetWorld()) return;
+//
+//     CurrentWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(WeaponClass);
+//     
+//     if (!CurrentWeapon) return;
+//     FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget,false);
+//     
+//     CurrentWeapon->AttachToComponent(Character->GetMesh(), AttachmentRules, WeaponEquipSocketName);
+//     CurrentWeapon->SetOwner(Character);
+// }
+
+void UWeaponComponent::EquipWeapon(TSoftClassPtr<ARSBaseWeapon> BaseWeapon)
 {
     ACharacter* Character = Cast<ACharacter>(GetOwner());
     if (!Character || !GetWorld()) return;
 
-    CurrentWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(WeaponClass);
-    
+    CurrentWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(BaseWeapon.Get());
     if (!CurrentWeapon) return;
+    
     FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget,false);
     
     CurrentWeapon->AttachToComponent(Character->GetMesh(), AttachmentRules, WeaponEquipSocketName);
     CurrentWeapon->SetOwner(Character);
 }
 
-void UWeaponComponent::SpawnWeapons(ARSBaseWeapon* BaseWeapon)
-{
-    ACharacter* Character = Cast<ACharacter>(GetOwner());
-    if (!Character || !GetWorld()) return;
-
-    BaseWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(WeaponClass);
-    if (!BaseWeapon) return;
-    FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget,false);
-    BaseWeapon->AttachToComponent(Character->GetMesh(), AttachmentRules, WeaponEquipSocketName);
-    BaseWeapon->SetOwner(Character);
-}
-
-
-void UWeaponComponent::AttachWeaponToSocket(ARSBaseWeapon* Weapon, USceneComponent* SceneComponent, const FName& SocketName)
+void UWeaponComponent::AttachWeaponToSocket(TSoftClassPtr<ARSBaseWeapon> BaseWeapon, USceneComponent* SceneComponent, const FName& SocketName)
 {
 }
 

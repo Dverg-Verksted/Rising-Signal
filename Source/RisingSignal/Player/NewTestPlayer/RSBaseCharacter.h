@@ -85,6 +85,10 @@ public:
     virtual void Jump() override;
 
     FORCEINLINE URSCharacterMovementComponent* GetBaseCharacterMovementComponent() const { return RSCharacterMovementComponent; }
+    FORCEINLINE URSInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
+
+    UFUNCTION(BlueprintCallable)
+    FORCEINLINE URSAbilitySystem* GetAbilitySystem() const { return AbilitySystem; }
 
     FORCEINLINE bool GetIsMantling() const;
     void SetIsMantling(bool NewValue);
