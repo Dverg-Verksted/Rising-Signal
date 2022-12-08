@@ -27,9 +27,11 @@ void URSBaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
     Speed = FMath::Lerp(Speed, CharacterMovementComponent->Velocity.Size(), LerpAlpha);
     Direction = CalculateDirection(CharacterMovementComponent->Velocity, CachedBaseCharacter->GetActorRotation());
+    LadderDirection = CharacterMovementComponent->Velocity.Z;
     bIsFalling = CharacterMovementComponent->IsFalling();
     bIsSprinting = CachedBaseCharacter->GetIsSprinting();
     bIsCrouching = CharacterMovementComponent->IsCrouching();
+    bIsOnLadder = CharacterMovementComponent->IsOnLadder();
 }
 
 void URSBaseCharacterAnimInstance::SetFallHeight(float NewValue)

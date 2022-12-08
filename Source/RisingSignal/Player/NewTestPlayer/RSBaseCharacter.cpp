@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Curves/CurveVector.h"
+#include "Game/InteractSystem/Environment/Ladder/Ladder.h"
 #include "Game/Inventory/RSCraftComponent.h"
 #include "Game/Inventory/RSEquipmentComponent.h"
 #include "Game/Inventory/RSInventoryComponent.h"
@@ -78,6 +79,57 @@ void ARSBaseCharacter::Jump()
     Super::Jump();
 }
 
+void ARSBaseCharacter::Mantle()
+{
+    if(!CanMantle())
+    {
+        return;
+    }
+    
+    FLedgeDescription LedgeDescription;
+	if(LedgeDetectorComponent->LedgeDetect(LedgeDescription))
+	{
+	    ACharacter* DefaultCharacter = GetClass()->GetDefaultObject<ACharacter>();
+	    float DefaultCapsuleHalfHeight = DefaultCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	    float CurrentCapsuleHalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	    float CapsuleHalfHeightOffset = 0.0f;
+	    if(bIsCrouched)
+	    {
+	        UnCrouch();
+	        CapsuleHalfHeightOffset = DefaultCapsuleHalfHeight - CurrentCapsuleHalfHeight;
+	    }
+
+	    bIsMantling = true;
+		
+	    FMantlingMovementParameters MantlingParameters;
+	    MantlingParameters.InitialLocation = GetActorLocation() + CapsuleHalfHeightOffset;
+	    MantlingParameters.InitialRotation = GetActorRotation();
+	    MantlingParameters.TargetLocation = LedgeDescription.Location;
+	    MantlingParameters.TargetRotation = LedgeDescription.Rotation;
+	    MantlingParameters.PrimitiveComponent = LedgeDescription.PrimitiveComponent;
+	    MantlingParameters.PrimitiveComponentInitialLocation = LedgeDescription.PrimitiveInitialLocation;
+	    float MantlingHeight = ((MantlingParameters.TargetLocation - DefaultCapsuleHalfHeight * FVector::UpVector) - (MantlingParameters.InitialLocation - DefaultCapsuleHalfHeight * FVector::UpVector)).Z;
+	    const FMantlingSettings& MantlingSettings = GetMantlingSettings(MantlingHeight);
+	    float MinRange;
+	    float MaxRange;
+	    MantlingSettings.MantlingCurve->GetTimeRange(MinRange, MaxRange);
+	    MantlingParameters.Duration = MaxRange - MinRange;
+		
+	    MantlingParameters.MantlingCurve = MantlingSettings.MantlingCurve;
+	    FVector2D SourceRange(MantlingSettings.MinHeight, MantlingSettings.MaxHeight);
+	    FVector2D TargetRange(MantlingSettings.MinHeightStartTime, MantlingSettings.MaxHeightStartTime);
+	    MantlingParameters.StartTime = FMath::GetMappedRangeValueClamped(SourceRange, TargetRange, MantlingHeight);
+
+	    MantlingParameters.InitialAnimationLocation = MantlingParameters.TargetLocation - MantlingSettings.AnimationCorrectionZ * FVector::UpVector + MantlingSettings.AnimationCorrectionXY * LedgeDescription.LedgeNormal;
+	    
+	    RSCharacterMovementComponent->StartMantle(MantlingParameters);
+		
+		
+	    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	    AnimInstance->Montage_Play(MantlingSettings.MantlingMontage, 1.0f, EMontagePlayReturnType::Duration, MantlingParameters.StartTime);
+	}
+}
+
 bool ARSBaseCharacter::GetIsMantling() const
 {
     return bIsMantling;
@@ -143,6 +195,45 @@ void ARSBaseCharacter::OnStopRoll(float HalfHeightAdjust)
     }
 }
 
+void ARSBaseCharacter::ClimbLadder(float Value)
+{
+    if(!FMath::IsNearlyZero(Value) && GetBaseCharacterMovementComponent()->IsOnLadder())
+    {
+        FVector LadderUpVector = GetBaseCharacterMovementComponent()->GetCurrentLadder()->GetActorUpVector();
+        AddMovementInput(LadderUpVector, Value);
+    }
+}
+
+void ARSBaseCharacter::RegisterInteractiveActor(AInteractiveActor* InteractiveActor)
+{
+    AvailableInteractiveActors.AddUnique(InteractiveActor);
+}
+
+void ARSBaseCharacter::UnRegisterInteractiveActor(AInteractiveActor* InteractiveActor)
+{
+    AvailableInteractiveActors.RemoveSingleSwap(InteractiveActor);
+}
+
+void ARSBaseCharacter::InteractWithLadder()
+{
+    if(GetBaseCharacterMovementComponent()->IsOnLadder())
+    {
+        GetBaseCharacterMovementComponent()->DetachFromLadder(EDetachFromLadderMethod::JumpOff);
+    }
+    else
+    {
+        const ALadder* AvailableLadder = GetAvailableLadder();
+        if(IsValid(AvailableLadder))
+        {
+            if(AvailableLadder->GetIsOnTop())
+            {
+                PlayAnimMontage(AvailableLadder->GetAttachFromTopAnimMontage());
+            }
+            GetBaseCharacterMovementComponent()->AttachToLadder(AvailableLadder);
+        }
+    }
+}
+
 void ARSBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -167,6 +258,8 @@ void ARSBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
     PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &ThisClass::InputMoveForward);
     PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ThisClass::InputMoveRight);
 
+    PlayerInputComponent->BindAxis(TEXT("ClimbLadder"), this, &ThisClass::InputLadder);
+
     PlayerInputComponent->BindAction(TEXT("Sprint"), IE_Pressed, this, &ThisClass::InputSprintPressed);
     PlayerInputComponent->BindAction(TEXT("Sprint"), IE_Released, this, &ThisClass::InputSprintReleased);
     PlayerInputComponent->BindAction(TEXT("Sprint"), IE_DoubleClick, this, &ThisClass::InputRoll);
@@ -181,6 +274,8 @@ void ARSBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
     PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ThisClass::InputJumpPressed);
     PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &ThisClass::InputJumpReleased);
+
+    PlayerInputComponent->BindAction(TEXT("InteractLadder"), IE_Released, this, &ThisClass::InteractWithLadder);
 
     PlayerInputComponent->BindAction(TEXT("Ragdoll"), IE_Pressed, this, &ThisClass::InputRagdollPressed);
     PlayerInputComponent->BindAction(TEXT("Roll"), IE_Pressed, this, &ARSBaseCharacter::InputRoll);
@@ -225,6 +320,11 @@ void ARSBaseCharacter::InputMoveRight(float Value)
     }
 }
 
+void ARSBaseCharacter::InputLadder(float Value)
+{
+    ClimbLadder(Value);
+}
+
 void ARSBaseCharacter::InputSprintPressed()
 {
     bIsSprinting = true;
@@ -262,53 +362,12 @@ void ARSBaseCharacter::InputCrouch()
 
 void ARSBaseCharacter::InputMantle()
 {
-    if(!CanMantle())
-    {
-        return;
-    }
-    
-    FLedgeDescription LedgeDescription;
-	if(LedgeDetectorComponent->LedgeDetect(LedgeDescription))
-	{
-	    ACharacter* DefaultCharacter = GetClass()->GetDefaultObject<ACharacter>();
-	    float DefaultCapsuleHalfHeight = DefaultCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-	    float CurrentCapsuleHalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-	    float CapsuleHalfHeightOffset = 0.0f;
-	    if(bIsCrouched)
-	    {
-	        UnCrouch();
-	        CapsuleHalfHeightOffset = DefaultCapsuleHalfHeight - CurrentCapsuleHalfHeight;
-	    }
+    Mantle();
+}
 
-	    bIsMantling = true;
-		
-	    FMantlingMovementParameters MantlingParameters;
-	    MantlingParameters.InitialLocation = GetActorLocation() + CapsuleHalfHeightOffset;
-	    MantlingParameters.InitialRotation = GetActorRotation();
-	    MantlingParameters.TargetLocation = LedgeDescription.Location;
-	    MantlingParameters.TargetRotation = LedgeDescription.Rotation;
-	    MantlingParameters.PrimitiveComponent = LedgeDescription.PrimitiveComponent;
-	    MantlingParameters.PrimitiveComponentInitialLocation = LedgeDescription.PrimitiveInitialLocation;
-	    float MantlingHeight = ((MantlingParameters.TargetLocation - DefaultCapsuleHalfHeight * FVector::UpVector) - (MantlingParameters.InitialLocation - DefaultCapsuleHalfHeight * FVector::UpVector)).Z;
-	    const FMantlingSettings& MantlingSettings = GetMantlingSettings(MantlingHeight);
-	    float MinRange;
-	    float MaxRange;
-	    MantlingSettings.MantlingCurve->GetTimeRange(MinRange, MaxRange);
-	    MantlingParameters.Duration = MaxRange - MinRange;
-		
-	    MantlingParameters.MantlingCurve = MantlingSettings.MantlingCurve;
-	    FVector2D SourceRange(MantlingSettings.MinHeight, MantlingSettings.MaxHeight);
-	    FVector2D TargetRange(MantlingSettings.MinHeightStartTime, MantlingSettings.MaxHeightStartTime);
-	    MantlingParameters.StartTime = FMath::GetMappedRangeValueClamped(SourceRange, TargetRange, MantlingHeight);
-
-	    MantlingParameters.InitialAnimationLocation = MantlingParameters.TargetLocation - MantlingSettings.AnimationCorrectionZ * FVector::UpVector + MantlingSettings.AnimationCorrectionXY * LedgeDescription.LedgeNormal;
-	    
-	    RSCharacterMovementComponent->StartMantle(MantlingParameters);
-		
-		
-	    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	    AnimInstance->Montage_Play(MantlingSettings.MantlingMontage, 1.0f, EMontagePlayReturnType::Duration, MantlingParameters.StartTime);
-	}
+void ARSBaseCharacter::InputInteractLadder()
+{
+    InteractWithLadder();
 }
 
 void ARSBaseCharacter::InputJumpPressed()
@@ -393,6 +452,20 @@ const FMantlingSettings& ARSBaseCharacter::GetMantlingSettings(float LedgeHeight
 	    return LedgeHeight > LowMantleMaxHeight ? HighMantlingSettings : LowMantlingSettings;
 }
 
+const ALadder* ARSBaseCharacter::GetAvailableLadder() const
+{
+    const ALadder* Result = nullptr;
+    for(const AInteractiveActor* InteractiveActor : AvailableInteractiveActors)
+    {
+        if(InteractiveActor->IsA<ALadder>())
+        {
+            Result = StaticCast<const ALadder*>(InteractiveActor);
+            break;
+        }
+    }
+    return Result;
+}
+
 bool ARSBaseCharacter::CanMove()
 {
     if(bIsMantling)
@@ -400,6 +473,10 @@ bool ARSBaseCharacter::CanMove()
         return false;
     }
     if(bIsRolling)
+    {
+        return false;
+    }
+    if(!GetCharacterMovement()->IsMovingOnGround())
     {
         return false;
     }
