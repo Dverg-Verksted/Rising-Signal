@@ -240,6 +240,8 @@ void ARSBaseCharacter::BeginPlay()
 
     AbilitySystem->OnStateChangedSignature.AddDynamic(this, &ARSBaseCharacter::CheckSomeState);
     AbilitySystem->OnDeath.AddDynamic(this, &ARSBaseCharacter::RegisterDeath);
+
+    Camera->SetWorldRotation(FRotator{0,0,0});
 }
 
 void ARSBaseCharacter::Tick(float DeltaTime)
@@ -304,7 +306,7 @@ void ARSBaseCharacter::InputMoveForward(float Value)
 {
     if(CanMove())
     {
-        FRotator YawRotator(0.0f, GetControlRotation().Yaw, 0.0f);
+        FRotator YawRotator(0.0f, 0.0f, 0.0f);
         FVector ForwardVector = YawRotator.RotateVector(FVector::ForwardVector);
         AddMovementInput(ForwardVector, Value);
     }
@@ -314,7 +316,7 @@ void ARSBaseCharacter::InputMoveRight(float Value)
 {
     if(CanMove())
     {
-        FRotator YawRotator(0.0f, GetControlRotation().Yaw, 0.0f);
+        FRotator YawRotator(0.0f, 0.0f, 0.0f);
         FVector RightVector = YawRotator.RotateVector(FVector::RightVector);
         AddMovementInput(RightVector, Value);
     }
