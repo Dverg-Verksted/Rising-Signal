@@ -93,6 +93,9 @@ public:
     UFUNCTION(BlueprintCallable)
     FORCEINLINE URSAbilitySystem* GetAbilitySystem() const { return AbilitySystem; }
 
+    UFUNCTION(BlueprintPure)
+    FORCEINLINE USkeletalMeshComponent* GetExtraMesh() const { return ExtraSkeletalMesh; }
+
     void Mantle();
 
     FORCEINLINE bool GetIsMantling() const;
@@ -155,6 +158,9 @@ protected:
 
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
     URSLedgeDetectorComponent* LedgeDetectorComponent;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+    USkeletalMeshComponent* ExtraSkeletalMesh;
 
 #pragma endregion
 

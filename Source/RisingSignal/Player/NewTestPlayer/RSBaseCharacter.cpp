@@ -45,6 +45,9 @@ ARSBaseCharacter::ARSBaseCharacter(const FObjectInitializer& ObjectInitializer)
     CraftComponent = CreateDefaultSubobject<URSCraftComponent>("CraftComponent");
     WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("WeaponComponent");
     LedgeDetectorComponent = CreateDefaultSubobject<URSLedgeDetectorComponent>("LedgeDetectorComponent");
+
+    ExtraSkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>("ExtraMesh");
+    ExtraSkeletalMesh->SetupAttachment(GetMesh());
 }
 
 void ARSBaseCharacter::Falling()
