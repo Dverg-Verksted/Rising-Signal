@@ -5,6 +5,7 @@
 #include "InteractDataItem.h"
 #include "InteractItemActor.h"
 #include "RSInteractStaticItemBase.h"
+#include "RSSearchComponent.h"
 #include "AnimNotifies/RSItemPickUpEndedAnimNotify.h"
 #include "Components/BoxComponent.h"
 #include "Game/JournalSystem/JournalSystem.h"
@@ -95,11 +96,13 @@ void UInteractComponent::RegisterBeginOverlapInteractItem(UPrimitiveComponent* O
     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
     if (!OtherActor) return;
-    AInteractItemActor* Item = Cast<AInteractItemActor>(OtherActor);
-    if (!Item) return;
+    AInteractItemActor* BaseItem = Cast<AInteractItemActor>(OtherActor);
+    URSSearchComponent* SearchComp = Cast<URSSearchComponent>(OtherComp);
+    if (!BaseItem && !SearchComp) return;
 
     LOG_INTERACT(ELogRSVerb::Display, FString::Printf(TEXT("Begin overlap actor: [%s]"), *OtherActor->GetName()));
-    AddItem(Item);
+    AddItem(BaseItem);
+    AddSearchItem(SearchComp);
 }
 
 void UInteractComponent::RegisterEndOverlapInteractItem(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -138,6 +141,24 @@ void UInteractComponent::AddItem(AInteractItemActor* InteractItem)
     }
 }
 
+void UInteractComponent::AddSearchItem(URSSearchComponent* SearchComponent)
+{
+    if (!SearchComponent)
+    {
+        LOG_INTERACT(ELogRSVerb::Warning, "Search Actor is nullptr");
+        return;
+    }
+
+    ArrSearchComp.AddUnique(SearchComponent);
+    if (!GetWorld()->GetTimerManager().TimerExists(CheckedInteractItemTimerHandle))
+    {
+        LOG_INTERACT(ELogRSVerb::Display, FString::Printf(TEXT("Start timer for checked distance | Num item: %i | Rate time start: %f"),
+            ArrInteractItem.Num(), RateTimeChecked));
+        GetWorld()->GetTimerManager().SetTimer(CheckedInteractItemTimerHandle, this, &UInteractComponent::CheckDistanceToItem,
+            RateTimeChecked, true);
+    }
+}
+
 void UInteractComponent::RemoveItem(AInteractItemActor* InteractItem)
 {
     if (!InteractItem)
@@ -156,35 +177,92 @@ void UInteractComponent::RemoveItem(AInteractItemActor* InteractItem)
 
 void UInteractComponent::CheckDistanceToItem()
 {
-    if (ArrInteractItem.Num() == 0) return;
+    bool ItemCloser;
+    AInteractItemActor* TempTargetItem = nullptr;
+    float TempTargetItemDist = MAX_FLT;
+    URSSearchComponent* TempTargetSearch = nullptr;
+    float TempTargetSearchDist = MAX_FLT;
 
-    const FVector L_CurrLoc = GetOwner()->GetActorLocation();
-    AInteractItemActor* TempTargetItem = ArrInteractItem[0];
-    float L_MinDistance = (TempTargetItem->GetActorLocation() - L_CurrLoc).Size();
-
-    for (const auto L_Item : ArrInteractItem)
+    if (ArrInteractItem.Num())
     {
-        float L_TempDist = (L_Item->GetActorLocation() - L_CurrLoc).Size();
-        if (L_MinDistance > L_TempDist)
+        const FVector L_CurrLoc = GetOwner()->GetActorLocation();
+
+        for (const auto L_Item : ArrInteractItem)
         {
-            TempTargetItem = L_Item;
-            L_MinDistance = L_TempDist;
+            float L_TempDist = (L_Item->GetActorLocation() - L_CurrLoc).Size();
+            if (TempTargetItemDist > L_TempDist)
+            {
+                TempTargetItem = L_Item;
+                TempTargetItemDist = L_TempDist;
+            }
         }
     }
 
-    if (TargetInteractItem != TempTargetItem)
+    if (ArrSearchComp.Num())
     {
-        LOG_INTERACT(ELogRSVerb::Display, FString::Printf(TEXT("New target item: %s | Distance: %f"),
-            *TempTargetItem->GetName(), L_MinDistance));
+        const FVector L_CurrLoc = GetOwner()->GetActorLocation();
 
-        if (TargetInteractItem)
+        for (const auto L_Search : ArrSearchComp)
         {
-            TargetInteractItem->DestroyInteractWidget();
+            float L_TempDist = (L_Search->GetOwner()->GetActorLocation() - L_CurrLoc).Size();
+            if (TempTargetSearchDist > L_TempDist)
+            {
+                TempTargetSearch = L_Search;
+                TempTargetSearchDist = L_TempDist;
+            }
         }
-
-        TargetInteractItem = TempTargetItem;
-        TargetInteractItem->LoadInteractWidget();
     }
+
+    if (TempTargetItem && TempTargetSearch)
+    {
+        ItemCloser = TempTargetItemDist >= TempTargetSearchDist;
+    }
+    else if (TempTargetItem)
+    {
+        ItemCloser = true;
+    }
+    else if (TempTargetSearch)
+    {
+        ItemCloser = false;
+    }
+    else
+    {
+        return;
+    }
+
+    if (ItemCloser)
+    {
+        if (TargetInteractItem != TempTargetItem)
+        {
+            LOG_INTERACT(ELogRSVerb::Display, FString::Printf(TEXT("New target item: %s | Distance: %f"),
+                *TempTargetItem->GetName(), TempTargetItemDist));
+
+            if (TargetInteractItem)
+            {
+                TargetInteractItem->DestroyInteractWidget();
+            }
+
+            TargetInteractItem = TempTargetItem;
+            TargetInteractItem->LoadInteractWidget();
+        }
+    }
+    else
+    {
+        if (TargetSearchItem != TempTargetSearch)
+        {
+            LOG_INTERACT(ELogRSVerb::Display, FString::Printf(TEXT("New target item: %s | Distance: %f"),
+                *TempTargetItem->GetName(), TempTargetSearchDist));
+
+            if (TargetSearchItem)
+            {
+                // TargetSearchItem->DestroyInteractWidget();
+            }
+
+            TargetSearchItem = TempTargetSearch;
+            // TargetSearchItem->LoadInteractWidget();
+        }
+    }
+
 }
 
 void UInteractComponent::RegisterInteractEvent()
@@ -196,6 +274,11 @@ void UInteractComponent::RegisterInteractEvent()
     {
         LOG_INTERACT(ELogRSVerb::Warning, "Can't interact, Player is Falling");
         return;
+    }
+
+    if (TargetSearchItem)
+    {
+        // TODO: Implement Search Logic
     }
 
     if (TargetInteractItem)

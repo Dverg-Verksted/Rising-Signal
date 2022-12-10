@@ -3,7 +3,6 @@
 #include "Game/Inventory/RSCraftComponent.h"
 #include "Game/InteractSystem/InteractItemActor.h"
 #include "Game/InteractSystem/RSInteractStaticItemBase.h"
-#include "Library/RSFunctionLibrary.h"
 
 
 FInventoryItem::FInventoryItem(const FInventoryItem* OtherItem)
