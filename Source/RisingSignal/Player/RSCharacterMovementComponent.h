@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Game/InteractSystem/Environment/Ladder/Ladder.h"
 #include "GameFramework/CharacterMovementComponent.h"
-//#include "NewTestPlayer/RSBaseCharacter.h"
 #include "RSCharacterMovementComponent.generated.h"
 
 class ARSBaseCharacter;
@@ -27,6 +27,15 @@ struct FMantlingMovementParameters
     FVector PrimitiveComponentInitialLocation;
 };
 
+UENUM(BlueprintType)
+enum class EDetachFromLadderMethod : uint8
+{
+    Fall = 0,
+    ReachingTheTop,
+    ReachingTheBottom,
+    JumpOff
+};
+
 USTRUCT(BlueprintType)
 struct FRollingMovementaParamaters
 {
@@ -43,7 +52,8 @@ enum class ECustomMovementMode : uint8
 {
     CMOVE_None = 0 UMETA(DisplayName = "None"),
     CMOVE_Mantling UMETA(DisplayName = "Mantling"),
-    CMOVE_Rolling UMETA(DisplayName = "Rolling")
+    CMOVE_Rolling UMETA(DisplayName = "Rolling"),
+    CMOVE_OnLadder UMETA(DisplayName = "Ladder")
 };
 
 UCLASS()
@@ -65,6 +75,11 @@ public:
     void StartRoll();
     void StopRoll();
 
+    void AttachToLadder(const ALadder* Ladder);
+    void DetachFromLadder(EDetachFromLadderMethod DetachFromLadderMethod);
+    bool IsOnLadder() const;
+    const ALadder* GetCurrentLadder() const { return CurrentLadder; }
+
     FORCEINLINE float GetRollCapsuleHalfHeight() const { return RollCapsuleHalfHeight; }
 
 protected:
@@ -76,7 +91,11 @@ protected:
 
     void PhysRolling(float DeltaTime, int32 Iterations);
 
+    void PhysLadder(float DeltaTime, int32 Iterations);
+
     bool IsEnoughSpaceToStandUp();
+
+    float GetActorToCurrentLadderProjection(FVector ActorLocation);
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     FRollingMovementaParamaters CurrentRollingParameters;
@@ -93,8 +112,29 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Speed parameters")
     float CrouchSpeed = 200.0f;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character movement: ladder", meta=(ClampMin = 0.0f, UIMin = 0.0f));
+    float ClimbingOnLadderSpeed = 200.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character movement: ladder", meta=(ClampMin = 0.0f, UIMin = 0.0f));
+    float LadderToCharacterOffset = 60.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character movement: ladder", meta=(ClampMin = 0.0f, UIMin = 0.0f));
+    float ClimbingOnLadderBrakingDecelaration = 2048.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character movement: ladder", meta=(ClampMin = 0.0f, UIMin = 0.0f));
+    float MinLadderBotomOffset = 90.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character movement: ladder", meta=(ClampMin = 0.0f, UIMin = 0.0f));
+    float MaxLadderTopOffset = 90.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character movement: ladder", meta=(ClampMin = 0.0f, UIMin = 0.0f));
+    float JumpOffFromLadderSpeed = 500.0f;
+
 private:
     TSoftObjectPtr<ARSBaseCharacter> BaseCharacterOwner;
+
+    UPROPERTY()
+    const ALadder* CurrentLadder = nullptr;
 
     FMantlingMovementParameters CurrentMantlingParameters;
     FTimerHandle MantlingTimer;

@@ -44,6 +44,26 @@ struct FStateParams
     UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Тип параметра"))
     EAbilityStatesType StateType = EAbilityStatesType::Health;
 
+    UPROPERTY(EditDefaultsOnly,
+        meta = (ToolTip = "Значение, после которого голод убавляет здоровье", EditCondition =
+            "StateType == EAbilityStatesType::Hungry", EditConditionHides))
+    float HungryDamage = 10.0f;
+
+    UPROPERTY(EditDefaultsOnly,
+        meta = (ToolTip = "Значение, после которого голод убавляет здоровье", EditCondition =
+            "StateType == EAbilityStatesType::Temp", EditConditionHides))
+    float TempDamage = 10.0f;
+
+    UPROPERTY(EditDefaultsOnly,
+        meta = (ToolTip = "Значение, после которого голод убавляет здоровье", EditCondition =
+            "StateType == EAbilityStatesType::Stress", EditConditionHides))
+    float StressDamageSelf = 10.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Struct",
+    meta = (ToolTip = "Эффект стресса на других", EditCondition =
+        "StateType == EAbilityStatesType::Stress", EditConditionHides))
+    float StressDamageOut = 0.0f;
+    
     // Value for Hungry, when system should make damage on health
     UPROPERTY(EditDefaultsOnly,
         meta = (ToolTip = "Значение, после которого голод убавляет здоровье", EditCondition =
@@ -67,10 +87,7 @@ struct FStateParams
         meta = (ToolTip = "Значение, изменения параметра"))
     float ChangedValue = 0.0f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Struct",
-    meta = (ToolTip = "Эффект стресса на других", EditCondition =
-        "StateType == EAbilityStatesType::Stress", EditConditionHides))
-    float StressDamageOut = 0.0f;
+    
     
 };
 

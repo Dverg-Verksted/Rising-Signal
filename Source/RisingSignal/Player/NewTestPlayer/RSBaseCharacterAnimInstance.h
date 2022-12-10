@@ -33,6 +33,9 @@ protected:
     float Direction;
 
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+    float LadderDirection;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
     bool bIsFalling = false;
 
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
@@ -40,6 +43,9 @@ protected:
 
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
     bool bIsCrouching = false;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+    bool bIsOnLadder = false;
     
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     float LowHeight = 3.0f;
