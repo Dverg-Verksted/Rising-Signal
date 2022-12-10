@@ -15,6 +15,7 @@ class ARSGamePlayerController;
 class AInteractItemActor;
 class UBoxComponent;
 class ARSGamePLayer;
+class URSSearchComponent;
 
 /**
  * @class
@@ -53,7 +54,7 @@ protected:
 
 public:
     UFUNCTION(BlueprintPure, Category = "UInteractComponent | InteractItem")
-    AInteractItemActor* GetInteractItem() const {return TargetInteractItem;}
+    AInteractItemActor* GetInteractItem() const { return TargetInteractItem; }
 
 private:
     // @private Size box collision
@@ -87,9 +88,15 @@ private:
     UPROPERTY()
     AInteractItemActor* TargetInteractItem;
 
+    UPROPERTY()
+    URSSearchComponent* TargetSearchItem;
+
     // @private Array interact item
     UPROPERTY()
     TArray<AInteractItemActor*> ArrInteractItem;
+
+    UPROPERTY()
+    TArray<URSSearchComponent*> ArrSearchComp;
 
     // @private Timer to check the distance of the player to the interactive object
     FTimerHandle CheckedInteractItemTimerHandle;
@@ -107,6 +114,8 @@ private:
      * @param1 AInteractItemActor
      **/
     void AddItem(AInteractItemActor* InteractItem);
+
+    void AddSearchItem(URSSearchComponent* SearchComponent);
 
     /**
      * @private Remove item
@@ -142,7 +151,7 @@ private:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animations", DisplayName = "Аниммонтаж подъема с земли",
         meta= (AllowPrivateAccess = true, ToolTip = "Укажите аниммонтаж, который должен проигрываться при подъеме предмета с земли"))
     UAnimMontage* GroundPickUpAnimMontage;
-    
+
     void InitAnimations();
 
     void StartPickUpAnimation() const;

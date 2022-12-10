@@ -5,6 +5,7 @@
 
 #include "Library/RSFunctionLibrary.h"
 #include "Player/RSGamePLayer.h"
+#include "Player/NewTestPlayer/RSBaseCharacter.h"
 
 URSEquipmentComponent::URSEquipmentComponent()
 {
@@ -77,8 +78,8 @@ void URSEquipmentComponent::TakeInHands(int32 Index)
 
     if(EquipmentSlots[CurrentItemInHand].bIsWeapon)
     {
-        /*ARSGamePLayer* GamePlayer = Cast<ARSGamePLayer>(GetOwner());
-        GamePlayer->GetWeaponComponent()->*/
+        ARSBaseCharacter* PlayerCharacter = Cast<ARSBaseCharacter>(GetOwner());
+        //PlayerCharacter->GetWeaponComponent()->SpawnWeapons(Weapon);
     }
 
     if (EquipmentSlots.Contains(CurrentItemInHand))

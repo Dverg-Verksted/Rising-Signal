@@ -23,6 +23,10 @@ float URSCharacterMovementComponent::GetMaxSpeed() const
     {
         Result = CrouchSpeed;
     }
+    if(IsOnLadder())
+    {
+        Result = ClimbingOnLadderSpeed;
+    }
 
     return Result;
 }
@@ -89,6 +93,64 @@ void URSCharacterMovementComponent::StopRoll()
     SetMovementMode(MOVE_Walking);
 }
 
+void URSCharacterMovementComponent::AttachToLadder(const ALadder* Ladder)
+{
+    bOrientRotationToMovement = false;
+    CurrentLadder = Ladder;
+    FRotator TargetOrientationRotation = CurrentLadder->GetActorForwardVector().ToOrientationRotator();
+    TargetOrientationRotation.Yaw += 180.0f;
+
+    FVector LadderUpVector = CurrentLadder->GetActorUpVector();
+    FVector LadderForwardVector = CurrentLadder->GetActorForwardVector();
+    float Projection = GetActorToCurrentLadderProjection(GetActorLocation());
+
+    FVector NewCharacterLocation = CurrentLadder->GetActorLocation() + Projection * LadderUpVector + LadderToCharacterOffset * LadderForwardVector;
+    if(CurrentLadder->GetIsOnTop())
+    {
+        NewCharacterLocation = CurrentLadder->GetAttachFromTopAnimMontageStartingLocation();
+    }
+    GetOwner()->SetActorLocation(NewCharacterLocation);
+    GetOwner()->SetActorRotation(TargetOrientationRotation);
+    SetMovementMode(MOVE_Custom, (uint8)ECustomMovementMode::CMOVE_OnLadder);
+}
+
+void URSCharacterMovementComponent::DetachFromLadder(EDetachFromLadderMethod DetachFromLadderMethod)
+{
+    bOrientRotationToMovement = true;
+    switch (DetachFromLadderMethod)
+    {
+        case EDetachFromLadderMethod::JumpOff:
+        {
+            FVector JumpDirection = CurrentLadder->GetActorForwardVector();
+            SetMovementMode(MOVE_Falling);
+            FVector JumpVelocity = JumpDirection * JumpOffFromLadderSpeed;
+            Launch(JumpVelocity);
+            break;
+        }
+        case EDetachFromLadderMethod::ReachingTheTop:
+        {
+            BaseCharacterOwner->Mantle();
+            break;
+        }
+        case EDetachFromLadderMethod::ReachingTheBottom:
+        {
+            SetMovementMode(MOVE_Walking);
+            break;
+        }
+        case EDetachFromLadderMethod::Fall:
+            default:
+        {
+            SetMovementMode(MOVE_Falling);
+            break;
+        }
+    }
+}
+
+bool URSCharacterMovementComponent::IsOnLadder() const
+{
+    return UpdatedComponent && MovementMode == MOVE_Custom && CustomMovementMode == StaticCast<uint8>(ECustomMovementMode::CMOVE_OnLadder);
+}
+
 void URSCharacterMovementComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)
 {
     Super::OnMovementModeChanged(PreviousMovementMode, PreviousCustomMode);
@@ -126,6 +188,11 @@ void URSCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations
         case ECustomMovementMode::CMOVE_Rolling:
         {
             PhysRolling(deltaTime, Iterations);
+            break;
+        }
+        case ECustomMovementMode::CMOVE_OnLadder:
+        {
+            PhysLadder(deltaTime, Iterations);
             break;
         }
         default:
@@ -193,6 +260,36 @@ void URSCharacterMovementComponent::PhysRolling(float DeltaTime, int32 Iteration
     SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), true, Hit);
 }
 
+void URSCharacterMovementComponent::PhysLadder(float DeltaTime, int32 Iterations)
+{
+    CalcVelocity(DeltaTime, 1.0f, false, ClimbingOnLadderBrakingDecelaration);
+    FVector Delta = Velocity * DeltaTime;
+
+    if(HasAnimRootMotion())
+    {
+        FHitResult Hit;
+        SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), false, Hit);
+        return;
+    }
+	
+    FVector NewPos = GetActorLocation() + Delta;
+    float NewPosProjection = GetActorToCurrentLadderProjection(NewPos);
+
+    if(NewPosProjection < MinLadderBotomOffset)
+    {
+        DetachFromLadder(EDetachFromLadderMethod::ReachingTheBottom);
+        return;
+    }
+    if(NewPosProjection > (CurrentLadder->GetLadderHeight() - MaxLadderTopOffset))
+    {
+        DetachFromLadder(EDetachFromLadderMethod::ReachingTheTop);
+        return;
+    }
+
+    FHitResult Hit;
+    SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), true, Hit);
+}
+
 bool URSCharacterMovementComponent::IsEnoughSpaceToStandUp()
 {
     FVector StandingLocation = UpdatedComponent->GetComponentLocation();
@@ -211,4 +308,12 @@ bool URSCharacterMovementComponent::IsEnoughSpaceToStandUp()
     bIsEnough = GetWorld()->OverlapBlockingTestByChannel(LocationWithOffset + Offset * FVector::UpVector, FQuat::Identity, CollisionChannel,
         StandingCapsuleShape, CapsuleParams, ResponseParams);
     return bIsEnough;
+}
+
+float URSCharacterMovementComponent::GetActorToCurrentLadderProjection(FVector ActorLocation)
+{
+    checkf(IsValid(CurrentLadder), TEXT("URSCharacterMovementComponent::GetCharacterToCurrentLadderProjection() can not be invoked when current ladder is null"));
+    FVector LadderUpVector = CurrentLadder->GetActorUpVector();
+    FVector LadderToCharacterDistance = ActorLocation - CurrentLadder->GetActorLocation();
+    return FVector::DotProduct(LadderUpVector, LadderToCharacterDistance);
 }

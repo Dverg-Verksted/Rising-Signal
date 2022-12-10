@@ -5,10 +5,12 @@
 #include "CoreMinimal.h"
 #include "RSLedgeDetectorComponent.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
+#include "Game/InteractSystem/Environment/InteractiveActor.h"
 #include "GameFramework/Character.h"
 #include "Player/RSCharacterMovementComponent.h"
 #include "RSBaseCharacter.generated.h"
 
+class ALadder;
 class ARSGamePlayerController;
 class UCameraComponent;
 class UWeaponComponent;
@@ -86,9 +88,15 @@ public:
 
     FORCEINLINE URSCharacterMovementComponent* GetBaseCharacterMovementComponent() const { return RSCharacterMovementComponent; }
     FORCEINLINE URSInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
+    FORCEINLINE UWeaponComponent* GetWeaponComponent() const { return WeaponComponent; }
 
     UFUNCTION(BlueprintCallable)
     FORCEINLINE URSAbilitySystem* GetAbilitySystem() const { return AbilitySystem; }
+
+    UFUNCTION(BlueprintPure)
+    FORCEINLINE USkeletalMeshComponent* GetExtraMesh() const { return ExtraSkeletalMesh; }
+
+    void Mantle();
 
     FORCEINLINE bool GetIsMantling() const;
     void SetIsMantling(bool NewValue);
@@ -101,12 +109,21 @@ public:
     void OnStartRoll(float HalfHeightAdjust);
     void OnStopRoll(float HalfHeightAdjust);
 
+    void ClimbLadder(float Value);
+
+    void RegisterInteractiveActor(AInteractiveActor* InteractiveActor);
+    void UnRegisterInteractiveActor(AInteractiveActor* InteractiveActor);
+
+    void InteractWithLadder();
+
     UPROPERTY()
     float CurrentHeight = 0.0f;
     
 protected:
 	
 	virtual void BeginPlay() override;
+
+    TArray<AInteractiveActor*> AvailableInteractiveActors;
     
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Falls")
@@ -142,6 +159,9 @@ protected:
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
     URSLedgeDetectorComponent* LedgeDetectorComponent;
 
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+    USkeletalMeshComponent* ExtraSkeletalMesh;
+
 #pragma endregion
 
 #pragma region MantlingSettings
@@ -175,6 +195,8 @@ private:
 
     void InputMoveRight(float Value);
 
+    void InputLadder(float Value);
+
     void InputSprintPressed();
 
     void InputSprintReleased();
@@ -186,6 +208,8 @@ private:
     void InputCrouch();
 
     void InputMantle();
+
+    void InputInteractLadder();
 
     void InputJumpPressed();
 
@@ -264,6 +288,8 @@ private:
 private:
 
     const FMantlingSettings& GetMantlingSettings(float LedgeHeight) const;
+
+    const ALadder* GetAvailableLadder() const;
 
     bool CanMove();
     bool CanMantle();
