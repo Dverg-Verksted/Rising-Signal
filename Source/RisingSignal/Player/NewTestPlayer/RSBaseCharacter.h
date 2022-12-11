@@ -83,6 +83,7 @@ public:
     virtual void Falling() override;
     virtual void Landed(const FHitResult& Hit) override;
     virtual void NotifyJumpApex() override;
+    
 
     virtual void Jump() override;
 
@@ -96,7 +97,8 @@ public:
     UFUNCTION(BlueprintPure)
     FORCEINLINE USkeletalMeshComponent* GetExtraMesh() const { return ExtraSkeletalMesh; }
 
-    void Mantle();
+    void Mantle(bool bForce = false);
+    void Roll();
 
     FORCEINLINE bool GetIsMantling() const;
     void SetIsMantling(bool NewValue);
@@ -125,7 +127,6 @@ protected:
 
     TArray<AInteractiveActor*> AvailableInteractiveActors;
     
-
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Falls")
     UCurveFloat* FallDamageCurve;
 
@@ -206,9 +207,7 @@ private:
     void InputWalk();
 
     void InputCrouch();
-
-    void InputMantle();
-
+    
     void InputInteractLadder();
 
     void InputJumpPressed();
@@ -293,6 +292,7 @@ private:
 
     bool CanMove();
     bool CanMantle();
+    bool CanRoll();
 
     bool bIsMantling;
     bool bIsRolling;

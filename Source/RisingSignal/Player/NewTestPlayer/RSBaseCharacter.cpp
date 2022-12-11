@@ -82,9 +82,9 @@ void ARSBaseCharacter::Jump()
     Super::Jump();
 }
 
-void ARSBaseCharacter::Mantle()
+void ARSBaseCharacter::Mantle(bool bForce)
 {
-    if(!CanMantle())
+    if(!(CanMantle() && RSCharacterMovementComponent->IsFalling() || bForce))
     {
         return;
     }
@@ -131,6 +131,19 @@ void ARSBaseCharacter::Mantle()
 	    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	    AnimInstance->Montage_Play(MantlingSettings.MantlingMontage, 1.0f, EMontagePlayReturnType::Duration, MantlingParameters.StartTime);
 	}
+}
+
+void ARSBaseCharacter::Roll()
+{
+    if(!CanRoll())
+    {
+        return;
+    }
+    if(OnRollStateChangedSignature.IsBound())
+    {
+        OnRollStateChangedSignature.Execute(true);
+    }
+    RSCharacterMovementComponent->StartRoll();
 }
 
 bool ARSBaseCharacter::GetIsMantling() const
@@ -251,6 +264,7 @@ void ARSBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+    Mantle();
 }
 
 void ARSBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -271,8 +285,6 @@ void ARSBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
     PlayerInputComponent->BindAction(TEXT("Walk"), IE_Pressed, this, &ThisClass::InputWalk);
     PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Pressed, this, &ThisClass::InputCrouch);
-
-    PlayerInputComponent->BindAction(TEXT("Mantle"), IE_Pressed, this, &ThisClass::InputMantle);
 
     PlayerInputComponent->BindAction(TEXT("Sprint"), IE_Pressed, this, &ARSBaseCharacter::InputSprintPressed);
     PlayerInputComponent->BindAction(TEXT("Sprint"), IE_Released, this, &ARSBaseCharacter::InputSprintReleased);
@@ -342,11 +354,7 @@ void ARSBaseCharacter::InputSprintReleased()
 
 void ARSBaseCharacter::InputRoll()
 {
-    if(OnRollStateChangedSignature.IsBound())
-    {
-        OnRollStateChangedSignature.Execute(true);
-    }
-    RSCharacterMovementComponent->StartRoll();
+    Roll();
 }
 
 void ARSBaseCharacter::InputWalk()
@@ -363,11 +371,6 @@ void ARSBaseCharacter::InputCrouch()
     {
         Crouch();
     }
-}
-
-void ARSBaseCharacter::InputMantle()
-{
-    Mantle();
 }
 
 void ARSBaseCharacter::InputInteractLadder()
@@ -481,7 +484,7 @@ bool ARSBaseCharacter::CanMove()
     {
         return false;
     }
-    if(!GetCharacterMovement()->IsMovingOnGround())
+    if(RSCharacterMovementComponent->IsOnLadder())
     {
         return false;
     }
@@ -493,6 +496,28 @@ bool ARSBaseCharacter::CanMove()
 bool ARSBaseCharacter::CanMantle()
 {
     if(bIsMantling)
+    {
+        return false;
+    }
+    if(RSCharacterMovementComponent->IsOnLadder())
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool ARSBaseCharacter::CanRoll()
+{
+    if(bIsRolling)
+    {
+        return false;
+    }
+    if(bIsMantling)
+    {
+        return false;
+    }
+    if(RSCharacterMovementComponent->IsOnLadder())
     {
         return false;
     }
