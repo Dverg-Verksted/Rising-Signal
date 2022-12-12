@@ -30,6 +30,12 @@ public:
 
 #pragma endregion
 
+    virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+
+    void OnChecpointReached(AActor* ReachedActor);
+
+    virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
+
 protected:
     virtual void BeginPlay() override;
 

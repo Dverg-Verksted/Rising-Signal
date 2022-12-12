@@ -6,6 +6,7 @@
 #include "RSLedgeDetectorComponent.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
 #include "Game/InteractSystem/Environment/InteractiveActor.h"
+#include "Game/SaveLoad/RSSavableObjectInterface.h"
 #include "GameFramework/Character.h"
 #include "Player/RSCharacterMovementComponent.h"
 #include "RSBaseCharacter.generated.h"
@@ -68,7 +69,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnLandedSignature, float);
 DECLARE_DELEGATE_OneParam(FOnRollStateChangedSignature, bool);
 
 UCLASS()
-class RISINGSIGNAL_API ARSBaseCharacter : public ACharacter
+class RISINGSIGNAL_API ARSBaseCharacter : public ACharacter, public IRSSavableObjectInterface
 {
 	GENERATED_BODY()
 
@@ -120,6 +121,9 @@ public:
 
     UPROPERTY()
     float CurrentHeight = 0.0f;
+
+    void UpdateCameraRotation();
+
     
 protected:
 	

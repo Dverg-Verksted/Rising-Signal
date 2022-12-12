@@ -250,14 +250,18 @@ void ARSBaseCharacter::InteractWithLadder()
     }
 }
 
+
+void ARSBaseCharacter::UpdateCameraRotation()
+{
+    Camera->SetWorldRotation(FRotator{0,0,0});
+}
+
 void ARSBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
     AbilitySystem->OnStateChangedSignature.AddDynamic(this, &ARSBaseCharacter::CheckSomeState);
     AbilitySystem->OnDeath.AddDynamic(this, &ARSBaseCharacter::RegisterDeath);
-
-    Camera->SetWorldRotation(FRotator{0,0,0});
 }
 
 void ARSBaseCharacter::Tick(float DeltaTime)

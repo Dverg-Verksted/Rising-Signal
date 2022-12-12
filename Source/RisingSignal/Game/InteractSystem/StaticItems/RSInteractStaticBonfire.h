@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "../Plugins/FMODStudio/Source/FMODStudio/Classes/FMODEvent.h"
 #include "Game/InteractSystem/RSInteractStaticItemBase.h"
+#include "Game/SaveLoad/RSSavableObjectInterface.h"
 #include "RSInteractStaticBonfire.generated.h"
 
 class AInteractItemActor;
@@ -108,7 +109,7 @@ protected:
         meta = (
             DisplayName = "Горит",
             ToolTip = "Должен ли этот костер гореть?"
-        ))
+        ), SaveGame)
     bool bIsFired = false;
 
     UPROPERTY()

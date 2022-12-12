@@ -5,6 +5,7 @@
 #include "../Plugins/FMODStudio/Source/FMODStudio/Classes/FMODBlueprintStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
+#include "Game/GameModes/RSGameMode.h"
 #include "Game/InteractSystem/InteractItemActor.h"
 #include "Library/RSFunctionLibrary.h"
 #include "Particles/ParticleSystem.h"
@@ -145,9 +146,15 @@ void ARSInteractStaticBonfire::Interact(ACharacter* InteractingCharacter)
 
     if (bNeedItem) return;
 
+    if (!InteractingCharacter)
+    {
+        LOG_RS(ELogRSVerb::Error, TEXT("No Character Given!"));
+        return;
+    }
+
     if (bIsFired)
     {
-        // Save();
+        GetWorld()->GetAuthGameMode<ARSGameMode>()->OnChecpointReached(InteractingCharacter);
     }
     else
     {
@@ -202,4 +209,3 @@ void ARSInteractStaticBonfire::PostEditChangeProperty(FPropertyChangedEvent& Pro
 }
 
 #endif
-

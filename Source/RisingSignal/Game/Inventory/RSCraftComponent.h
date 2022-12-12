@@ -59,6 +59,10 @@ public:
     UFUNCTION(BlueprintCallable)
     bool GetIsWorkbenchNearBy() const { return bIsWorkbenchNearBy; }
 
+    TArray<FInventoryItem> GetItems() const { return CraftingItems; }
+
+    void LoadItems(TArray<FInventoryItem> Items) { CraftingItems = Items; }
+
 protected:
     virtual void BeginPlay() override;
 

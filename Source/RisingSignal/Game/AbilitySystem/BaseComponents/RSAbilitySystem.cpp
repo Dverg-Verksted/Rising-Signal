@@ -299,6 +299,18 @@ void URSAbilitySystem::SetChangeValue(EAbilityStatesType AbilityStateType, float
     }
 }
 
+void URSAbilitySystem::SetState(FStateParams StateParams)
+{
+    for (auto& State : States)
+    {
+        if (State.StateType == StateParams.StateType)
+        {
+            State.CurrentValue = StateParams.CurrentValue;
+            State.ChangedValue = StateParams.ChangedValue;
+        }
+    }
+}
+
 float URSAbilitySystem::GetCurrentStateValue(EAbilityStatesType SearchState) const
 {
     for (const auto State : States)
