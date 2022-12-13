@@ -71,11 +71,10 @@ DECLARE_DELEGATE_OneParam(FOnRollStateChangedSignature, bool);
 UCLASS()
 class RISINGSIGNAL_API ARSBaseCharacter : public ACharacter, public IRSSavableObjectInterface
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	
-	ARSBaseCharacter(const FObjectInitializer& ObjectInitializer);
+    ARSBaseCharacter(const FObjectInitializer& ObjectInitializer);
 
     FOnSlideSignature OnSlide;
     FOnLandedSignature OnLanded;
@@ -84,7 +83,7 @@ public:
     virtual void Falling() override;
     virtual void Landed(const FHitResult& Hit) override;
     virtual void NotifyJumpApex() override;
-    
+
 
     virtual void Jump() override;
 
@@ -124,19 +123,17 @@ public:
 
     void UpdateCameraRotation();
 
-    
 protected:
-	
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
 
     TArray<AInteractiveActor*> AvailableInteractiveActors;
-    
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Falls")
     UCurveFloat* FallDamageCurve;
 
 #pragma region Components
-protected:
 
+protected:
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
     URSCharacterMovementComponent* RSCharacterMovementComponent;
 
@@ -170,8 +167,8 @@ protected:
 #pragma endregion
 
 #pragma region MantlingSettings
-protected:
 
+protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Mantling")
     FMantlingSettings HighMantlingSettings;
 
@@ -182,16 +179,15 @@ protected:
     float LowMantleMaxHeight = 125.0f;
 
 #pragma endregion
-    
-public:	
-	
-	virtual void Tick(float DeltaTime) override;
-    
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+public:
+    virtual void Tick(float DeltaTime) override;
+
+    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 #pragma region Input
-private:
 
+private:
     void InputLookUp(float Value);
 
     void InputLookRight(float Value);
@@ -211,7 +207,7 @@ private:
     void InputWalk();
 
     void InputCrouch();
-    
+
     void InputInteractLadder();
 
     void InputJumpPressed();
@@ -229,7 +225,7 @@ private:
     void InputActionSlot4();
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character | PlayerInput",
-            Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "x"))
+        Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "x"))
     float LookUpMouseSensitivity{1.0f};
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character | PlayerInput",
@@ -244,7 +240,7 @@ private:
         Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "deg"))
     float LookRightRate{90.0f};
 
-#pragma endregion 
+#pragma endregion
 
 #pragma region Extension
 
@@ -287,9 +283,7 @@ private:
 
 #pragma endregion Extension
 
-
 private:
-
     const FMantlingSettings& GetMantlingSettings(float LedgeHeight) const;
 
     const ALadder* GetAvailableLadder() const;

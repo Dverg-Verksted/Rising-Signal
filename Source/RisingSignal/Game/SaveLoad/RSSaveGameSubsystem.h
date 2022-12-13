@@ -53,4 +53,10 @@ public:
     /* Initialize Subsystem, good moment to load in SaveGameSettings variables */
     void Initialize(FSubsystemCollectionBase& Collection) override;
 
+    void SetSaveGame(URSSaveGame* SaveGame);
+
+    FString GetSlotName() const { return CurrentSlotName; }
+
+    URSSaveGame* GetSaveGame() const { return CurrentSaveGame; }
+
 };

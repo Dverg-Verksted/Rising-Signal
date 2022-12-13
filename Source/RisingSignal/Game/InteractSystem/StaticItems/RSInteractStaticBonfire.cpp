@@ -154,7 +154,7 @@ void ARSInteractStaticBonfire::Interact(ACharacter* InteractingCharacter)
 
     if (bIsFired)
     {
-        GetWorld()->GetAuthGameMode<ARSGameMode>()->OnChecpointReached(InteractingCharacter);
+        GetWorld()->GetAuthGameMode<ARSGameMode>()->CheckpointReached(InteractingCharacter);
     }
     else
     {

@@ -36,7 +36,7 @@ struct FPlayerSaveData
 public:
     /* Player Id defined by the online sub system (such as Steam) converted to FString for simplicity  */
     UPROPERTY()
-    FString PlayerID;
+    FString PlayerID = "None";
 
     /* Location if player was alive during save */
     UPROPERTY()
@@ -48,7 +48,7 @@ public:
 
     /* We don't always want to restore location, and may just resume player at specific respawn point in world. */
     UPROPERTY()
-    bool bResumeAtTransform;
+    bool bResumeAtTransform = false;
 
     UPROPERTY()
     TArray<FStateParams> AbilityParams;
@@ -62,7 +62,7 @@ public:
     UPROPERTY()
     TMap<int32, FInventoryItem> EquipmentSlots;
 
-    int32 CurrentItemInHand;
+    int32 CurrentItemInHand = 0;
 };
 
 /**
@@ -75,16 +75,14 @@ class RISINGSIGNAL_API URSSaveGame : public USaveGame
     GENERATED_BODY()
 
 public:
-    UPROPERTY()
-    TMap<EAbilityStatesType, FStateParams> SavedStates;
-
-    UPROPERTY()
-    TArray<FPlayerSaveData> SavedPlayers;
-
     /* Actors stored from a level (currently does not support a specific level and just assumes the demo map) */
     UPROPERTY()
     TArray<FActorSaveData> SavedActors;
 
-    FPlayerSaveData* GetPlayerData(APlayerState* PlayerState);
+    FPlayerSaveData* GetPlayerData();
 
+    void ClearData();
+    
+    UPROPERTY()
+    FPlayerSaveData SavedPlayer{};
 };

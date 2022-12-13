@@ -11,6 +11,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
+#include "Library/RSFunctionLibrary.h"
 #include "Player/RSPlayerState.h"
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 
@@ -39,18 +40,11 @@ bool URSSaveGameSubsystem::OverrideSpawnTransform(AController* NewPlayer)
 
     if (APawn* MyPawn = PS->GetPawn())
     {
-        FPlayerSaveData* FoundData = CurrentSaveGame->GetPlayerData(PS);
+        FPlayerSaveData* FoundData = CurrentSaveGame->GetPlayerData();
         if (FoundData && FoundData->bResumeAtTransform)
         {
             MyPawn->SetActorLocation(FoundData->Location);
             MyPawn->SetActorRotation(FoundData->Rotation);
-
-            // PlayerState owner is a (Player)Controller
-            AController* PC = Cast<AController>(PS->GetOwner());
-            // Set control rotation to change camera direction, setting Pawn rotation is not enough
-            // PC->SetControlRotation(FoundData->Rotation);
-
-            
 
             return true;
         }
@@ -72,9 +66,17 @@ void URSSaveGameSubsystem::SetSlotName(FString NewSlotName)
 
 void URSSaveGameSubsystem::WriteSaveGame()
 {
+
+    UE_LOG(LogTemp, Warning, TEXT("%s::%s() called"), *GetName(), *FString(__FUNCTION__));
+
+    if (!CurrentSaveGame)
+    {
+        LOG_RS(ELogRSVerb::Error, "No SaveGame Found!");
+        return;
+    }
+
     // Clear arrays, may contain data from previously loaded SaveGame
-    CurrentSaveGame->SavedPlayers.Empty();
-    CurrentSaveGame->SavedActors.Empty();
+    CurrentSaveGame->ClearData();
 
     AGameStateBase* GS = GetWorld()->GetGameState();
     if (GS == nullptr)
@@ -143,6 +145,8 @@ void URSSaveGameSubsystem::LoadSaveGame(FString InSlotName)
 
         UE_LOG(LogTemp, Warning, TEXT("Loaded SaveGame Data."));
 
+        
+
         // Iterate the entire world of actors
         for (FActorIterator It(GetWorld()); It; ++It)
         {
@@ -184,7 +188,6 @@ void URSSaveGameSubsystem::LoadSaveGame(FString InSlotName)
 }
 
 
-
 void URSSaveGameSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
@@ -196,4 +199,9 @@ void URSSaveGameSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     // Make sure it's loaded into memory .Get() only resolves if already loaded previously elsewhere in code
     UDataTable* DummyTable = SGSettings->DummyTablePath.LoadSynchronous();
     //DummyTable->GetAllRows() // We don't need this table for anything, just an content reference example
+}
+
+void URSSaveGameSubsystem::SetSaveGame(URSSaveGame* SaveGame)
+{
+    CurrentSaveGame = SaveGame;
 }
