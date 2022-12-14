@@ -51,9 +51,11 @@ public:
     {
         return FString::Printf(TEXT("Slot: %i, Count: %i"), Item.SlotIndex, Item.Count);
     }
-    
+
     bool FindItemsToUse(TArray<FNeededItem>& NeedItems);
     FInventoryItem GetItemByIndex(int32 Index);
+
+    void LoadItems(TArray<FInventoryItem> Items) { InventoryItems = Items; }
 
 protected:
     // Called when the game starts

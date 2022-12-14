@@ -129,7 +129,7 @@ void URSCharacterMovementComponent::DetachFromLadder(EDetachFromLadderMethod Det
         }
         case EDetachFromLadderMethod::ReachingTheTop:
         {
-            BaseCharacterOwner->Mantle();
+            BaseCharacterOwner->Mantle(true);
             break;
         }
         case EDetachFromLadderMethod::ReachingTheBottom:

@@ -30,6 +30,21 @@ public:
 
 #pragma endregion
 
+    virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+
+    UFUNCTION(BlueprintCallable)
+    void CheckpointReached(AActor* ReachedActor);
+
+    virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
+
+    UFUNCTION(BlueprintCallable)
+    void LoadCheckpoint();
+
+    UFUNCTION(BlueprintCallable)
+    void LoadLevel(FName LevelName, bool FromBegin);
+
+    void RestartLevel();
+
 protected:
     virtual void BeginPlay() override;
 

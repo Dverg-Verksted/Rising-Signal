@@ -15,7 +15,7 @@ class ARSGamePlayerController;
 class AInteractItemActor;
 class UBoxComponent;
 class ARSGamePLayer;
-class URSSearchComponent;
+class URSLootComponent;
 
 /**
  * @class
@@ -89,14 +89,14 @@ private:
     AInteractItemActor* TargetInteractItem;
 
     UPROPERTY()
-    URSSearchComponent* TargetSearchItem;
+    URSLootComponent* TargetSearchItem;
 
     // @private Array interact item
     UPROPERTY()
     TArray<AInteractItemActor*> ArrInteractItem;
 
     UPROPERTY()
-    TArray<URSSearchComponent*> ArrSearchComp;
+    TArray<URSLootComponent*> ArrLootComp;
 
     // @private Timer to check the distance of the player to the interactive object
     FTimerHandle CheckedInteractItemTimerHandle;
@@ -115,7 +115,7 @@ private:
      **/
     void AddItem(AInteractItemActor* InteractItem);
 
-    void AddSearchItem(URSSearchComponent* SearchComponent);
+    void AddSearchItem(URSLootComponent* SearchComponent);
 
     /**
      * @private Remove item

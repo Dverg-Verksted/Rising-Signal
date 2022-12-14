@@ -31,6 +31,15 @@ public:
 
     void TakeInHands(int32 Index);
 
+    TMap<int32, FInventoryItem> GetItems() const { return EquipmentSlots; }
+    int32 GetEquippedItem() const { return CurrentItemInHand; }
+
+    void LoadItems(TMap<int32, FInventoryItem> ItemsMap, int32 EquippedItem)
+    {
+        EquipmentSlots = ItemsMap;
+        TakeInHands(EquippedItem);
+    }
+
 protected:
     UPROPERTY()
     TMap<int32, FInventoryItem> EquipmentSlots;
