@@ -160,6 +160,11 @@ void URSCraftComponent::FindSuitableRecipe()
         LOG_RS(ELogRSVerb::Error, "Datatable is null");
         return;
     }
+
+    if(CraftingItems[OUTPUT_SLOT].InteractRowName != NAME_None)
+    {
+        return;
+    }
     
     TArray<FName> RowNames = SortRecipesByIngredients(RecipeDataTable);
     for (const auto RowName : RowNames)

@@ -113,11 +113,12 @@ void AInteractItemActor::DestroyInteractWidget()
 {
     if (InteractWidget)
     {
-        InteractWidget->EndAnimation();
-        GetWorldTimerManager().SetTimer(ResetInteractAnimTimerHandle, [&]()
-        {
-            InteractWidget->SetVisibility(ESlateVisibility::Collapsed);
-        }, InteractWidget->GetEndAnim()->GetEndTime(), false);
+        InteractWidget->EndAnimation(); 
+        // GetWorldTimerManager().SetTimer(ResetInteractAnimTimerHandle, [&]() //TODO: Check it
+        // {
+        //     if (InteractWidget)
+        //         InteractWidget->SetVisibility(ESlateVisibility::Collapsed);
+        // }, InteractWidget->GetEndAnim()->GetEndTime(), false);
     }
 }
 
@@ -136,9 +137,8 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
 
 #if WITH_EDITOR
 
-        
         // LOG_RS(ELogRSVerb::Warning, GetWorld()->GetName() + " = CurrentMapName --- SelectedMapName = " + DataInteract->AttachedMap.GetAssetName());
-        
+
         if (!DataInteract->AttachedMap.IsNull() && DataInteract->AttachedMap.GetAssetName() != GetWorld()->GetName())
         {
             this->Mesh->SetStaticMesh(nullptr);
@@ -263,7 +263,3 @@ void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItem
         Item->ItemCount = Count;
     }
 }
-
-
-
-

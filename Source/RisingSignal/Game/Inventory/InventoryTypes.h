@@ -99,11 +99,11 @@ struct FInventoryItem : public FTableRowBase
     FWeaponSettings WeaponSettings;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
-        DisplayName="Стакается предмет?", meta=(EditCondition = "!bCanEquip", EditConditionHides))
+        DisplayName="Стакается предмет?")
     bool bStack = true;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",
-        DisplayName = "Можно использовать?", meta=(EditCondition = "!bCanEquip", EditConditionHides))
+        DisplayName = "Можно использовать?")
     bool bCanUse = false;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Инвентарь",

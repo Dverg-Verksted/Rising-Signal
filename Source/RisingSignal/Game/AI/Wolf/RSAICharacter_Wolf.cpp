@@ -117,7 +117,6 @@ void ARSAICharacter_Wolf::InitAnimations()
         const auto BiteNotify = Cast<URSBiteAnimNotify>(NotifyEvent.Notify);
         if (BiteNotify)
         {
-            LOG_RS(ELogRSVerb::Warning, "Done");
             BiteNotify->OnNotified.AddUObject(this, &ARSAICharacter_Wolf::ProvideDamage);
             break;
         }

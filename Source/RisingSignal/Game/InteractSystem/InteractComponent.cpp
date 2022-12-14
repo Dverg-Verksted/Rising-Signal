@@ -5,7 +5,7 @@
 #include "InteractDataItem.h"
 #include "InteractItemActor.h"
 #include "RSInteractStaticItemBase.h"
-#include "RSSearchComponent.h"
+#include "Game/Inventory/RSLootComponent.h"
 #include "AnimNotifies/RSItemPickUpEndedAnimNotify.h"
 #include "Components/BoxComponent.h"
 #include "Game/JournalSystem/JournalSystem.h"
@@ -97,12 +97,12 @@ void UInteractComponent::RegisterBeginOverlapInteractItem(UPrimitiveComponent* O
 {
     if (!OtherActor) return;
     AInteractItemActor* BaseItem = Cast<AInteractItemActor>(OtherActor);
-    URSSearchComponent* SearchComp = Cast<URSSearchComponent>(OtherComp);
-    if (!BaseItem && !SearchComp) return;
+    URSLootComponent* LootComp = Cast<URSLootComponent>(OtherComp);
+    if (!BaseItem && !LootComp) return;
 
     LOG_INTERACT(ELogRSVerb::Display, FString::Printf(TEXT("Begin overlap actor: [%s]"), *OtherActor->GetName()));
     AddItem(BaseItem);
-    AddSearchItem(SearchComp);
+    AddSearchItem(LootComp);
 }
 
 void UInteractComponent::RegisterEndOverlapInteractItem(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -141,15 +141,15 @@ void UInteractComponent::AddItem(AInteractItemActor* InteractItem)
     }
 }
 
-void UInteractComponent::AddSearchItem(URSSearchComponent* SearchComponent)
+void UInteractComponent::AddSearchItem(URSLootComponent* LootComponent)
 {
-    if (!SearchComponent)
+    if (!LootComponent)
     {
         LOG_INTERACT(ELogRSVerb::Warning, "Search Actor is nullptr");
         return;
     }
 
-    ArrSearchComp.AddUnique(SearchComponent);
+    ArrLootComp.AddUnique(LootComponent);
     if (!GetWorld()->GetTimerManager().TimerExists(CheckedInteractItemTimerHandle))
     {
         LOG_INTERACT(ELogRSVerb::Display, FString::Printf(TEXT("Start timer for checked distance | Num item: %i | Rate time start: %f"),
@@ -180,7 +180,7 @@ void UInteractComponent::CheckDistanceToItem()
     bool ItemCloser;
     AInteractItemActor* TempTargetItem = nullptr;
     float TempTargetItemDist = MAX_FLT;
-    URSSearchComponent* TempTargetSearch = nullptr;
+    URSLootComponent* TempTargetSearch = nullptr;
     float TempTargetSearchDist = MAX_FLT;
 
     if (ArrInteractItem.Num())
@@ -198,11 +198,11 @@ void UInteractComponent::CheckDistanceToItem()
         }
     }
 
-    if (ArrSearchComp.Num())
+    if (ArrLootComp.Num())
     {
         const FVector L_CurrLoc = GetOwner()->GetActorLocation();
 
-        for (const auto L_Search : ArrSearchComp)
+        for (const auto L_Search : ArrLootComp)
         {
             float L_TempDist = (L_Search->GetOwner()->GetActorLocation() - L_CurrLoc).Size();
             if (TempTargetSearchDist > L_TempDist)

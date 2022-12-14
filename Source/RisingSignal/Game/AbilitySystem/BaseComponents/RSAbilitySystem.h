@@ -158,7 +158,7 @@ protected:
 #pragma region AbilitySystemParams
 
 public:
-    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Ability states")
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Ability states", SaveGame)
     TArray<FStateParams> States;
     
 private:
@@ -237,6 +237,8 @@ public:
     UFUNCTION(BlueprintCallable)
     void SetChangeValue(EAbilityStatesType AbilityStateType, float ChangedValueModifier);
 
+    void SetState(FStateParams StateParams);
+
     // Return true if player is dead
     UFUNCTION(BlueprintCallable, BlueprintPure)
     bool GetIsPlayerDead() const {
@@ -262,6 +264,8 @@ public:
 
     UFUNCTION()
     void StressOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+
 
 private:
     // control on state changes, it check all state on new change value

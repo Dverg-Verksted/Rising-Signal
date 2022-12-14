@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "InteractTypes.h"
+#include "Game/SaveLoad/RSSavableObjectInterface.h"
 #include "GameFramework/Actor.h"
 #include "RSInteractStaticItemBase.generated.h"
 
@@ -14,7 +15,7 @@
  */
 UCLASS(HideCategories = ("Variable", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
     "Mobile", "Activation", "Component Replication", "Events", "Asset User Data", "Collision", "Rendering", "Input", "Actor", "LOD"))
-class RISINGSIGNAL_API ARSInteractStaticItemBase : public AActor
+class RISINGSIGNAL_API ARSInteractStaticItemBase : public AActor, public IRSSavableObjectInterface
 {
     GENERATED_BODY()
 
@@ -34,7 +35,7 @@ public:
 
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings | Interact", DisplayName = "Запрашивать предмет",
-        meta = (ToolTip = "Необходимо ли проверить наличие необходимых предметов у персонажа при первом взаимодействии"))
+        meta = (ToolTip = "Необходимо ли проверить наличие необходимых предметов у персонажа при первом взаимодействии"), SaveGame)
     bool bNeedItem = false;
 
     UPROPERTY(EditAnywhere, DisplayName = "Необходимые предметы", Category = "Settings | Interact",
