@@ -27,7 +27,7 @@ void URSAbilitySystem::BeginPlay()
     
     SphereCollision->SetCollisionProfileName("OverlapAllDynamic");
     SphereCollision->SetGenerateOverlapEvents(true);
-    SphereCollision->bHiddenInGame = false;
+    SphereCollision->bHiddenInGame = true;
     SphereCollision->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
     SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &URSAbilitySystem::StressOverlapBegin);
     SphereCollision->OnComponentEndOverlap.AddDynamic(this, &URSAbilitySystem::StressOverlapEnd);
