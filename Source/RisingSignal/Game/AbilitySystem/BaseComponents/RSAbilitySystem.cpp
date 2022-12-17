@@ -279,35 +279,29 @@ void URSAbilitySystem::AddEffect(int AddTime, EAbilityStatesType AddEffectType, 
     {
         if(Effect.EffectType == AddEffectType)
         {
-            if(Effect.Time == 0.0f)
-            {
-                Effect.EffectValue = AddValue;
-                Effect.Time = AddTime;
-            }
-
-            if (Effect.Time > 0.0f)
-            {
-                Effect.EffectValue += AddValue;
-                Effect.Time += AddTime;
-            }
+            Effect.EffectValue += AddValue;
+            Effect.Time += AddTime;
         }
     } 
 }
 
 void URSAbilitySystem::UpdateEffects()
 {
-    for (FEffect& Effect : Effects)
+    for (FEffect &Effect : Effects)
     {
         if(Effect.Time != 0.0f)
         {
             ChangeCurrentStateValue(Effect.EffectType, Effect.EffectValue);
+
+            LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("%f"), Effect.EffectValue));
             
             Effect.Time--;
         }
         
         if(Effect.Time == 0.0f)
         {
-         
+            Effect.Time = 0.0f;
+            Effect.EffectValue = 0.0f;
         }
     }
 }
