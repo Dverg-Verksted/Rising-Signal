@@ -17,6 +17,18 @@ void ARSGameMode::InitGame(const FString& MapName, const FString& Options, FStri
 
 }
 
+void ARSGameMode::StartPlay()
+{
+    if (UGameplayStatics::ParseOption(OptionsString, "LoadCheckpoint") == "True")
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Checkpoint"));
+        LoadCheckpoint();
+    }
+
+    Super::StartPlay();
+
+}
+
 void ARSGameMode::CheckpointReached(AActor* ReachedActor)
 {
     ARSBaseCharacter* Player = Cast<ARSBaseCharacter>(ReachedActor);
@@ -93,9 +105,4 @@ void ARSGameMode::BeginPlay()
         }
     }
 
-    if (UGameplayStatics::ParseOption(OptionsString, "LoadCheckpoint") == "True")
-    {
-        UE_LOG(LogTemp, Warning, TEXT("Checkpoint"));
-        LoadCheckpoint();
-    }
 }
