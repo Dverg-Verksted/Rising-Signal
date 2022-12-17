@@ -232,21 +232,15 @@ void ARSBaseCharacter::UnRegisterInteractiveActor(AInteractiveActor* Interactive
 
 void ARSBaseCharacter::InteractWithLadder()
 {
-    if(GetBaseCharacterMovementComponent()->IsOnLadder())
+    /*if(GetBaseCharacterMovementComponent()->IsOnLadder())
     {
         GetBaseCharacterMovementComponent()->DetachFromLadder(EDetachFromLadderMethod::JumpOff);
-    }
-    else
+    }*/
+    
+    const ALadder* AvailableLadder = GetAvailableLadder();
+    if(IsValid(AvailableLadder))
     {
-        const ALadder* AvailableLadder = GetAvailableLadder();
-        if(IsValid(AvailableLadder))
-        {
-            if(AvailableLadder->GetIsOnTop())
-            {
-                PlayAnimMontage(AvailableLadder->GetAttachFromTopAnimMontage());
-            }
-            GetBaseCharacterMovementComponent()->AttachToLadder(AvailableLadder);
-        }
+        GetBaseCharacterMovementComponent()->AttachToLadder(AvailableLadder);
     }
 }
 
