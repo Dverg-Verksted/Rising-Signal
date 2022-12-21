@@ -69,7 +69,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnLandedSignature, float);
 DECLARE_DELEGATE_OneParam(FOnRollStateChangedSignature, bool);
 
 UCLASS()
-class RISINGSIGNAL_API ARSBaseCharacter : public ACharacter, public IRSSavableObjectInterface
+class RISINGSIGNAL_API ARSBaseCharacter : public ACharacter
 {
     GENERATED_BODY()
 

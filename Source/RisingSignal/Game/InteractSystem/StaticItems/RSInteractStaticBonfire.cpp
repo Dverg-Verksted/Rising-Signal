@@ -142,8 +142,6 @@ void ARSInteractStaticBonfire::Interact(ACharacter* InteractingCharacter)
 {
     Super::Interact(InteractingCharacter);
 
-    UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), EventIgnition, GetActorTransform(), true);
-
     if (bNeedItem) return;
 
     if (!InteractingCharacter)
@@ -158,6 +156,21 @@ void ARSInteractStaticBonfire::Interact(ACharacter* InteractingCharacter)
     }
     else
     {
+        // FFMODEventInstance{}
+        // UFMODBlueprintStatics::Event
+        FFMODEventInstance IgnitionInstance = UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), EventIgnition, GetActorTransform(),
+            false);
+
+        // UFMODBlueprintStatics::EventInstanceStop(IgnitionInstance);
+        if (UFMODBlueprintStatics::EventInstanceIsValid(IgnitionInstance))
+        {
+            // UFMODBlueprintStatics::EventInstanceSetParameter(IgnitionInstance,"Campfire",0);
+            // UFMODBlueprintStatics::EventInstanceSetParameter(IgnitionInstance,"",0);
+            UFMODBlueprintStatics::EventInstancePlay(IgnitionInstance);
+
+            // LOG_RS(ELogRSVerb::Error, "Sounds");
+        }
+
         SetFire(true);
         if (ParentInteractActor)
         {

@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "InteractDataItem.h"
+#include "Components/TimelineComponent.h"
 #include "Engine/DataTable.h"
 #include "Game/Inventory/InventoryTypes.h"
 #include "GameFramework/Actor.h"
+#include "Game/SaveLoad/RSSavableObjectInterface.h"
 #include "InteractItemActor.generated.h"
 
 
@@ -15,7 +17,7 @@ class UWidgetComponent;
 class UInteractWidget;
 UCLASS(HideCategories = ("Variable", "Transform", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
     "Mobile", "Activation", "Component Replication", "Events", "Asset User Data", "Collision", "Rendering", "Input", "Actor", "LOD"))
-class RISINGSIGNAL_API AInteractItemActor : public AActor
+class RISINGSIGNAL_API AInteractItemActor : public AActor, public IRSSavableObjectInterface
 {
     GENERATED_BODY()
 
@@ -26,7 +28,6 @@ public:
     AInteractItemActor();
 
 protected:
-    
     virtual void BeginPlay() override;
 
     virtual void PostLoad() override;
@@ -41,7 +42,6 @@ protected:
 #pragma endregion
 
 #pragma region Components
-
 
 private:
     // @private Mesh component
@@ -103,6 +103,14 @@ public:
     ARSInteractStaticItemBase* GetChildStaticActor() const { return ChildStaticItemActor; }
 
     void SetInteractText(FText NewText);
+
+protected:
+    UPROPERTY(VisibleDefaultsOnly, Category = "Floating Settings",
+        meta=(EditCondition = "TypeItem == ETypeItem::InvItem", EditConditionHides, ClampMin = 0, ClampMax = 100))
+    float FloatingHeight = 0.0f;
+
+    UPROPERTY(VisibleDefaultsOnly, Category = "Floating Settings")
+    FTimeline FloatingTimeline;
 
 private:
     UPROPERTY(EditInstanceOnly, Category = "Settings Interact", DisplayName = "Радиус взаимодействия")
@@ -173,6 +181,11 @@ private:
 
     void InitDataInteract(const FDataTableRowHandle NewInteractData, const bool bInitWidgetText = false);
 
+    void MoveItemDown();
+
+    FVector GetItemBounds();
+
+
 #pragma endregion
 
 #pragma region Statics
@@ -186,7 +199,7 @@ public:
      * @param Distance Distance from Spawner where to spawn item. By default = 150.0f.
      */
     UFUNCTION(BlueprintCallable)
-    static void SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count = 1, float Distance = 150.0f,
+    static void SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count = 1, float Distance = 200.0f,
         bool RandomDirection = false);
 
 

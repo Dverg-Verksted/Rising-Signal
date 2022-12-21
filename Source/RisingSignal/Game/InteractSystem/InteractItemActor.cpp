@@ -61,6 +61,8 @@ void AInteractItemActor::BeginPlay()
     }
 
     InitDataInteract(InteractData, true);
+
+    MoveItemDown();
 }
 
 void AInteractItemActor::PostLoad()
@@ -113,7 +115,7 @@ void AInteractItemActor::DestroyInteractWidget()
 {
     if (InteractWidget)
     {
-        InteractWidget->EndAnimation(); 
+        InteractWidget->EndAnimation();
         // GetWorldTimerManager().SetTimer(ResetInteractAnimTimerHandle, [&]() //TODO: Check it
         // {
         //     if (InteractWidget)
@@ -220,11 +222,39 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
             {
                 InteractWidget->SetText(DataInteract->InteractText);
             }
-            else if (TypeItem != ETypeItem::StaticItem)
+            else if (TypeItem != ETypeItem::InvItem)
             {
                 InteractWidget->SetText(this->NameItem);
             }
     }
+}
+
+void AInteractItemActor::MoveItemDown()
+{
+
+    FHitResult Hit;
+    GetWorld()->LineTraceSingleByChannel(Hit, GetActorLocation(), FVector::DownVector * 500, ECC_WorldStatic);
+
+    if (Hit.bBlockingHit)
+    {
+        FVector NewLoc = GetActorLocation();
+        NewLoc.Z = Hit.ImpactPoint.Z + GetItemBounds().Z / 2 + FloatingHeight;
+
+        SetActorLocation(NewLoc);
+    }
+}
+
+FVector AInteractItemActor::GetItemBounds()
+{
+    if (Mesh)
+    {
+        FVector Min, Max;
+        Mesh->GetLocalBounds(Min, Max);
+
+        LOG_RS(ELogRSVerb::Warning, GetName() + " bounds = " + Min.ToString() + " " + Max.ToString());
+        return Max;
+    }
+    return FVector::ZeroVector;
 }
 
 void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count, float Distance, bool RandomDirection)
@@ -237,6 +267,9 @@ void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItem
 
     FVector SpawnerLocation = Spawner->GetActorLocation();
     FVector SpawnDirection;
+    float SpawnDistance = Distance < 150.0f ? 150.0f : Distance;
+    SpawnDistance = UKismetMathLibrary::RandomFloatInRange(Distance - 10, Distance + 10);
+
     if (RandomDirection)
     {
         SpawnDirection = UKismetMathLibrary::RandomUnitVector();
@@ -247,7 +280,7 @@ void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItem
         SpawnDirection = Spawner->GetActorForwardVector();
     }
 
-    FVector ItemSpawnLocation = SpawnerLocation + (SpawnDirection * Distance);
+    FVector ItemSpawnLocation = SpawnerLocation + (SpawnDirection * SpawnDistance);
 
     FTransform ItemSpawnTransform{ItemSpawnLocation};
 
@@ -262,4 +295,5 @@ void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItem
         Item->InteractData.RowName = InventoryItemRules.InteractRowName;
         Item->ItemCount = Count;
     }
+
 }
