@@ -55,7 +55,7 @@ void URSInventoryComponent::RemoveItem(const FInventoryItem& InventorySlot, int3
 
     if (!bItemUsed)
     {
-        AInteractItemActor::SpawnItem(GetOwner(), InventorySlot, CountRemove);
+        AInteractItemActor::SpawnItem(GetOwner(), InventorySlot, CountRemove, 5.0f);
     }
 }
 
