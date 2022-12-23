@@ -52,16 +52,40 @@ void URSCraftComponent::RemoveItem(const FInventoryItem& InventorySlot, int32 Co
 void URSCraftComponent::SetCampfireNearBy(bool NewValue)
 {
     bIsCampfireNearBy = NewValue;
+    if(!NewValue)
+    {
+        ClearOutputSlot();
+    }
+    if(HaveAnyItems())
+    {
+        FindSuitableRecipe();
+    }
 }
 
 void URSCraftComponent::SetSmallFireNearBy(bool NewValue)
 {
     bIsSmallFireNearBy = NewValue;
+    if(!NewValue)
+    {
+        ClearOutputSlot();
+    }
+    if(HaveAnyItems())
+    {
+        FindSuitableRecipe();
+    }
 }
 
 void URSCraftComponent::SetWorkbenchNearBy(bool NewValue)
 {
     bIsWorkbenchNearBy = NewValue;
+    if(!NewValue)
+    {
+        ClearOutputSlot();
+    }
+    if(HaveAnyItems())
+    {
+        FindSuitableRecipe();
+    }
 }
 
 bool URSCraftComponent::GetIsOutputSlotAvailable() const
@@ -157,6 +181,19 @@ bool URSCraftComponent::CanCraftRecipe(const FRecipeItem* RecipeItem) const
     if(RecipeItem->bIsNeedWorkbench)
     {
         if(bIsWorkbenchNearBy)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool URSCraftComponent::HaveAnyItems() const
+{
+    for (auto CraftItem : CraftingItems)
+    {
+        if(CraftItem.InteractRowName != NAME_None)
         {
             return true;
         }

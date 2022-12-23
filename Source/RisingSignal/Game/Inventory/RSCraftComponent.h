@@ -84,6 +84,7 @@ private:
     void RefreshItems();
     TArray<FName> SortRecipesByIngredients(const UDataTable* RecipeTable) const;
     bool CanCraftRecipe(const FRecipeItem* RecipeItem) const;
+    bool HaveAnyItems() const;
 
     void RemoveUsedItems();
 
