@@ -123,13 +123,35 @@ public:
 
     void UpdateCameraRotation();
 
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    FORCEINLINE float GetIKLeftFootOffset() const {return IKLeftFootOffset;}
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    FORCEINLINE float GetIKRightFootOffset() const {return IKRightFootOffset;}
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    FORCEINLINE float GetIKPelvisOffset() const {return IKPelvisOffset;}
+
 protected:
     virtual void BeginPlay() override;
 
+    UPROPERTY()
     TArray<AInteractiveActor*> AvailableInteractiveActors;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Falls")
     UCurveFloat* FallDamageCurve;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character | IK System")
+    FName IKLeftFootSocketName;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character | IK System")
+    FName IKRightFootSocketName;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character | IK System")
+    float IKInterpSpeed = 20.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character | IK System")
+    float IKExtendedDistance = 60.0f;
 
 #pragma region Components
 
@@ -291,6 +313,18 @@ private:
     bool CanMove();
     bool CanMantle();
     bool CanRoll();
+
+    float GetIKFootOffset(const FName& SocketName);
+    float GetPelvisOffset();
+    void CalculateOffsets(float DeltaSeconds);
+
+    float IKLeftFootOffset = 0.0f;
+    float IKRightFootOffset = 0.0f;
+    float IKPelvisOffset = 0.0f;
+    float IKTraceDistance = 50.0f;
+    float IKScale = 0.0f;
+    float CapsuleRadius = 0.0f;
+    float MinimumOffset = 3.0f;
 
     bool bIsMantling;
     bool bIsRolling;
