@@ -75,14 +75,19 @@ class RISINGSIGNAL_API URSSaveGame : public USaveGame
     GENERATED_BODY()
 
 public:
+    UPROPERTY()
+    FPlayerSaveData SavedPlayer{};
+
     /* Actors stored from a level (currently does not support a specific level and just assumes the demo map) */
     UPROPERTY()
     TArray<FActorSaveData> SavedActors;
 
+    UPROPERTY()
+    TArray<FActorSaveData> SavedSpawnedActors;
+
     FPlayerSaveData* GetPlayerData();
 
     void ClearData();
-    
-    UPROPERTY()
-    FPlayerSaveData SavedPlayer{};
+
+
 };

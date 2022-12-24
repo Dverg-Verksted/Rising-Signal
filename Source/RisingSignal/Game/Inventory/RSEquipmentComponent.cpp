@@ -79,7 +79,7 @@ void URSEquipmentComponent::TakeInHands(int32 Index)
     if(EquipmentSlots[CurrentItemInHand].bIsWeapon)
     {
         ARSBaseCharacter* PlayerCharacter = Cast<ARSBaseCharacter>(GetOwner());
-        //PlayerCharacter->GetWeaponComponent()->SpawnWeapons(Weapon);
+        PlayerCharacter->GetWeaponComponent()->EquipWeapon(EquipmentSlots[CurrentItemInHand].WeaponSettings.WeaponClassPtr);
     }
 
     if (EquipmentSlots.Contains(CurrentItemInHand))

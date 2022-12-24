@@ -27,12 +27,14 @@ void URSAbilitySystem::BeginPlay()
     
     SphereCollision->SetCollisionProfileName("OverlapAllDynamic");
     SphereCollision->SetGenerateOverlapEvents(true);
-    SphereCollision->bHiddenInGame = false;
+    SphereCollision->bHiddenInGame = true;
     SphereCollision->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
     SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &URSAbilitySystem::StressOverlapBegin);
     SphereCollision->OnComponentEndOverlap.AddDynamic(this, &URSAbilitySystem::StressOverlapEnd);
     
     GetWorld()->GetTimerManager().SetTimer(TStateChange, this, &URSAbilitySystem::CheckStateChanges, TimerUpdateState, true);
+
+    GetWorld()->GetTimerManager().SetTimer(TEffectCheck, this, &URSAbilitySystem::UpdateEffects, 1.0f, true);
     
     GamePlayerRef = Cast<ARSBaseCharacter>(GetOwner());
     OwnerRef = Cast<ACharacter>(GetOwner());
@@ -45,6 +47,13 @@ void URSAbilitySystem::BeginPlay()
     {
         LOG_RS(ELogRSVerb::Error, "No pointer to OwnerRef");
     }
+
+    Effects.Add(FEffect{0, EAbilityStatesType::Health,0});
+    Effects.Add(FEffect{0, EAbilityStatesType::Hungry,0});
+    Effects.Add(FEffect{0, EAbilityStatesType::Stamina,0});
+    Effects.Add(FEffect{0, EAbilityStatesType::Stress,0});
+    Effects.Add(FEffect{0, EAbilityStatesType::Temp,0});
+
 }
 
 #pragma endregion Defaults
@@ -137,98 +146,6 @@ float URSAbilitySystem::GetHealthChangedValue()
     
     return ValueOnChangeHealth;
     
-}
-
-void URSAbilitySystem::AddEffect(float AddTime, float AddHealth, float AddStamina, float AddStress, float AddHungry, float AddTemp)
-{
-
-    if(GetEffect(AddHealth,  AddStamina,  AddStress, AddHungry, AddTemp))
-    {
-        for (FEffect& Effect : Effects)
-        {
-            if(Effect.Health == AddHealth && Effect.Stamina == AddStamina &&
-                Effect.Stress == AddStress && Effect.Hungry == AddHungry)
-            {
-                Effect.Time += AddTime;
-            }
-        }
-    }
-    else
-    {
-        if(!GetWorld()->GetTimerManager().IsTimerActive(TEffectCheck))
-        {
-            GetWorld()->GetTimerManager().SetTimer(TEffectCheck, this,
-                &URSAbilitySystem::UpdateEffects, 1.0f, true);
-        }
-        FEffect Effect = {AddTime, AddHealth,  AddStamina,  AddStress, AddHungry, AddTemp};
-        Effects.Add(Effect);
-    }
-}
-
-bool URSAbilitySystem::GetEffect(float Health, float Stamina, float Stress, float Hungry, float Temp)
-{
-    FEffect Effect = {Health,  Stamina,  Stress, Hungry, Temp};
-    return FindEffect(Effect);
-}
-
-void URSAbilitySystem::UpdateEffects()
-{
-    
-    for (FEffect& Effect : Effects)
-    {
-        ChangeCurrentStateValue(EAbilityStatesType::Health, Effect.Health);
-        ChangeCurrentStateValue(EAbilityStatesType::Stamina, Effect.Stamina);
-        ChangeCurrentStateValue(EAbilityStatesType::Stress, Effect.Stress);
-        ChangeCurrentStateValue(EAbilityStatesType::Hungry, Effect.Hungry);
-        ChangeCurrentStateValue(EAbilityStatesType::Temp, Effect.Temp);
-
-        if(Effect.Time != 0.0f)
-        {
-            Effect.Time--;
-        }
-        
-        if(Effect.Time == 0.0f)
-        {
-            //Effects.RemoveAt()
-        }
-    }
-}
-
-bool URSAbilitySystem::FindEffect(const FEffect FinEffect)
-{
-    bool Answer = false;
-    for (const FEffect Effect : Effects)
-    {
-        if(Effect.Health == FinEffect.Health && Effect.Stamina == FinEffect.Stamina &&
-                Effect.Stress == FinEffect.Stress && Effect.Hungry == FinEffect.Hungry)
-        {
-            Answer = true;
-        }
-    }
-    return Answer;
-}
-
-void URSAbilitySystem::RemoveEffect(FEffect RemEffect)
-{
-    if(FindEffect(RemEffect) && Effects.Num() > 0)
-    {
-        int i = 0;
-        for (FEffect Effect : Effects)
-        {
-            if(Effect.Health == RemEffect.Health && Effect.Stamina == RemEffect.Stamina &&
-                Effect.Stress == RemEffect.Stress && Effect.Hungry == RemEffect.Hungry)
-            {
-                Effects.RemoveAt(i);
-                break;
-            }
-            i++;
-        }
-    }
-
-    if(Effects.Num() == 0)
-    {
-        GetWorld()->GetTimerManager().ClearTimer(TEffectCheck);
-    }
 }
 
 void URSAbilitySystem::OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy,
@@ -352,3 +269,41 @@ FStateParams URSAbilitySystem::GetState(EAbilityStatesType AbilityStateType)
 }
 
 #pragma endregion Functions
+
+#pragma region Effects
+
+void URSAbilitySystem::AddEffect(int AddTime, EAbilityStatesType AddEffectType, float AddValue)
+{
+    
+    for (FEffect &Effect : Effects)
+    {
+        if(Effect.EffectType == AddEffectType)
+        {
+            Effect.EffectValue += AddValue;
+            Effect.Time += AddTime;
+        }
+    } 
+}
+
+void URSAbilitySystem::UpdateEffects()
+{
+    for (FEffect &Effect : Effects)
+    {
+        if(Effect.Time != 0.0f)
+        {
+            ChangeCurrentStateValue(Effect.EffectType, Effect.EffectValue);
+
+            LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("%f"), Effect.EffectValue));
+            
+            Effect.Time--;
+        }
+        
+        if(Effect.Time == 0.0f)
+        {
+            Effect.Time = 0.0f;
+            Effect.EffectValue = 0.0f;
+        }
+    }
+}
+
+#pragma endregion Effects

@@ -45,13 +45,14 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Инвентарь")
     TArray<FInventoryItem> GetItems();
-
+    
     UFUNCTION(BlueprintPure, Category = "Инвентарь")
     static FString ToString(FInventoryItem Item)
     {
         return FString::Printf(TEXT("Slot: %i, Count: %i"), Item.SlotIndex, Item.Count);
     }
 
+    FInventoryItem* FindFreeSlot();
     bool FindItemsToUse(TArray<FNeededItem>& NeedItems);
     FInventoryItem GetItemByIndex(int32 Index);
 
@@ -78,7 +79,6 @@ private:
 
     void AddStacks(FInventoryItem* Item, int32 Count);
     FInventoryItem* FindItemData(const FDataTableRowHandle& RowDataHandle) const;
-    FInventoryItem* FindFreeSlot();
 
 
     TSoftObjectPtr<URSAbilitySystem> AbilitySystem;

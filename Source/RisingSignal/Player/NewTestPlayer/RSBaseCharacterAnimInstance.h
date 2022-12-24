@@ -59,6 +59,15 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     float LerpAlpha = 0.07f;
 
+    UPROPERTY(EditAnywhere, Transient, BlueprintReadOnly, Category= "Character | IK System")
+    FVector LeftFootEffectorLocation = FVector::ZeroVector;
+
+    UPROPERTY(EditAnywhere, Transient, BlueprintReadOnly, Category="Character | IK System")
+    FVector RightFootEffectorLocation = FVector::ZeroVector;
+
+    UPROPERTY(EditAnywhere, Transient, BlueprintReadOnly, Category="Character | IK System")
+    FVector PelvisOffset = FVector::ZeroVector;
+
 private:
 
     void SetFallHeight(float NewValue);

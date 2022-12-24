@@ -107,11 +107,27 @@ void URSCharacterMovementComponent::AttachToLadder(const ALadder* Ladder)
     FVector NewCharacterLocation = CurrentLadder->GetActorLocation() + Projection * LadderUpVector + LadderToCharacterOffset * LadderForwardVector;
     if(CurrentLadder->GetIsOnTop())
     {
-        NewCharacterLocation = CurrentLadder->GetAttachFromTopAnimMontageStartingLocation();
+        AttachToLadderFromTop();
     }
-    GetOwner()->SetActorLocation(NewCharacterLocation);
+    else
+    {
+        GetOwner()->SetActorLocation(NewCharacterLocation);
+        GetOwner()->SetActorRotation(TargetOrientationRotation);
+        SetMovementMode(MOVE_Custom, StaticCast<uint8>(ECustomMovementMode::CMOVE_OnLadder));
+    }
+}
+
+void URSCharacterMovementComponent::AttachToLadderFromTop()
+{
+    FRotator TargetOrientationRotation = CurrentLadder->GetActorForwardVector().ToOrientationRotator();
+    FVector StartPos = CurrentLadder->GetActorLocation() + CurrentLadder->GetAttachFromTopStartPosition();
+    GetOwner()->SetActorLocation(StartPos);
+    ARSBaseCharacter* BaseCharacter = Cast<ARSBaseCharacter>(GetOwner());
     GetOwner()->SetActorRotation(TargetOrientationRotation);
-    SetMovementMode(MOVE_Custom, (uint8)ECustomMovementMode::CMOVE_OnLadder);
+    float MontageDuration = BaseCharacter->PlayAnimMontage(CurrentLadder->GetAttachFromTopAnimMontage());
+    bIsAttachingToLadder = true;
+    SetMovementMode(MOVE_Custom, StaticCast<uint8>(ECustomMovementMode::CMOVE_AttachingOnLadder));
+    GetWorld()->GetTimerManager().SetTimer(LadderTimer, this, &URSCharacterMovementComponent::SetLadderMovement, MontageDuration, false);
 }
 
 void URSCharacterMovementComponent::DetachFromLadder(EDetachFromLadderMethod DetachFromLadderMethod)
@@ -146,6 +162,12 @@ void URSCharacterMovementComponent::DetachFromLadder(EDetachFromLadderMethod Det
     }
 }
 
+void URSCharacterMovementComponent::SetLadderMovement()
+{
+    SetMovementMode(MOVE_Custom, StaticCast<uint8>(ECustomMovementMode::CMOVE_OnLadder));
+    bIsAttachingToLadder = false;
+}
+
 bool URSCharacterMovementComponent::IsOnLadder() const
 {
     return UpdatedComponent && MovementMode == MOVE_Custom && CustomMovementMode == StaticCast<uint8>(ECustomMovementMode::CMOVE_OnLadder);
@@ -160,13 +182,13 @@ void URSCharacterMovementComponent::OnMovementModeChanged(EMovementMode Previous
         Velocity = FVector::ZeroVector;
         switch (CustomMovementMode)
         {
-            case (uint8)ECustomMovementMode::CMOVE_Mantling:
+            case ECustomMovementMode::CMOVE_Mantling:
             {
                 GetWorld()->GetTimerManager().SetTimer(MantlingTimer, this, &URSCharacterMovementComponent::EndMantle,
                     CurrentMantlingParameters.Duration, false);
                 break;
             }
-            case (uint8)ECustomMovementMode::CMOVE_Rolling:
+            case ECustomMovementMode::CMOVE_Rolling:
             {
                 GetWorld()->GetTimerManager().SetTimer(RollingTimer, this, &URSCharacterMovementComponent::StopRoll, CurrentRollingParameters.Duration , false);
                 break;
@@ -193,6 +215,11 @@ void URSCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations
         case ECustomMovementMode::CMOVE_OnLadder:
         {
             PhysLadder(deltaTime, Iterations);
+            break;
+        }
+        case ECustomMovementMode::CMOVE_AttachingOnLadder:
+        {
+            PhysAttachToLadder(deltaTime, Iterations);
             break;
         }
         default:
@@ -258,6 +285,18 @@ void URSCharacterMovementComponent::PhysRolling(float DeltaTime, int32 Iteration
     Velocity = Delta / DeltaTime;
     FHitResult Hit;
     SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), true, Hit);
+}
+
+void URSCharacterMovementComponent::PhysAttachToLadder(float DeltaTime, int32 Iterations)
+{
+    const float ElapsedTime = GetWorld()->GetTimerManager().GetTimerElapsed(LadderTimer);
+    const FVector NewLocation = FMath::Lerp(GetOwner()->GetActorLocation(), CurrentLadder->GetAttachFromTopEndPosition(), CurrentLadder->GetAttachCurve()->GetFloatValue(ElapsedTime));
+    const FVector Delta = NewLocation - GetActorLocation();
+
+    Velocity = Delta / DeltaTime;
+
+    FHitResult HitResult;
+    SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), false, HitResult);
 }
 
 void URSCharacterMovementComponent::PhysLadder(float DeltaTime, int32 Iterations)
