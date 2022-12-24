@@ -124,6 +124,10 @@ protected:
         meta=(EditCondition = "ShouldFloat", EditConditionHides, ClampMin = 0, ClampMax = 100))
     float FloatingHeight = 10.0f;
 
+    UPROPERTY(EditAnywhere, Category = "Floating Settings",
+        meta=(EditCondition = "ShouldFloat", EditConditionHides, ClampMin = 0, ClampMax = 360))
+    float RotationSpeed = 20.0f;
+
 
     FTimeline FloatingTimeline;
 

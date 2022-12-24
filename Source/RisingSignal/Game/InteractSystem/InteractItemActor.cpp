@@ -72,7 +72,11 @@ void AInteractItemActor::BeginPlay()
     InitDataInteract(InteractData, true);
 
     if (TypeItem != ETypeItem::StaticItem)
+    {
         MoveItemDown();
+
+        SetActorRotation(FRotator(0.0f, UKismetMathLibrary::RandomFloatInRange(0.0f, 359.0f), 0.0f));
+    }
 
     if (FloatingCurve)
     {
@@ -96,6 +100,12 @@ void AInteractItemActor::Tick(float DeltaSeconds)
 
     FloatingTimeline.TickTimeline(DeltaSeconds);
 
+    if (ShouldFloat)
+    {
+        FRotator NewRot = GetActorRotation();
+        NewRot.Yaw += RotationSpeed * DeltaSeconds;
+        SetActorRotation(NewRot);
+    }
 }
 
 void AInteractItemActor::PostLoad()
@@ -351,6 +361,7 @@ void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItem
     {
         float CharHeight = RSChar->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
         ItemSpawnLocation.Z -= CharHeight;
+        LOG_RS(ELogRSVerb::Warning, "IF STATEMENT");
     }
 
     FTransform ItemSpawnTransform{ItemSpawnLocation};
