@@ -55,7 +55,7 @@ void URSInventoryComponent::RemoveItem(const FInventoryItem& InventorySlot, int3
 
     if (!bItemUsed)
     {
-        AInteractItemActor::SpawnItem(GetOwner(), InventorySlot, CountRemove);
+        AInteractItemActor::SpawnItem(GetOwner(), InventorySlot, CountRemove, 5.0f);
     }
 }
 
@@ -105,7 +105,14 @@ bool URSInventoryComponent::UseItem(const FInventoryItem& InventorySlot)
     {
         for (auto& Effect : InventorySlot.ItemEffect)
         {
-            AbilitySystem->ChangeCurrentStateValue(Effect.StateType, Effect.EffectValue);
+            if (Effect.EffectDuration == 0.0f)
+            {
+                AbilitySystem->ChangeCurrentStateValue(Effect.StateType, Effect.EffectValue);
+            }
+            else
+            {
+                AbilitySystem->AddEffect(Effect.EffectDuration,Effect.StateType,Effect.EffectValue);
+            }
         }
 
         RemoveItem(InventorySlot, 1, true);

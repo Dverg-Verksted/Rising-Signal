@@ -2,24 +2,28 @@
 
 #include "Game/InteractSystem/InteractItemActor.h"
 #include "RSInteractStaticItemBase.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Components/SphereComponent.h"
 #include "Game/Inventory/RSInventoryComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Library/RSFunctionLibrary.h"
+#include "Player/NewTestPlayer/RSBaseCharacter.h"
 #include "Widgets/InteractWidget.h"
 
 // Sets default values
 AInteractItemActor::AInteractItemActor()
 {
-    // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-    PrimaryActorTick.bCanEverTick = false;
-    PrimaryActorTick.bStartWithTickEnabled = false;
-    PrimaryActorTick.bAllowTickOnDedicatedServer = false;
-    PrimaryActorTick.bTickEvenWhenPaused = false;
+    // // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+    SetActorTickEnabled(true);
+    PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bStartWithTickEnabled = true;
+    // PrimaryActorTick.bAllowTickOnDedicatedServer = false;
+    // PrimaryActorTick.bTickEvenWhenPaused = false;
 
     this->Mesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("Mesh component"));
     SetRootComponent(this->Mesh);
+    Mesh->SetSimulatePhysics(false);
 
     static ConstructorHelpers::FClassFinder<UInteractWidget> UnitSelector(
         TEXT("/Game/RisingSignal/Core/HUD/UI_UserHUD/Widgets/WBP_InteractText"));
@@ -43,6 +47,11 @@ AInteractItemActor::AInteractItemActor()
     {
         InteractData.DataTable = DataTableInteractItem;
     }
+
+    static ConstructorHelpers::FObjectFinder<UCurveFloat> FloatCurve(
+        TEXT("CurveFloat'/Game/RisingSignal/Core/InteractItems/CF_FloatingItem.CF_FloatingItem'"));
+    FloatingCurve = FloatCurve.Object;
+
 }
 
 
@@ -61,6 +70,42 @@ void AInteractItemActor::BeginPlay()
     }
 
     InitDataInteract(InteractData, true);
+
+    if (TypeItem != ETypeItem::StaticItem)
+    {
+        MoveItemDown();
+
+        SetActorRotation(FRotator(0.0f, UKismetMathLibrary::RandomFloatInRange(0.0f, 359.0f), 0.0f));
+    }
+
+    if (FloatingCurve)
+    {
+        FOnTimelineFloat TimelineProgress;
+        TimelineProgress.BindUFunction(this, FName("TimelineProgress"));
+        FloatingTimeline.AddInterpFloat(FloatingCurve, TimelineProgress);
+        FloatingTimeline.SetPlayRate(FloatingSpeed);
+        FloatingTimeline.SetLooping(true);
+        FloatingTimeline.SetNewTime(UKismetMathLibrary::RandomFloatInRange(0.0f, 4.0f));
+    }
+
+    if (ShouldFloat)
+    {
+        StartFloating(true);
+    }
+}
+
+void AInteractItemActor::Tick(float DeltaSeconds)
+{
+    Super::Tick(DeltaSeconds);
+
+    FloatingTimeline.TickTimeline(DeltaSeconds);
+
+    if (ShouldFloat)
+    {
+        FRotator NewRot = GetActorRotation();
+        NewRot.Yaw += RotationSpeed * DeltaSeconds;
+        SetActorRotation(NewRot);
+    }
 }
 
 void AInteractItemActor::PostLoad()
@@ -113,7 +158,7 @@ void AInteractItemActor::DestroyInteractWidget()
 {
     if (InteractWidget)
     {
-        InteractWidget->EndAnimation(); 
+        InteractWidget->EndAnimation();
         // GetWorldTimerManager().SetTimer(ResetInteractAnimTimerHandle, [&]() //TODO: Check it
         // {
         //     if (InteractWidget)
@@ -126,6 +171,34 @@ void AInteractItemActor::SetInteractText(FText NewText)
 {
     if (InteractWidget)
         InteractWidget->SetText(NewText);
+}
+
+void AInteractItemActor::StartFloating(bool bStart)
+{
+
+    if (!ShouldFloat) return;
+
+    if (bStart)
+    {
+        FloatingTimeline.Play();
+    }
+    else
+    {
+        FloatingTimeline.Stop();
+    }
+}
+
+void AInteractItemActor::TimelineProgress(float Value)
+{
+
+    if (SavedLocation != FVector::ZeroVector)
+    {
+        FVector NewLoc = SavedLocation;
+
+        NewLoc.Z += Value * FloatingHeight;
+
+        SetActorLocation(NewLoc);
+    }
 }
 
 void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractData, const bool bInitWidgetText)
@@ -202,13 +275,12 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
                 LOG_RS(ELogRSVerb::Error, "Inventory RowHandle didn't set for " + GetName());
             }
 
-            Mesh->SetSimulatePhysics(true);
         }
         else
         {
+            this->ShouldFloat = false;
             this->NameItem = DataInteract->Name;
             this->DescriptionItem = DataInteract->DescriptionItem;
-            Mesh->SetSimulatePhysics(false);
         }
 
         if (bInitWidgetText)
@@ -220,11 +292,44 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
             {
                 InteractWidget->SetText(DataInteract->InteractText);
             }
-            else if (TypeItem != ETypeItem::StaticItem)
+            else
             {
                 InteractWidget->SetText(this->NameItem);
             }
     }
+}
+
+void AInteractItemActor::MoveItemDown()
+{
+
+    LOG_RS(ELogRSVerb::Warning, GetName() + " " + FString::SanitizeFloat(GetItemZBound()));
+
+    FHitResult Hit;
+    GetWorld()->LineTraceSingleByChannel(Hit, GetActorLocation(), FVector::DownVector * 2000, ECC_WorldStatic);
+
+    if (Hit.bBlockingHit)
+    {
+        FVector NewLoc = GetActorLocation();
+        NewLoc.Z = Hit.ImpactPoint.Z + GetItemZBound() / 2 + FloatingHeight + UKismetMathLibrary::RandomFloatInRange(0.0f, 30.0f);
+
+        SetActorLocation(NewLoc);
+    }
+
+    SavedLocation = GetActorLocation();
+}
+
+float AInteractItemActor::GetItemZBound()
+{
+    if (Mesh)
+    {
+        FVector Min, Max;
+        Mesh->GetLocalBounds(Min, Max);
+
+        return UKismetMathLibrary::Abs(Min.Z) > UKismetMathLibrary::Abs(Max.Z)
+                   ? UKismetMathLibrary::Abs(Min.Z)
+                   : UKismetMathLibrary::Abs(Max.Z);
+    }
+    return 0.0f;
 }
 
 void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count, float Distance, bool RandomDirection)
@@ -237,6 +342,9 @@ void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItem
 
     FVector SpawnerLocation = Spawner->GetActorLocation();
     FVector SpawnDirection;
+    float SpawnDistance = Distance < 150.0f ? 150.0f : Distance;
+    SpawnDistance = UKismetMathLibrary::RandomFloatInRange(Distance - 10, Distance + 10);
+
     if (RandomDirection)
     {
         SpawnDirection = UKismetMathLibrary::RandomUnitVector();
@@ -247,7 +355,14 @@ void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItem
         SpawnDirection = Spawner->GetActorForwardVector();
     }
 
-    FVector ItemSpawnLocation = SpawnerLocation + (SpawnDirection * Distance);
+    FVector ItemSpawnLocation = SpawnerLocation + (SpawnDirection * SpawnDistance);
+
+    if (ARSBaseCharacter* RSChar = Cast<ARSBaseCharacter>(Spawner))
+    {
+        float CharHeight = RSChar->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+        ItemSpawnLocation.Z -= CharHeight;
+        LOG_RS(ELogRSVerb::Warning, "IF STATEMENT");
+    }
 
     FTransform ItemSpawnTransform{ItemSpawnLocation};
 
@@ -261,5 +376,11 @@ void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItem
         Item->InitDataInteract(NewDTRowHandle);
         Item->InteractData.RowName = InventoryItemRules.InteractRowName;
         Item->ItemCount = Count;
+
+        if (Item->TypeItem != ETypeItem::StaticItem)
+            Item->MoveItemDown();
+
+        Item->ShouldFloat = true;
     }
+
 }

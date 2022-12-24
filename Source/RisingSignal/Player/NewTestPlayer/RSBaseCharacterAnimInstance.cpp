@@ -32,6 +32,10 @@ void URSBaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
     bIsSprinting = CachedBaseCharacter->GetIsSprinting();
     bIsCrouching = CharacterMovementComponent->IsCrouching();
     bIsOnLadder = CharacterMovementComponent->IsOnLadder();
+
+    LeftFootEffectorLocation = FVector(-(CachedBaseCharacter->GetIKLeftFootOffset() + CachedBaseCharacter->GetIKPelvisOffset()), 0.0f, 0.0f);
+    RightFootEffectorLocation = FVector((CachedBaseCharacter->GetIKRightFootOffset() + CachedBaseCharacter->GetIKPelvisOffset()), 0.0f , 0.0f);
+    PelvisOffset = FVector(0.0f, 0.0f, CachedBaseCharacter->GetIKPelvisOffset());
 }
 
 void URSBaseCharacterAnimInstance::SetFallHeight(float NewValue)

@@ -3,7 +3,9 @@
 
 #include "Game/Inventory/RSCraftComponent.h"
 #include "Algo/StableSort.h"
+#include "Game/InteractSystem/InteractItemActor.h"
 #include "Library/RSFunctionLibrary.h"
+#include "Player/NewTestPlayer/RSBaseCharacter.h"
 
 
 URSCraftComponent::URSCraftComponent()
@@ -36,19 +38,54 @@ void URSCraftComponent::RemoveItem(const FInventoryItem& Item)
     UpdateSlot(SlotIndex);
 }
 
+void URSCraftComponent::RemoveItem(const FInventoryItem& InventorySlot, int32 CountRemove, bool bItemUsed)
+{
+    const int32 SlotIndex = InventorySlot.SlotIndex;
+
+    CraftingItems[SlotIndex] = FInventoryItem(SlotIndex);
+    CraftingItems[SlotIndex].TypeComponent = ETypeComponent::Craft;
+    UpdateSlot(SlotIndex);
+    
+    AInteractItemActor::SpawnItem(GetOwner(), InventorySlot, CountRemove, 2.0f);
+}
+
 void URSCraftComponent::SetCampfireNearBy(bool NewValue)
 {
     bIsCampfireNearBy = NewValue;
+    if(!NewValue)
+    {
+        ClearOutputSlot();
+    }
+    if(HaveAnyItems())
+    {
+        FindSuitableRecipe();
+    }
 }
 
 void URSCraftComponent::SetSmallFireNearBy(bool NewValue)
 {
     bIsSmallFireNearBy = NewValue;
+    if(!NewValue)
+    {
+        ClearOutputSlot();
+    }
+    if(HaveAnyItems())
+    {
+        FindSuitableRecipe();
+    }
 }
 
 void URSCraftComponent::SetWorkbenchNearBy(bool NewValue)
 {
     bIsWorkbenchNearBy = NewValue;
+    if(!NewValue)
+    {
+        ClearOutputSlot();
+    }
+    if(HaveAnyItems())
+    {
+        FindSuitableRecipe();
+    }
 }
 
 bool URSCraftComponent::GetIsOutputSlotAvailable() const
@@ -64,6 +101,28 @@ void URSCraftComponent::SetIsOutputSlotAvailable(bool NewValue)
 void URSCraftComponent::BeginPlay()
 {
     Super::BeginPlay();
+
+    CachedBaseCharacter = Cast<ARSBaseCharacter>(GetOwner());
+
+    CachedBaseCharacter->InventoryOpenClose.AddDynamic(this, &URSCraftComponent::ClearCraftSlots);
+}
+
+void URSCraftComponent::ClearCraftSlots()
+{
+    URSInventoryComponent* InventoryComponent = GetOwner()->FindComponentByClass<URSInventoryComponent>();
+    for (auto CraftingItem : CraftingItems)
+    {
+        if(CraftingItem.InteractRowName != NAME_None)
+        {
+            const FInventoryItem* FreeSlot = InventoryComponent->FindFreeSlot();
+            if(FreeSlot && FreeSlot->SlotIndex != SLOT_REMOVE)
+            {
+                InventoryComponent->MoveItem(CraftingItem, *FreeSlot);
+                continue;
+            }
+            RemoveItem(CraftingItem, CraftingItem.Count, false);
+        }
+    }
 }
 
 void URSCraftComponent::UpdateSlot(int32 Index)
@@ -122,6 +181,19 @@ bool URSCraftComponent::CanCraftRecipe(const FRecipeItem* RecipeItem) const
     if(RecipeItem->bIsNeedWorkbench)
     {
         if(bIsWorkbenchNearBy)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool URSCraftComponent::HaveAnyItems() const
+{
+    for (auto CraftItem : CraftingItems)
+    {
+        if(CraftItem.InteractRowName != NAME_None)
         {
             return true;
         }

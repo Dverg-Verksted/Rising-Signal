@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
+#include "Game/GameModes/RSGameMode.h"
 #include "Game/HUD/GameHUD.h"
 #include "Game/Inventory/RSEquipmentComponent.h"
 #include "Game/WeaponSystem/WeaponComponent.h"
@@ -51,7 +52,7 @@ void ARSGamePLayer::BeginPlay()
 
     AbilitySystem->OnStateChangedSignature.AddDynamic(this, &ARSGamePLayer::CheckSomeState);
     AbilitySystem->OnDeath.AddDynamic(this, &ARSGamePLayer::RegisterDeath);
-
+    //Cast<ARSGameMode>(GetWorld()->GetAuthGameMode())->LoadCheckpoint();
 }
 
 void ARSGamePLayer::Tick(float DeltaSeconds)

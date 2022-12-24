@@ -4,6 +4,7 @@
 #include "Game/InteractSystem/Environment/Ladder/Ladder.h"
 
 #include "Components/BoxComponent.h"
+#include "Player/NewTestPlayer/RSBaseCharacter.h"
 
 ALadder::ALadder()
 {
@@ -36,13 +37,15 @@ void ALadder::OnConstruction(const FTransform& Transform)
     LeftRailMeshComponent->SetRelativeLocation(FVector(0.0f, -LadderWeight * 0.5f, LadderHeight * 0.5f));
     RightRailMeshComponent->SetRelativeLocation(FVector(0.0f, LadderWeight * 0.5f, LadderHeight * 0.5f));
 
+    AttachFromTopStartPosition = FVector(AttachFromTopStartPosition.X, AttachFromTopStartPosition.Y, LadderHeight + OffsetZFromTopStartPosition);
+
     UStaticMesh* LeftRailMesh = LeftRailMeshComponent->GetStaticMesh();
     if(IsValid(LeftRailMesh))
     {
         float MeshHeight = LeftRailMesh->GetBoundingBox().GetSize().Z;
         if(!FMath::IsNearlyZero(MeshHeight))
         {
-            LeftRailMeshComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, LadderHeight / MeshHeight));
+            LeftRailMeshComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, LadderHeight / MeshHeight + 0.7f));
         }
     }
 
@@ -52,7 +55,7 @@ void ALadder::OnConstruction(const FTransform& Transform)
         float MeshHeight = RightRailMesh->GetBoundingBox().GetSize().Z;
         if(!FMath::IsNearlyZero(MeshHeight))
         {
-            RightRailMeshComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, LadderHeight / MeshHeight));
+            RightRailMeshComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, LadderHeight / MeshHeight + 0.7f));
         }
     }
 
@@ -107,10 +110,10 @@ UAnimMontage* ALadder::GetAttachFromTopAnimMontage() const
     return AttachFromTopAnimMontage;
 }
 
-FVector ALadder::GetAttachFromTopAnimMontageStartingLocation() const
+FVector ALadder::GetAttachFromTopEndPosition() const
 {
     FRotator OrientationRotation = GetActorForwardVector().ToOrientationRotator();
-    FVector Offset = OrientationRotation.RotateVector(AttachFromTopAnimMontageInitialOffset);
+    FVector Offset = OrientationRotation.RotateVector(OffsetAttachFromTopEndPosition);
     FVector LadderTop = GetActorLocation() + GetActorUpVector() * LadderHeight;
     return LadderTop + Offset;
 }
@@ -124,11 +127,18 @@ void ALadder::OnInteractionVolumeStartOverlap(UPrimitiveComponent* OverlappedCom
     {
         return;
     }
-	
+    
     if(OverlappedComponent == TopInteractionVolume)
     {
         bIsOnTop = true;
     }
+
+    ARSBaseCharacter* BaseCharacter = Cast<ARSBaseCharacter>(OtherActor);
+    if(!BaseCharacter->GetIsMantling() && !BaseCharacter->GetBaseCharacterMovementComponent()->bIsAttachingToLadder)
+    {
+        BaseCharacter->InteractWithLadder();
+    }
+	
 }
 
 void ALadder::OnInteractionVolumeEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
