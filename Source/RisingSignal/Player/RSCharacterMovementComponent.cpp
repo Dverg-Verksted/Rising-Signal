@@ -127,7 +127,7 @@ void URSCharacterMovementComponent::AttachToLadderFromTop()
     float MontageDuration = BaseCharacter->PlayAnimMontage(CurrentLadder->GetAttachFromTopAnimMontage());
     bIsAttachingToLadder = true;
     SetMovementMode(MOVE_Custom, StaticCast<uint8>(ECustomMovementMode::CMOVE_AttachingOnLadder));
-    GetWorld()->GetTimerManager().SetTimer(LadderTimer, this, &URSCharacterMovementComponent::SetLadderMovement, MontageDuration, false);
+    GetWorld()->GetTimerManager().SetTimer(LadderTimer, this, &URSCharacterMovementComponent::SetLadderMovement, MontageDuration - 1.0f, false);
 }
 
 void URSCharacterMovementComponent::DetachFromLadder(EDetachFromLadderMethod DetachFromLadderMethod)
@@ -145,7 +145,10 @@ void URSCharacterMovementComponent::DetachFromLadder(EDetachFromLadderMethod Det
         }
         case EDetachFromLadderMethod::ReachingTheTop:
         {
-            BaseCharacterOwner->Mantle(true);
+            bIsAttachingToLadder = true;
+            float MontageDuration = BaseCharacterOwner->PlayAnimMontage(CurrentLadder->GetAttachOnTopAnimMontage());
+            GetWorld()->GetTimerManager().SetTimer(LadderTimer, this, &URSCharacterMovementComponent::SetWalkingMovement, MontageDuration, false);
+            SetMovementMode(MOVE_Custom, StaticCast<uint8>(ECustomMovementMode::CMOVE_AttachingOnTopLadder));
             break;
         }
         case EDetachFromLadderMethod::ReachingTheBottom:
@@ -165,6 +168,12 @@ void URSCharacterMovementComponent::DetachFromLadder(EDetachFromLadderMethod Det
 void URSCharacterMovementComponent::SetLadderMovement()
 {
     SetMovementMode(MOVE_Custom, StaticCast<uint8>(ECustomMovementMode::CMOVE_OnLadder));
+    bIsAttachingToLadder = false;
+}
+
+void URSCharacterMovementComponent::SetWalkingMovement()
+{
+    SetMovementMode(MOVE_Walking);
     bIsAttachingToLadder = false;
 }
 
@@ -220,6 +229,11 @@ void URSCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations
         case ECustomMovementMode::CMOVE_AttachingOnLadder:
         {
             PhysAttachToLadder(deltaTime, Iterations);
+            break;
+        }
+        case ECustomMovementMode::CMOVE_AttachingOnTopLadder:
+        {
+            PhysAttachOnTopLadder(deltaTime, Iterations);
             break;
         }
         default:
@@ -290,7 +304,7 @@ void URSCharacterMovementComponent::PhysRolling(float DeltaTime, int32 Iteration
 void URSCharacterMovementComponent::PhysAttachToLadder(float DeltaTime, int32 Iterations)
 {
     const float ElapsedTime = GetWorld()->GetTimerManager().GetTimerElapsed(LadderTimer);
-    const FVector NewLocation = FMath::Lerp(GetOwner()->GetActorLocation(), CurrentLadder->GetAttachFromTopEndPosition(), CurrentLadder->GetAttachCurve()->GetFloatValue(ElapsedTime));
+    const FVector NewLocation = FMath::Lerp(GetOwner()->GetActorLocation(), CurrentLadder->GetAttachFromTopEndPosition(), CurrentLadder->GetAttachFromTopCurve()->GetFloatValue(ElapsedTime));
     const FVector Delta = NewLocation - GetActorLocation();
 
     Velocity = Delta / DeltaTime;
@@ -298,6 +312,19 @@ void URSCharacterMovementComponent::PhysAttachToLadder(float DeltaTime, int32 It
     FHitResult HitResult;
     SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), false, HitResult);
 }
+
+void URSCharacterMovementComponent::PhysAttachOnTopLadder(float DeltaTime, int32 Iterations)
+{
+    const float ElapsedTime = GetWorld()->GetTimerManager().GetTimerElapsed(LadderTimer);
+    const FVector NewLocation = FMath::Lerp(GetOwner()->GetActorLocation(), CurrentLadder->GetTopPosition(), CurrentLadder->GetAttachOnTopCurve()->GetFloatValue(ElapsedTime));
+    const FVector Delta = NewLocation - GetActorLocation();
+
+    Velocity = Delta / DeltaTime;
+
+    FHitResult HitResult;
+    SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), false, HitResult);
+}
+
 
 void URSCharacterMovementComponent::PhysLadder(float DeltaTime, int32 Iterations)
 {

@@ -65,6 +65,10 @@ void ARSBaseCharacter::Landed(const FHitResult& Hit)
     {
         OnLanded.Broadcast(FallHeight);
     }
+    if(FallHeight > MinHeightForRoll && FallHeight < MaxHeightForRoll)
+    {
+        Roll();
+    }
     if(IsValid(FallDamageCurve))
     {
         const float DamageAmount = FallDamageCurve->GetFloatValue(FallHeight);
@@ -536,7 +540,7 @@ float ARSBaseCharacter::GetIKFootOffset(const FName& SocketName)
     FVector LineEndPostion = LineStartPosition - (CapsuleRadius + IKTraceDistance) * FVector::UpVector;
 
     FHitResult HitResult;
-    ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(ECC_Visibility);
+    ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1);
 
     FVector BoxFoot(2.0f, 15.0f, 7.0f);
     if(UKismetSystemLibrary::BoxTraceSingle(GetWorld(), LineStartPosition, LineEndPostion, BoxFoot, GetMesh()->GetSocketRotation(SocketName), TraceType, true, TArray<AActor*>(), EDrawDebugTrace::None, HitResult, true))

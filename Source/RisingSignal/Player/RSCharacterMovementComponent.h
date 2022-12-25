@@ -54,6 +54,7 @@ enum class ECustomMovementMode : uint8
     CMOVE_Mantling UMETA(DisplayName = "Mantling"),
     CMOVE_Rolling UMETA(DisplayName = "Rolling"),
     CMOVE_AttachingOnLadder UMETA(DisplayName = "AttachingOnLadder"),
+    CMOVE_AttachingOnTopLadder UMETA(DisplayName = "AttachingOnTopLadder"),
     CMOVE_OnLadder UMETA(DisplayName = "Ladder")
 };
 
@@ -64,9 +65,6 @@ class RISINGSIGNAL_API URSCharacterMovementComponent : public UCharacterMovement
 
 public:
     virtual void BeginPlay() override;
-
-    void StartSprint();
-    void StopSprint();
 
     virtual float GetMaxSpeed() const override;
 
@@ -80,6 +78,7 @@ public:
     void AttachToLadderFromTop();
     void DetachFromLadder(EDetachFromLadderMethod DetachFromLadderMethod);
     void SetLadderMovement();
+    void SetWalkingMovement();
     bool IsOnLadder() const;
     const ALadder* GetCurrentLadder() const { return CurrentLadder; }
 
@@ -97,6 +96,8 @@ protected:
     void PhysRolling(float DeltaTime, int32 Iterations);
 
     void PhysAttachToLadder(float DeltaTime, int32 Iterations);
+
+    void PhysAttachOnTopLadder(float DeltaTime, int32 Iterations);
 
     void PhysLadder(float DeltaTime, int32 Iterations);
 

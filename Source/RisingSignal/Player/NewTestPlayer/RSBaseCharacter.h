@@ -138,6 +138,14 @@ protected:
     UPROPERTY()
     TArray<AInteractiveActor*> AvailableInteractiveActors;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= "Landed settings", DisplayName="Минимальная высота для кувырка",
+    meta=(ToolTip="Выше этой высоты персонаж будет делать кувырок при приземлении. Должна быть меньше максимальной высоты для кувырка", ClampMin = 0.0f, UIMin = 0.0f))
+    float MinHeightForRoll = 1.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= "Landed settings", DisplayName="Максимальная высота для кувырка",
+    meta=(ToolTip="Выше этой высоты персонаж не сможет сделать кувырок при приземлении. Должна быть не меньше минимальной высоты для кувырка", ClampMin = 0.0f, UIMin = 0.0f))
+    float MaxHeightForRoll = 3.0f;
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Falls")
     UCurveFloat* FallDamageCurve;
 

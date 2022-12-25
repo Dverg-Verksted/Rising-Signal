@@ -23,17 +23,23 @@ public:
 
     virtual void BeginPlay() override;
 
-    float GetLadderHeight() const;
+    float GetLadderHeight() const { return LadderHeight; }
 
-    bool GetIsOnTop() const;
+    bool GetIsOnTop() const { return bIsOnTop; }
 
-    UAnimMontage* GetAttachFromTopAnimMontage() const;
+    UAnimMontage* GetAttachFromTopAnimMontage() const { return AttachFromTopAnimMontage; }
+    
+    UAnimMontage* GetAttachOnTopAnimMontage() const { return AttachOnTopAnimMontage; }
 
-    UCurveFloat* GetAttachCurve() const { return AttachFromTopCurve; }
-
-    FVector GetAttachFromTopEndPosition() const;
+    UCurveFloat* GetAttachFromTopCurve() const { return AttachFromTopCurve; }
+    UCurveFloat* GetAttachOnTopCurve() const { return AttachOnTopCurve; }
 
     FVector GetAttachFromTopStartPosition() const { return AttachFromTopStartPosition; }
+    
+    FVector GetAttachFromTopEndPosition() const;
+
+    FVector GetTopPosition() const;
+
 
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ladder parameters", DisplayName="Высота лестницы")
@@ -51,10 +57,17 @@ protected:
     
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ladder parameters", DisplayName="Анимация залаза на лестницу сверху")
     UAnimMontage* AttachFromTopAnimMontage;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ladder parameters", DisplayName="Анимация залаза с лестницы наверх")
+    UAnimMontage* AttachOnTopAnimMontage;
     
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ladder parameters", DisplayName="Кривая скорости",
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ladder parameters", DisplayName="Кривая скорости слаза",
         meta=(ToolTip="Задает скорость перемещения персонажа из верхней точки начала анимации в конечную в зависимости от времени анимации"))
     UCurveFloat* AttachFromTopCurve;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ladder parameters", DisplayName="Кривая скорости залаза",
+        meta=(ToolTip="Задает скорость перемещения персонажа из нижней точки начала анимации в конечную в зависимости от времени анимации"))
+    UCurveFloat* AttachOnTopCurve;
     
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ladder parameters", DisplayName="Верхняя позиция",
         meta=(MakeEditWidget, ToolTip="Позиция в которую переместиться персонаж при взаимодействии с лестницей и с которой начнется анимация залаза сверху. Можно редактировать только X и Y координаты."))
