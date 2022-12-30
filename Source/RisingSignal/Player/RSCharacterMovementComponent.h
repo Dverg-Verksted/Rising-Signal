@@ -53,6 +53,7 @@ enum class ECustomMovementMode : uint8
     CMOVE_None = 0 UMETA(DisplayName = "None"),
     CMOVE_Mantling UMETA(DisplayName = "Mantling"),
     CMOVE_Rolling UMETA(DisplayName = "Rolling"),
+    CMOVE_AttachingOnLadder UMETA(DisplayName = "AttachingOnLadder"),
     CMOVE_OnLadder UMETA(DisplayName = "Ladder")
 };
 
@@ -76,11 +77,15 @@ public:
     void StopRoll();
 
     void AttachToLadder(const ALadder* Ladder);
+    void AttachToLadderFromTop();
     void DetachFromLadder(EDetachFromLadderMethod DetachFromLadderMethod);
+    void SetLadderMovement();
     bool IsOnLadder() const;
     const ALadder* GetCurrentLadder() const { return CurrentLadder; }
 
     FORCEINLINE float GetRollCapsuleHalfHeight() const { return RollCapsuleHalfHeight; }
+
+    bool bIsAttachingToLadder = false;
 
 protected:
     virtual void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
@@ -90,6 +95,8 @@ protected:
     void PhysMantle(float DeltaTime, int32 Iterations);
 
     void PhysRolling(float DeltaTime, int32 Iterations);
+
+    void PhysAttachToLadder(float DeltaTime, int32 Iterations);
 
     void PhysLadder(float DeltaTime, int32 Iterations);
 
@@ -139,5 +146,6 @@ private:
     FMantlingMovementParameters CurrentMantlingParameters;
     FTimerHandle MantlingTimer;
     FTimerHandle RollingTimer;
+    FTimerHandle LadderTimer;
     float RollDuration;
 };

@@ -4,18 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "InteractDataItem.h"
+#include "Components/TimelineComponent.h"
 #include "Engine/DataTable.h"
 #include "Game/Inventory/InventoryTypes.h"
 #include "GameFramework/Actor.h"
+#include "Game/SaveLoad/RSSavableObjectInterface.h"
 #include "InteractItemActor.generated.h"
 
 
 class USphereComponent;
 class UWidgetComponent;
 class UInteractWidget;
-UCLASS(HideCategories = ("Variable", "Transform", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
+UCLASS(HideCategories = ("Variable", "Transform", "Sockets", "Shape", "Navigation", "ComponentTick", /*"Physics",*/ "Tags", "Cooking", "HLOD",
     "Mobile", "Activation", "Component Replication", "Events", "Asset User Data", "Collision", "Rendering", "Input", "Actor", "LOD"))
-class RISINGSIGNAL_API AInteractItemActor : public AActor
+class RISINGSIGNAL_API AInteractItemActor : public AActor, public IRSSavableObjectInterface
 {
     GENERATED_BODY()
 
@@ -26,8 +28,9 @@ public:
     AInteractItemActor();
 
 protected:
-    
     virtual void BeginPlay() override;
+
+    virtual void Tick(float DeltaSeconds) override;
 
     virtual void PostLoad() override;
 
@@ -41,7 +44,6 @@ protected:
 #pragma endregion
 
 #pragma region Components
-
 
 private:
     // @private Mesh component
@@ -103,6 +105,38 @@ public:
     ARSInteractStaticItemBase* GetChildStaticActor() const { return ChildStaticItemActor; }
 
     void SetInteractText(FText NewText);
+
+    UFUNCTION()
+    void StartFloating(bool bStart);
+    UFUNCTION(BlueprintPure, Category = "Floating Settings")
+    bool IsFloating() const { return bIsFloating; }
+
+    UFUNCTION()
+void TimelineProgress(float Value);
+
+protected:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Floating Settings",
+        meta=(EditCondition = "TypeItem == ETypeItem::InvItem", EditConditionHides), SaveGame)
+    bool ShouldFloat = true;
+
+
+    UPROPERTY(EditAnywhere, Category = "Floating Settings",
+        meta=(EditCondition = "ShouldFloat", EditConditionHides, ClampMin = 0, ClampMax = 100))
+    float FloatingHeight = 10.0f;
+
+    UPROPERTY(EditAnywhere, Category = "Floating Settings",
+        meta=(EditCondition = "ShouldFloat", EditConditionHides, ClampMin = 0, ClampMax = 360))
+    float RotationSpeed = 20.0f;
+
+
+    FTimeline FloatingTimeline;
+
+    UPROPERTY(EditAnywhere, Category = "Floating Settings",
+        meta=(EditCondition = "ShouldFloat", EditConditionHides, ClampMin = 0, ClampMax = 5))
+    float FloatingSpeed = 1.0f;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Floating Settings")
+    UCurveFloat* FloatingCurve;
 
 private:
     UPROPERTY(EditInstanceOnly, Category = "Settings Interact", DisplayName = "Радиус взаимодействия")
@@ -171,7 +205,18 @@ private:
 
     FTimerHandle ResetInteractAnimTimerHandle;
 
+    bool bIsFloating = false;
+
+    UPROPERTY(VisibleInstanceOnly, Category = "Floating Settings",
+        meta=(EditCondition = "ShouldFloat", EditConditionHides), SaveGame)
+    FVector SavedLocation = FVector::ZeroVector;
+
     void InitDataInteract(const FDataTableRowHandle NewInteractData, const bool bInitWidgetText = false);
+
+    void MoveItemDown();
+
+    float GetItemZBound();
+
 
 #pragma endregion
 
@@ -186,8 +231,8 @@ public:
      * @param Distance Distance from Spawner where to spawn item. By default = 150.0f.
      */
     UFUNCTION(BlueprintCallable)
-    static void SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count = 1, float Distance = 150.0f,
-        bool RandomDirection = false);
+    static void SpawnItem(AActor* Spawner, FInventoryItem InventoryItemRules, int32 Count = 1, float Distance = 200.0f,
+        bool RandomDirection = true);
 
 
 #pragma endregion Statics

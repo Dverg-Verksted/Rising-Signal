@@ -12,6 +12,7 @@
 #include "Game/Inventory/RSInventoryComponent.h"
 #include "Game/WeaponSystem/WeaponComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Player/RSGamePlayerController.h"
 
 ARSBaseCharacter::ARSBaseCharacter(const FObjectInitializer& ObjectInitializer)
@@ -232,21 +233,15 @@ void ARSBaseCharacter::UnRegisterInteractiveActor(AInteractiveActor* Interactive
 
 void ARSBaseCharacter::InteractWithLadder()
 {
-    if(GetBaseCharacterMovementComponent()->IsOnLadder())
+    /*if(GetBaseCharacterMovementComponent()->IsOnLadder())
     {
         GetBaseCharacterMovementComponent()->DetachFromLadder(EDetachFromLadderMethod::JumpOff);
-    }
-    else
+    }*/
+    
+    const ALadder* AvailableLadder = GetAvailableLadder();
+    if(IsValid(AvailableLadder))
     {
-        const ALadder* AvailableLadder = GetAvailableLadder();
-        if(IsValid(AvailableLadder))
-        {
-            if(AvailableLadder->GetIsOnTop())
-            {
-                PlayAnimMontage(AvailableLadder->GetAttachFromTopAnimMontage());
-            }
-            GetBaseCharacterMovementComponent()->AttachToLadder(AvailableLadder);
-        }
+        GetBaseCharacterMovementComponent()->AttachToLadder(AvailableLadder);
     }
 }
 
@@ -269,6 +264,7 @@ void ARSBaseCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
     Mantle();
+    CalculateOffsets(DeltaTime);
 }
 
 void ARSBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -527,5 +523,44 @@ bool ARSBaseCharacter::CanRoll()
     }
 
     return true;
+}
+
+float ARSBaseCharacter::GetIKFootOffset(const FName& SocketName)
+{
+    float Result = 0.0f;
+
+    CapsuleRadius = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	
+    FVector SocketLocation = GetMesh()->GetSocketLocation(SocketName);
+    FVector LineStartPosition(SocketLocation.X, SocketLocation.Y, GetActorLocation().Z);
+    FVector LineEndPostion = LineStartPosition - (CapsuleRadius + IKTraceDistance) * FVector::UpVector;
+
+    FHitResult HitResult;
+    ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(ECC_Visibility);
+
+    FVector BoxFoot(2.0f, 15.0f, 7.0f);
+    if(UKismetSystemLibrary::BoxTraceSingle(GetWorld(), LineStartPosition, LineEndPostion, BoxFoot, GetMesh()->GetSocketRotation(SocketName), TraceType, true, TArray<AActor*>(), EDrawDebugTrace::None, HitResult, true))
+    {
+        Result = LineStartPosition.Z - CapsuleRadius - HitResult.Location.Z;
+    }
+    return Result;
+}
+
+float ARSBaseCharacter::GetPelvisOffset()
+{
+    if(IKLeftFootOffset > MinimumOffset || IKRightFootOffset > MinimumOffset)
+    {
+        return -FMath::Max(IKLeftFootOffset ,IKRightFootOffset);
+    }
+    
+    return 0.0f;
+    
+}
+
+void ARSBaseCharacter::CalculateOffsets(float DeltaSeconds)
+{
+    IKLeftFootOffset = FMath::FInterpTo(IKLeftFootOffset, GetIKFootOffset(IKLeftFootSocketName), DeltaSeconds, IKInterpSpeed);
+    IKRightFootOffset = FMath::FInterpTo(IKRightFootOffset, GetIKFootOffset(IKRightFootSocketName), DeltaSeconds, IKInterpSpeed);
+    IKPelvisOffset = FMath::FInterpTo(IKPelvisOffset, GetPelvisOffset(), DeltaSeconds, IKInterpSpeed);
 }
 

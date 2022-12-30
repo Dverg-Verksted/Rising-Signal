@@ -96,12 +96,9 @@ struct FEffect
 {
     GENERATED_USTRUCT_BODY()
 
-    float Time;
-    float Health;
-    float Stamina;
-    float Stress;
-    float Hungry;
-    float Temp;
+    int Time;
+    EAbilityStatesType EffectType;
+    float EffectValue;
     
 };
 
@@ -286,25 +283,14 @@ private:
 
     UPROPERTY(EditDefaultsOnly, Category = "Effect")
     TArray<FEffect> Effects;
-     
-    /**
-     * @brief 
-     * @param AddHealth 
-     * @param AddStamina 
-     * @param AddStress 
-     * @param AddHungry 
-     * @param AddTemp 
-     */
-    void AddEffect(float AddTime, float AddHealth, float AddStamina, float AddStress,
-        float AddHungry, float AddTemp);
 
-    bool GetEffect(float Health, float Stamina, float Stress, float Hungry, float Temp);
+public:
+    
+    void AddEffect(int AddTime, EAbilityStatesType AddEffectType, float AddValue);
 
+private:
+    
     void UpdateEffects();
-
-    bool FindEffect(FEffect FindEffect);
-
-    void RemoveEffect(FEffect RemEffect);
 
 
 #pragma endregion Effects

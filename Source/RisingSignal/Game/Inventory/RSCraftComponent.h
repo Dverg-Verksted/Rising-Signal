@@ -25,6 +25,7 @@ public:
 
     void AddItemInSlot(const FInventoryItem& Item, int32 Index);
     virtual void RemoveItem(const FInventoryItem& Item) override;
+    virtual void RemoveItem(const FInventoryItem& InventorySlot, int32 CountRemove, bool bItemUsed) override;
     virtual bool SwapItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot) override;
     void FindSuitableRecipe();
 
@@ -46,6 +47,9 @@ public:
     void SetIsOutputSlotAvailable(bool NewValue);
 
     void ClearOutputSlot();
+    
+    UFUNCTION()
+    void ClearCraftSlots();
 
     UPROPERTY()
     TArray<FInventoryItem> UsedItems;
@@ -74,15 +78,19 @@ private:
     bool bIsCampfireNearBy = false;
     bool bIsWorkbenchNearBy = false;
 
+
     virtual void UpdateSlot(int32 Index) override;
     void PrepareItemToCraft(FDataTableRowHandle Item);
     void RefreshItems();
     TArray<FName> SortRecipesByIngredients(const UDataTable* RecipeTable) const;
     bool CanCraftRecipe(const FRecipeItem* RecipeItem) const;
+    bool HaveAnyItems() const;
 
     void RemoveUsedItems();
 
     bool bIsOutputSlotAvailable = false;
+
+    TWeakObjectPtr<ARSBaseCharacter> CachedBaseCharacter;
 
     UPROPERTY()
     TArray<FInventoryItem> CraftingItems;

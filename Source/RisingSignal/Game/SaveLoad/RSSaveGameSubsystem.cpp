@@ -107,6 +107,8 @@ void URSSaveGameSubsystem::WriteSaveGame()
             continue;
         }
 
+        LOG_RS(ELogRSVerb::Warning, "Saving actor: " + Actor->GetFName().ToString());
+
         FActorSaveData ActorData;
         ActorData.ActorName = Actor->GetFName();
         ActorData.Transform = Actor->GetActorTransform();
@@ -143,9 +145,7 @@ void URSSaveGameSubsystem::LoadSaveGame(FString InSlotName)
             return;
         }
 
-        UE_LOG(LogTemp, Warning, TEXT("Loaded SaveGame Data."));
-
-        
+        LOG_RS(ELogRSVerb::Warning, "SaveGame loaded");
 
         // Iterate the entire world of actors
         for (FActorIterator It(GetWorld()); It; ++It)
@@ -156,6 +156,9 @@ void URSSaveGameSubsystem::LoadSaveGame(FString InSlotName)
             {
                 continue;
             }
+
+            bool bFound = false;
+            LOG_RS(ELogRSVerb::Warning, "Loading actor: " + Actor->GetFName().ToString());
 
             for (FActorSaveData ActorData : CurrentSaveGame->SavedActors)
             {
@@ -172,8 +175,16 @@ void URSSaveGameSubsystem::LoadSaveGame(FString InSlotName)
 
                     IRSSavableObjectInterface::Execute_OnActorLoaded(Actor);
 
+                    bFound = true;
+
                     break;
                 }
+            }
+
+            if (!bFound)
+            {
+                //If actor not in savegame - destroy
+                Actor->Destroy();
             }
         }
 
