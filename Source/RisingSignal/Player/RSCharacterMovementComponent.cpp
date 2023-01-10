@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Curves/CurveVector.h"
 #include "NewTestPlayer/RSBaseCharacter.h"
+#include "Game/InteractSystem/Environment/Rope/Rope.h"
 
 void URSCharacterMovementComponent::BeginPlay()
 {
@@ -236,6 +237,11 @@ void URSCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations
             PhysAttachOnTopLadder(deltaTime, Iterations);
             break;
         }
+        case ECustomMovementMode::CMOVE_OnRope:
+        {
+            PhysHanging(deltaTime, Iterations);
+            break;
+        }
         default:
         {
             break;
@@ -354,6 +360,19 @@ void URSCharacterMovementComponent::PhysLadder(float DeltaTime, int32 Iterations
 
     FHitResult Hit;
     SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), true, Hit);
+}
+
+void URSCharacterMovementComponent::PhysHanging(float DeltaTime, int32 Iterations)
+{
+    const ARope* CurrentRope = BaseCharacterOwner->GetAvailableRope();
+
+    const FVector NewLocation = FMath::Lerp(GetOwner()->GetActorLocation(), CurrentRope->GetCableEndMeshComponent()->GetComponentLocation(), 0.2f);
+    const FVector Delta = NewLocation - GetActorLocation();
+
+    Velocity = Delta / DeltaTime;
+
+    FHitResult HitResult;
+    SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), false, HitResult);
 }
 
 bool URSCharacterMovementComponent::IsEnoughSpaceToStandUp()

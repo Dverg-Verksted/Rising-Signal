@@ -12,6 +12,7 @@
 #include "RSBaseCharacter.generated.h"
 
 class ALadder;
+class ARope;
 class ARSGamePlayerController;
 class UCameraComponent;
 class UWeaponComponent;
@@ -83,8 +84,7 @@ public:
     virtual void Falling() override;
     virtual void Landed(const FHitResult& Hit) override;
     virtual void NotifyJumpApex() override;
-
-
+    
     virtual void Jump() override;
 
     FORCEINLINE URSCharacterMovementComponent* GetBaseCharacterMovementComponent() const { return RSCharacterMovementComponent; }
@@ -96,6 +96,18 @@ public:
 
     UFUNCTION(BlueprintPure)
     FORCEINLINE USkeletalMeshComponent* GetExtraMesh() const { return ExtraSkeletalMesh; }
+
+    UFUNCTION(BlueprintCallable)
+    FORCEINLINE bool IsHanging() const { return bIsHanging; }
+
+    UFUNCTION(BlueprintCallable)
+    FORCEINLINE bool IsClimbingOnWall() const { return bIsClimbingOnWall; }
+
+    UFUNCTION(BlueprintCallable)
+    void SetIsHanging(bool NewValue) { bIsHanging = NewValue; }
+
+    UFUNCTION(BlueprintCallable)
+    void SetIsClimbingOnWall(bool NewValue) { bIsClimbingOnWall = NewValue; }
 
     void Mantle(bool bForce = false);
     void Roll();
@@ -112,17 +124,22 @@ public:
     void OnStopRoll(float HalfHeightAdjust);
 
     void ClimbLadder(float Value);
+    void SwingRope(float Value);
 
     void RegisterInteractiveActor(AInteractiveActor* InteractiveActor);
     void UnRegisterInteractiveActor(AInteractiveActor* InteractiveActor);
 
     void InteractWithLadder();
+    void InteractWithRope(ARope* Rope);
 
     UPROPERTY()
     float CurrentHeight = 0.0f;
 
     void UpdateCameraRotation();
 
+    const ALadder* GetAvailableLadder() const;
+    ARope* GetAvailableRope() const;
+    
     UFUNCTION(BlueprintCallable, BlueprintPure)
     FORCEINLINE float GetIKLeftFootOffset() const {return IKLeftFootOffset;}
 
@@ -131,6 +148,8 @@ public:
 
     UFUNCTION(BlueprintCallable, BlueprintPure)
     FORCEINLINE float GetIKPelvisOffset() const {return IKPelvisOffset;}
+
+    FORCEINLINE float GetHangingSpeed() const { return HangingSpeed; }
 
 protected:
     virtual void BeginPlay() override;
@@ -228,6 +247,8 @@ private:
 
     void InputLadder(float Value);
 
+    void InputRope(float Value);
+
     void InputSprintPressed();
 
     void InputSprintReleased();
@@ -316,8 +337,8 @@ private:
 private:
     const FMantlingSettings& GetMantlingSettings(float LedgeHeight) const;
 
-    const ALadder* GetAvailableLadder() const;
-
+    void GetControlRightVector(FVector& Right);
+    
     bool CanMove();
     bool CanMantle();
     bool CanRoll();
@@ -325,6 +346,8 @@ private:
     float GetIKFootOffset(const FName& SocketName);
     float GetPelvisOffset();
     void CalculateOffsets(float DeltaSeconds);
+
+    float HangingSpeed = 0.0f;
 
     float IKLeftFootOffset = 0.0f;
     float IKRightFootOffset = 0.0f;
@@ -337,4 +360,6 @@ private:
     bool bIsMantling;
     bool bIsRolling;
     bool bIsSprinting;
+    bool bIsHanging;
+    bool bIsClimbingOnWall;
 };

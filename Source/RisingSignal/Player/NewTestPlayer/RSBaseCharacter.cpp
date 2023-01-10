@@ -2,16 +2,19 @@
 
 
 #include "Player/NewTestPlayer/RSBaseCharacter.h"
+#include "RSBaseCharacterAnimInstance.h"
 #include "RSLedgeDetectorComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Curves/CurveVector.h"
 #include "Game/InteractSystem/Environment/Ladder/Ladder.h"
+#include "Game/InteractSystem/Environment/Rope/Rope.h"
 #include "Game/Inventory/RSCraftComponent.h"
 #include "Game/Inventory/RSEquipmentComponent.h"
 #include "Game/Inventory/RSInventoryComponent.h"
 #include "Game/WeaponSystem/WeaponComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Player/RSGamePlayerController.h"
 
@@ -85,6 +88,16 @@ void ARSBaseCharacter::NotifyJumpApex()
 void ARSBaseCharacter::Jump()
 {
     Super::Jump();
+
+    if(bIsHanging)
+    {
+        GetCapsuleComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+        RSCharacterMovementComponent->SetMovementMode(MOVE_Walking);
+        SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
+        bIsHanging = false;
+        URSBaseCharacterAnimInstance* AnimInstance = Cast<URSBaseCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+        AnimInstance->ToggleHanging(false);
+    }
 }
 
 void ARSBaseCharacter::Mantle(bool bForce)
@@ -225,6 +238,19 @@ void ARSBaseCharacter::ClimbLadder(float Value)
     }
 }
 
+void ARSBaseCharacter::SwingRope(float Value)
+{
+    if(!FMath::IsNearlyZero(Value) && bIsHanging)
+    {
+        ARope* CurrentRope = GetAvailableRope();
+        FVector RightVector;
+        GetControlRightVector(RightVector);
+        RightVector *= Value;
+        HangingSpeed = Value * 600.0f;
+        CurrentRope->AddSwingForce(RightVector, false);
+    }
+}
+
 void ARSBaseCharacter::RegisterInteractiveActor(AInteractiveActor* InteractiveActor)
 {
     AvailableInteractiveActors.AddUnique(InteractiveActor);
@@ -246,6 +272,19 @@ void ARSBaseCharacter::InteractWithLadder()
     if(IsValid(AvailableLadder))
     {
         GetBaseCharacterMovementComponent()->AttachToLadder(AvailableLadder);
+    }
+}
+
+void ARSBaseCharacter::InteractWithRope(ARope* Rope)
+{
+    if(!bIsHanging)
+    {
+        RSCharacterMovementComponent->StopMovementImmediately();
+        GetCapsuleComponent()->AttachToComponent(Rope->GetCableEndMeshComponent(), FAttachmentTransformRules::KeepWorldTransform);
+        URSBaseCharacterAnimInstance* AnimInstance = Cast<URSBaseCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+        AnimInstance->ToggleHanging(true);
+        bIsHanging = true;
+        RSCharacterMovementComponent->SetMovementMode(MOVE_Custom, StaticCast<uint8>(ECustomMovementMode::CMOVE_OnRope));
     }
 }
 
@@ -282,6 +321,7 @@ void ARSBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
     PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ThisClass::InputMoveRight);
 
     PlayerInputComponent->BindAxis(TEXT("ClimbLadder"), this, &ThisClass::InputLadder);
+    PlayerInputComponent->BindAxis(TEXT("SwingLadder"), this, &ThisClass::InputRope);
 
     PlayerInputComponent->BindAction(TEXT("Sprint"), IE_Pressed, this, &ThisClass::InputSprintPressed);
     PlayerInputComponent->BindAction(TEXT("Sprint"), IE_Released, this, &ThisClass::InputSprintReleased);
@@ -344,6 +384,11 @@ void ARSBaseCharacter::InputMoveRight(float Value)
 void ARSBaseCharacter::InputLadder(float Value)
 {
     ClimbLadder(Value);
+}
+
+void ARSBaseCharacter::InputRope(float Value)
+{
+    SwingRope(Value);
 }
 
 void ARSBaseCharacter::InputSprintPressed()
@@ -464,6 +509,11 @@ const FMantlingSettings& ARSBaseCharacter::GetMantlingSettings(float LedgeHeight
 	    return LedgeHeight > LowMantleMaxHeight ? HighMantlingSettings : LowMantlingSettings;
 }
 
+void ARSBaseCharacter::GetControlRightVector(FVector& Right)
+{
+    Right = UKismetMathLibrary::GetRightVector(FRotator(0.0f, GetControlRotation().Yaw, 0.0f));
+}
+
 const ALadder* ARSBaseCharacter::GetAvailableLadder() const
 {
     const ALadder* Result = nullptr;
@@ -472,6 +522,20 @@ const ALadder* ARSBaseCharacter::GetAvailableLadder() const
         if(InteractiveActor->IsA<ALadder>())
         {
             Result = StaticCast<const ALadder*>(InteractiveActor);
+            break;
+        }
+    }
+    return Result;
+}
+
+ARope* ARSBaseCharacter::GetAvailableRope() const
+{
+    ARope* Result = nullptr;
+    for(AInteractiveActor* InteractiveActor : AvailableInteractiveActors)
+    {
+        if(InteractiveActor->IsA<ARope>())
+        {
+            Result = StaticCast<ARope*>(InteractiveActor);
             break;
         }
     }
@@ -489,6 +553,10 @@ bool ARSBaseCharacter::CanMove()
         return false;
     }
     if(RSCharacterMovementComponent->IsOnLadder())
+    {
+        return false;
+    }
+    if(bIsHanging)
     {
         return false;
     }

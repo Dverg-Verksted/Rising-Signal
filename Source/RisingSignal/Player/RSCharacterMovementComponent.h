@@ -55,7 +55,8 @@ enum class ECustomMovementMode : uint8
     CMOVE_Rolling UMETA(DisplayName = "Rolling"),
     CMOVE_AttachingOnLadder UMETA(DisplayName = "AttachingOnLadder"),
     CMOVE_AttachingOnTopLadder UMETA(DisplayName = "AttachingOnTopLadder"),
-    CMOVE_OnLadder UMETA(DisplayName = "Ladder")
+    CMOVE_OnLadder UMETA(DisplayName = "Ladder"),
+    CMOVE_OnRope UMETA(DisplayName = "Rope")
 };
 
 UCLASS()
@@ -100,6 +101,8 @@ protected:
     void PhysAttachOnTopLadder(float DeltaTime, int32 Iterations);
 
     void PhysLadder(float DeltaTime, int32 Iterations);
+
+    void PhysHanging(float DeltaTime, int32 Iterations);
 
     bool IsEnoughSpaceToStandUp();
 

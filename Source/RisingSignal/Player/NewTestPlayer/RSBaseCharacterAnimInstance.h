@@ -21,6 +21,8 @@ public:
     virtual void NativeBeginPlay() override;
     virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
+    void ToggleHanging(bool NewValue);
+
 protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Slide animations")
@@ -46,6 +48,15 @@ protected:
 
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
     bool bIsOnLadder = false;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+    bool bIsHanging = false;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+    bool bIsClimbing = false;
+    
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+    float HangingSpeed = 0.0f;
     
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     float LowHeight = 3.0f;
@@ -58,6 +69,7 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     float LerpAlpha = 0.07f;
+
 
     UPROPERTY(EditAnywhere, Transient, BlueprintReadOnly, Category= "Character | IK System")
     FVector LeftFootEffectorLocation = FVector::ZeroVector;

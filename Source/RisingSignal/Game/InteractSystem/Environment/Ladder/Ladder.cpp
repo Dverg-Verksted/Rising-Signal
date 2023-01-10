@@ -2,8 +2,6 @@
 
 
 #include "Game/InteractSystem/Environment/Ladder/Ladder.h"
-
-#include "DrawDebugHelpers.h"
 #include "Components/BoxComponent.h"
 #include "Player/NewTestPlayer/RSBaseCharacter.h"
 

@@ -32,10 +32,16 @@ void URSBaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
     bIsSprinting = CachedBaseCharacter->GetIsSprinting();
     bIsCrouching = CharacterMovementComponent->IsCrouching();
     bIsOnLadder = CharacterMovementComponent->IsOnLadder();
+    HangingSpeed = FMath::Lerp(HangingSpeed, CachedBaseCharacter->GetHangingSpeed(), LerpAlpha);
 
     LeftFootEffectorLocation = FVector(-(CachedBaseCharacter->GetIKLeftFootOffset() + CachedBaseCharacter->GetIKPelvisOffset()), 0.0f, 0.0f);
     RightFootEffectorLocation = FVector((CachedBaseCharacter->GetIKRightFootOffset() + CachedBaseCharacter->GetIKPelvisOffset()), 0.0f , 0.0f);
     PelvisOffset = FVector(0.0f, 0.0f, CachedBaseCharacter->GetIKPelvisOffset());
+}
+
+void URSBaseCharacterAnimInstance::ToggleHanging(bool NewValue)
+{
+    bIsHanging = NewValue;
 }
 
 void URSBaseCharacterAnimInstance::SetFallHeight(float NewValue)
