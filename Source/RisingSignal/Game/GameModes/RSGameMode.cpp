@@ -15,25 +15,28 @@ void ARSGameMode::InitGame(const FString& MapName, const FString& Options, FStri
 
     Super::InitGame(MapName, Options, ErrorMessage);
 
+    GetWorld()->OnWorldBeginPlay.AddUObject(this, &ARSGameMode::GameStarted);
+
 }
 
 void ARSGameMode::StartPlay()
 {
+    UE_LOG(LogTemp, Warning, TEXT("%s::%s() called"), *GetName(), *FString(__FUNCTION__));
+
     Super::StartPlay();
-    
-    if (UGameplayStatics::ParseOption(OptionsString, "LoadCheckpoint") == "True")
+
+    if (bGameWasLoaded)
     {
-        UE_LOG(LogTemp, Warning, TEXT("Checkpoint"));
-        LoadCheckpoint();
+        SG->OnSaveGameLoaded.Broadcast(SG->GetSaveGame());
     }
+
 }
 
 void ARSGameMode::CheckpointReached(AActor* ReachedActor)
 {
     ARSBaseCharacter* Player = Cast<ARSBaseCharacter>(ReachedActor);
-    if (Player)
+    if (Player && SG)
     {
-        URSSaveGameSubsystem* SG = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>();
         // Immediately auto save on death
         SG->WriteSaveGame();
     }
@@ -48,13 +51,20 @@ void ARSGameMode::LoadCheckpoint()
 {
     ARSGamePlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSGamePlayerController>();
 
-    URSSaveGameSubsystem* SG = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>();
+    if (!SG)
+    {
+        LOG_RS(ELogRSVerb::Error, "No SaveGame Subsystem");
+    }
+
     SG->HandleStartingNewPlayer(Controller);
     SG->OverrideSpawnTransform(Controller);
+    SG->OnPlayerLoaded.Broadcast(SG->GetSaveGame());
 
     // Optional slot name (Falls back to slot specified in SaveGameSettings class/INI otherwise)
     FString SelectedSaveSlot = UGameplayStatics::ParseOption(OptionsString, "SaveGame");
-    SG->LoadSaveGame(SelectedSaveSlot);
+
+    bGameWasLoaded = SG->LoadSaveGame(SelectedSaveSlot);
+
 }
 
 void ARSGameMode::LoadLevel(FName LevelName, bool FromBegin)
@@ -67,17 +77,11 @@ void ARSGameMode::LoadLevel(FName LevelName, bool FromBegin)
 
 void ARSGameMode::RestartLevel()
 {
-
-    // FString SelectedSaveSlot = UGameplayStatics::ParseOption(OptionsString, "SaveGame");
-
-    // UGameplayStatics::DeleteGameInSlot(SelectedSaveSlot, 0);
-
-    // OptionsString+="";
-    // UKismetSystemLibrary::ExecuteConsoleCommand(this, "RestartLevel");
 }
 
 void ARSGameMode::BeginPlay()
 {
+    UE_LOG(LogTemp, Warning, TEXT("%s::%s() called"), *GetName(), *FString(__FUNCTION__));
     Super::BeginPlay();
 
     this->PC = Cast<ARSGamePlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
@@ -86,24 +90,36 @@ void ARSGameMode::BeginPlay()
     this->GameHUD = Cast<AGameHUD>(this->PC->GetHUD());
     check(this->GameHUD);
 
-    URSSaveGameSubsystem* SGS = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>();
+    SG = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>();
 
-    if (!UGameplayStatics::DoesSaveGameExist(SGS->GetSlotName(), 0))
+    if (!UGameplayStatics::DoesSaveGameExist(SG->GetSlotName(), 0))
     {
-        SGS->SetSaveGame(Cast<URSSaveGame>(UGameplayStatics::CreateSaveGameObject(URSSaveGame::StaticClass())));
+        SG->SetSaveGame(Cast<URSSaveGame>(UGameplayStatics::CreateSaveGameObject(URSSaveGame::StaticClass())));
 
         UE_LOG(LogTemp, Warning, TEXT("Created New SaveGame Data. 1111111"));
     }
     else
     {
-        SGS->SetSaveGame(Cast<URSSaveGame>(UGameplayStatics::LoadGameFromSlot(SGS->GetSlotName(), 0)));
-        if (SGS->GetSaveGame() == nullptr)
+        SG->SetSaveGame(Cast<URSSaveGame>(UGameplayStatics::LoadGameFromSlot(SG->GetSlotName(), 0)));
+        if (SG->GetSaveGame() == nullptr)
         {
             UE_LOG(LogTemp, Warning, TEXT("Failed to load SaveGame Data."));
             return;
         }
     }
 
-    
+    if (UGameplayStatics::ParseOption(OptionsString, "LoadCheckpoint") == "True")
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Checkpoint"));
+        LoadCheckpoint();
+    }
 
+}
+
+void ARSGameMode::GameStarted()
+{
+    // if (bGameWasLoaded)
+    // {
+    //     SG->OnSaveGameLoaded.Broadcast(SG->GetSaveGame());
+    // }
 }

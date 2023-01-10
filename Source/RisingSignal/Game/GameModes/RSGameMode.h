@@ -47,8 +47,12 @@ public:
 
     void RestartLevel();
 
+    
+
 protected:
     virtual void BeginPlay() override;
+
+    void GameStarted();
 
 private:
     // Current pointer on ARSGamePlayerController
@@ -58,4 +62,9 @@ private:
     // Current pointer on AGameHUD
     UPROPERTY()
     AGameHUD* GameHUD;
+    
+    UPROPERTY()
+    class URSSaveGameSubsystem* SG;
+
+    bool bGameWasLoaded = false;
 };

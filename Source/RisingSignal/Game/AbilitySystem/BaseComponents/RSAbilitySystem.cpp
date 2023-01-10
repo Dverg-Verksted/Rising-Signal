@@ -17,25 +17,25 @@ URSAbilitySystem::URSAbilitySystem()
 {
     PrimaryComponentTick.bCanEverTick = false;
     SphereCollision = CreateDefaultSubobject<USphereComponent>("StressCollision");
-    if(SphereCollision) SphereCollision->InitSphereRadius(100.0f);
+    if (SphereCollision) SphereCollision->InitSphereRadius(100.0f);
 }
 
 // Called when the game starts
 void URSAbilitySystem::BeginPlay()
 {
     Super::BeginPlay();
-    
+
     SphereCollision->SetCollisionProfileName("OverlapAllDynamic");
     SphereCollision->SetGenerateOverlapEvents(true);
     SphereCollision->bHiddenInGame = true;
     SphereCollision->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
     SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &URSAbilitySystem::StressOverlapBegin);
     SphereCollision->OnComponentEndOverlap.AddDynamic(this, &URSAbilitySystem::StressOverlapEnd);
-    
+
     GetWorld()->GetTimerManager().SetTimer(TStateChange, this, &URSAbilitySystem::CheckStateChanges, TimerUpdateState, true);
 
     GetWorld()->GetTimerManager().SetTimer(TEffectCheck, this, &URSAbilitySystem::UpdateEffects, 1.0f, true);
-    
+
     GamePlayerRef = Cast<ARSBaseCharacter>(GetOwner());
     OwnerRef = Cast<ACharacter>(GetOwner());
 
@@ -48,11 +48,11 @@ void URSAbilitySystem::BeginPlay()
         LOG_RS(ELogRSVerb::Error, "No pointer to OwnerRef");
     }
 
-    Effects.Add(FEffect{0, EAbilityStatesType::Health,0});
-    Effects.Add(FEffect{0, EAbilityStatesType::Hungry,0});
-    Effects.Add(FEffect{0, EAbilityStatesType::Stamina,0});
-    Effects.Add(FEffect{0, EAbilityStatesType::Stress,0});
-    Effects.Add(FEffect{0, EAbilityStatesType::Temp,0});
+    Effects.Add(FEffect{0, EAbilityStatesType::Health, 0});
+    Effects.Add(FEffect{0, EAbilityStatesType::Hungry, 0});
+    Effects.Add(FEffect{0, EAbilityStatesType::Stamina, 0});
+    Effects.Add(FEffect{0, EAbilityStatesType::Stress, 0});
+    Effects.Add(FEffect{0, EAbilityStatesType::Temp, 0});
 
 }
 
@@ -73,13 +73,17 @@ void URSAbilitySystem::CheckStateChanges()
             State.ChangedValue = GetStaminaChangedValue();
         }
     }
-    
+
     for (auto& State : States)
     {
         State.CurrentValue = FMath::Clamp(State.CurrentValue += State.ChangedValue, State.MinValue, State.MaxValue);
 
-        if(State.StateType == EAbilityStatesType::Health && State.CurrentValue == 0) OnDeath.Broadcast();
-        
+        if (!bIsDead && State.StateType == EAbilityStatesType::Health && State.CurrentValue <= 0)
+        {
+            bIsDead = true;
+            OnDeath.Broadcast();
+        }
+
         if (OnStateChangedSignature.IsBound())
         {
             OnStateChangedSignature.Broadcast(State.StateType, State.CurrentValue);
@@ -114,56 +118,56 @@ float URSAbilitySystem::GetHealthChangedValue()
 {
     float ValueOnChangeHealth = 0.0f;
     bool bHealthIsCriticalLevel = false;
-    
-    if(!GodMode)
+
+    if (!GodMode)
     {
-        FStateParams TempHungryParam = GetState(EAbilityStatesType::Hungry); 
+        FStateParams TempHungryParam = GetState(EAbilityStatesType::Hungry);
         FStateParams TempTempParam = GetState(EAbilityStatesType::Temp);
         FStateParams TempStressParam = GetState(EAbilityStatesType::Stress);
-        
+
         if (GetState(EAbilityStatesType::Health).CurrentValue <= HpCritLvl)
         {
             bHealthIsCriticalLevel = true;
         }
-        
+
         if (TempHungryParam.CurrentValue >= TempHungryParam.AfterIsDebafHungry && !bHealthIsCriticalLevel)
         {
             ValueOnChangeHealth -= TempHungryParam.HungryDamage * TimerUpdateState;
         }
-        
+
         if (TempTempParam.CurrentValue <= TempTempParam.AfterIsDebafTemp && !bHealthIsCriticalLevel)
         {
             ValueOnChangeHealth -= TempTempParam.TempDamage * TimerUpdateState;
         }
 
-        if (TempStressParam.CurrentValue  >= TempStressParam.AfterIsDebafStress && !bHealthIsCriticalLevel)
+        if (TempStressParam.CurrentValue >= TempStressParam.AfterIsDebafStress && !bHealthIsCriticalLevel)
         {
             ValueOnChangeHealth -= TempStressParam.StressDamageSelf * TimerUpdateState;
         }
-        
-        
+
     }
-    
+
     return ValueOnChangeHealth;
-    
+
 }
 
 void URSAbilitySystem::OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy,
     AActor* DamageCauser)
 {
-    
-    if(!GodMode)
+
+    if (GodMode || bIsDead) return;
+
+    ChangeCurrentStateValue(EAbilityStatesType::Health, -Damage);
+    if (GetState(EAbilityStatesType::Health).CurrentValue <= HpCritLvl)
     {
-        ChangeCurrentStateValue(EAbilityStatesType::Health, -Damage);
-        if(GetState(EAbilityStatesType::Health).CurrentValue <= HpCritLvl)
-        {
-            GetWorld()->GetTimerManager().SetTimer(TRegenHealth, this, &URSAbilitySystem::RegenHealth, TimerUpdateState, true);
-        }
+        GetWorld()->GetTimerManager().SetTimer(TRegenHealth, this, &URSAbilitySystem::RegenHealth, TimerUpdateState, true);
     }
-    
+
     // Death check
-    if (GetCurrentStateValue(EAbilityStatesType::Health) <= 0 && !GodMode)
+    if (GetCurrentStateValue(EAbilityStatesType::Health) <= 0)
     {
+        bIsDead = true;
+
         GetWorld()->GetTimerManager().ClearTimer(TStateChange);
         OnDeath.Broadcast();
     }
@@ -171,17 +175,17 @@ void URSAbilitySystem::OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage,
 
 void URSAbilitySystem::RegenHealth()
 {
-    if(GetState(EAbilityStatesType::Health).CurrentValue < HpCritLvl)
-    ChangeCurrentStateValue(EAbilityStatesType::Health, 10);
+    if (GetState(EAbilityStatesType::Health).CurrentValue < HpCritLvl)
+        ChangeCurrentStateValue(EAbilityStatesType::Health, 10);
 }
 
 void URSAbilitySystem::StressOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
     UActorComponent* TempAbilitySys = OtherActor->GetComponentByClass(URSAbilitySystem::StaticClass());
-    if(OtherActor->GetComponentByClass(URSAbilitySystem::StaticClass()))
+    if (OtherActor->GetComponentByClass(URSAbilitySystem::StaticClass()))
     {
-        if(!IsMonster)
+        if (!IsMonster)
         {
             SetChangeValue(EAbilityStatesType::Stress,
                 Cast<URSAbilitySystem>(TempAbilitySys)->GetState(EAbilityStatesType::Stress).StressDamageOut);
@@ -190,12 +194,12 @@ void URSAbilitySystem::StressOverlapBegin(UPrimitiveComponent* OverlappedCompone
 }
 
 void URSAbilitySystem::StressOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-    UPrimitiveComponent* OtherComp,int32 OtherBodyIndex)
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
     UActorComponent* TempAbilitySys = OtherActor->GetComponentByClass(URSAbilitySystem::StaticClass());
-    if(OtherActor->GetComponentByClass(URSAbilitySystem::StaticClass()))
+    if (OtherActor->GetComponentByClass(URSAbilitySystem::StaticClass()))
     {
-        if(!IsMonster)
+        if (!IsMonster)
         {
             SetChangeValue(EAbilityStatesType::Stress,
                 Cast<URSAbilitySystem>(TempAbilitySys)->
@@ -251,7 +255,7 @@ void URSAbilitySystem::ChangeCurrentStateValue(EAbilityStatesType StateTy, float
             return;
         }
     }
-    
+
 }
 
 FStateParams URSAbilitySystem::GetState(EAbilityStatesType AbilityStateType)
@@ -274,31 +278,33 @@ FStateParams URSAbilitySystem::GetState(EAbilityStatesType AbilityStateType)
 
 void URSAbilitySystem::AddEffect(int AddTime, EAbilityStatesType AddEffectType, float AddValue)
 {
-    
-    for (FEffect &Effect : Effects)
+
+    for (FEffect& Effect : Effects)
     {
-        if(Effect.EffectType == AddEffectType)
+        if (Effect.EffectType == AddEffectType)
         {
             Effect.EffectValue += AddValue;
             Effect.Time += AddTime;
         }
-    } 
+    }
 }
 
 void URSAbilitySystem::UpdateEffects()
 {
-    for (FEffect &Effect : Effects)
+    if (bIsDead) return;
+
+    for (FEffect& Effect : Effects)
     {
-        if(Effect.Time != 0.0f)
+        if (Effect.Time != 0.0f)
         {
             ChangeCurrentStateValue(Effect.EffectType, Effect.EffectValue);
 
             LOG_RS(ELogRSVerb::Display, FString::Printf(TEXT("%f"), Effect.EffectValue));
-            
+
             Effect.Time--;
         }
-        
-        if(Effect.Time == 0.0f)
+
+        if (Effect.Time == 0.0f)
         {
             Effect.Time = 0.0f;
             Effect.EffectValue = 0.0f;
