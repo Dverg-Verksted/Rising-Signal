@@ -93,10 +93,14 @@ void ARSBaseCharacter::Jump()
     {
         GetCapsuleComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
         RSCharacterMovementComponent->SetMovementMode(MOVE_Walking);
-        SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
+        FRotator CurrentCharacterRotation = GetActorRotation();
+        SetActorRotation(FRotator(0.0f, CurrentCharacterRotation.Yaw, 0.0f));
         bIsHanging = false;
         URSBaseCharacterAnimInstance* AnimInstance = Cast<URSBaseCharacterAnimInstance>(GetMesh()->GetAnimInstance());
         AnimInstance->ToggleHanging(false);
+        ARope* CurrentRope = GetAvailableRope();
+        FVector RopePhysicLinearVelocity = CurrentRope->GetCableEndMeshComponent()->GetPhysicsLinearVelocity();
+        LaunchCharacter(FVector(RopePhysicLinearVelocity.X, RopePhysicLinearVelocity.Y, 100), false, false);
     }
 }
 
@@ -280,6 +284,8 @@ void ARSBaseCharacter::InteractWithRope(ARope* Rope)
     if(!bIsHanging)
     {
         RSCharacterMovementComponent->StopMovementImmediately();
+        FRotator RopeRotation = Rope->GetCableEndMeshComponent()->GetComponentRotation();
+        SetActorRotation(FRotator(RopeRotation.Pitch, GetActorRotation().Yaw, GetActorRotation().Roll));
         GetCapsuleComponent()->AttachToComponent(Rope->GetCableEndMeshComponent(), FAttachmentTransformRules::KeepWorldTransform);
         URSBaseCharacterAnimInstance* AnimInstance = Cast<URSBaseCharacterAnimInstance>(GetMesh()->GetAnimInstance());
         AnimInstance->ToggleHanging(true);
