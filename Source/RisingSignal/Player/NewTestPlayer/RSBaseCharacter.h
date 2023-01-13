@@ -125,12 +125,19 @@ public:
 
     void ClimbLadder(float Value);
     void SwingRope(float Value);
+    
+    void MoveWallForward(float Value);
+    
+    void MoveWallRight(float Value);
 
     void RegisterInteractiveActor(AInteractiveActor* InteractiveActor);
     void UnRegisterInteractiveActor(AInteractiveActor* InteractiveActor);
 
     void InteractWithLadder();
     void InteractWithRope(ARope* Rope);
+    void InteractWithWall();
+
+    void DetachFromWall();
 
     UPROPERTY()
     float CurrentHeight = 0.0f;
@@ -139,6 +146,7 @@ public:
 
     const ALadder* GetAvailableLadder() const;
     ARope* GetAvailableRope() const;
+    AClimbingWall* GetAvailableWall() const;
     
     UFUNCTION(BlueprintCallable, BlueprintPure)
     FORCEINLINE float GetIKLeftFootOffset() const {return IKLeftFootOffset;}
@@ -248,6 +256,10 @@ private:
     void InputLadder(float Value);
 
     void InputRope(float Value);
+
+    void InputWallForward(float Value);
+
+    void InputWallRight(float Value);
 
     void InputSprintPressed();
 

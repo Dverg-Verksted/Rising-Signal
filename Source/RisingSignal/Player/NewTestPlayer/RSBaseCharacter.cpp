@@ -102,6 +102,23 @@ void ARSBaseCharacter::Jump()
         FVector RopePhysicLinearVelocity = CurrentRope->GetCableEndMeshComponent()->GetPhysicsLinearVelocity();
         LaunchCharacter(FVector(RopePhysicLinearVelocity.X, RopePhysicLinearVelocity.Y, 100), false, false);
     }
+
+    if(RSCharacterMovementComponent->IsOnLadder())
+    {
+        if(GetBaseCharacterMovementComponent()->IsOnLadder())
+        {
+            GetBaseCharacterMovementComponent()->DetachFromLadder(EDetachFromLadderMethod::JumpOff);
+        }
+    }
+
+    if(bIsClimbingOnWall)
+    {
+        RSCharacterMovementComponent->SetMovementMode(MOVE_Walking);
+        RSCharacterMovementComponent->bOrientRotationToMovement = true;
+        bIsClimbingOnWall = false;
+        URSBaseCharacterAnimInstance* AnimInstance = Cast<URSBaseCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+        AnimInstance->ToggleOnWall(false);
+    }
 }
 
 void ARSBaseCharacter::Mantle(bool bForce)
@@ -255,6 +272,24 @@ void ARSBaseCharacter::SwingRope(float Value)
     }
 }
 
+void ARSBaseCharacter::MoveWallForward(float Value)
+{
+    if(!FMath::IsNearlyZero(Value))
+    {
+        FVector WallUpVector = GetBaseCharacterMovementComponent()->GetCurrentWall()->GetActorUpVector();
+        AddMovementInput(WallUpVector, Value);
+    }
+}
+
+void ARSBaseCharacter::MoveWallRight(float Value)
+{
+    if(!FMath::IsNearlyZero(Value))
+    {
+        FVector WallRightVector = GetBaseCharacterMovementComponent()->GetCurrentWall()->GetActorRightVector();
+        AddMovementInput(-WallRightVector, Value);
+    }
+}
+
 void ARSBaseCharacter::RegisterInteractiveActor(AInteractiveActor* InteractiveActor)
 {
     AvailableInteractiveActors.AddUnique(InteractiveActor);
@@ -294,6 +329,27 @@ void ARSBaseCharacter::InteractWithRope(ARope* Rope)
     }
 }
 
+void ARSBaseCharacter::InteractWithWall()
+{
+    if(!bIsClimbingOnWall)
+    {
+        const AClimbingWall* AvailableWall = GetAvailableWall();
+        if(IsValid(AvailableWall))
+        {
+            bIsClimbingOnWall = true;
+            URSBaseCharacterAnimInstance* AnimInstance = Cast<URSBaseCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+            AnimInstance->ToggleOnWall(true);
+            RSCharacterMovementComponent->AttachToWall(AvailableWall);
+        }
+    }
+}
+
+void ARSBaseCharacter::DetachFromWall()
+{
+    bIsClimbingOnWall = false;
+    URSBaseCharacterAnimInstance* AnimInstance = Cast<URSBaseCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+    AnimInstance->ToggleOnWall(false);
+}
 
 void ARSBaseCharacter::UpdateCameraRotation()
 {
@@ -328,6 +384,9 @@ void ARSBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
     PlayerInputComponent->BindAxis(TEXT("ClimbLadder"), this, &ThisClass::InputLadder);
     PlayerInputComponent->BindAxis(TEXT("SwingLadder"), this, &ThisClass::InputRope);
+
+    PlayerInputComponent->BindAxis(TEXT("MoveWallForward"), this, &ThisClass::InputWallForward);
+    PlayerInputComponent->BindAxis(TEXT("MoveWallRight"), this, &ThisClass::InputWallRight);
 
     PlayerInputComponent->BindAction(TEXT("Sprint"), IE_Pressed, this, &ThisClass::InputSprintPressed);
     PlayerInputComponent->BindAction(TEXT("Sprint"), IE_Released, this, &ThisClass::InputSprintReleased);
@@ -395,6 +454,18 @@ void ARSBaseCharacter::InputLadder(float Value)
 void ARSBaseCharacter::InputRope(float Value)
 {
     SwingRope(Value);
+}
+
+void ARSBaseCharacter::InputWallForward(float Value)
+{
+    if(bIsClimbingOnWall)
+    MoveWallForward(Value);
+}
+
+void ARSBaseCharacter::InputWallRight(float Value)
+{
+    if(bIsClimbingOnWall)
+    MoveWallRight(Value);
 }
 
 void ARSBaseCharacter::InputSprintPressed()
@@ -548,6 +619,20 @@ ARope* ARSBaseCharacter::GetAvailableRope() const
     return Result;
 }
 
+AClimbingWall* ARSBaseCharacter::GetAvailableWall() const
+{
+    AClimbingWall* Result = nullptr;
+    for(AInteractiveActor* InteractiveActor : AvailableInteractiveActors)
+    {
+        if(InteractiveActor->IsA<AClimbingWall>())
+        {
+            Result = StaticCast<AClimbingWall*>(InteractiveActor);
+            break;
+        }
+    }
+    return Result;
+}
+
 bool ARSBaseCharacter::CanMove()
 {
     if(bIsMantling)
@@ -563,6 +648,10 @@ bool ARSBaseCharacter::CanMove()
         return false;
     }
     if(bIsHanging)
+    {
+        return false;
+    }
+    if(bIsClimbingOnWall)
     {
         return false;
     }

@@ -27,6 +27,13 @@ void URSBaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
     Speed = FMath::Lerp(Speed, CharacterMovementComponent->Velocity.Size(), LerpAlpha);
     Direction = CalculateDirection(CharacterMovementComponent->Velocity, CachedBaseCharacter->GetActorRotation());
+    GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::Printf(TEXT("Rotation: X:%f, Y:%f, Z:%f"),  CachedBaseCharacter->GetActorRotation().Pitch,  CachedBaseCharacter->GetActorRotation().Yaw,  CachedBaseCharacter->GetActorRotation().Roll));
+    if(bIsClimbing)
+    {
+        VelocityOnWall = FVector(CharacterMovementComponent->Velocity.Z, CharacterMovementComponent->Velocity.Y, 0.0f);
+        OnWallSpeed = FMath::Lerp(OnWallSpeed, VelocityOnWall.Size(), LerpAlpha);
+        OnWallDirection = -CalculateDirection(VelocityOnWall, CachedBaseCharacter->GetActorRotation());
+    }
     LadderDirection = CharacterMovementComponent->Velocity.Z;
     bIsFalling = CharacterMovementComponent->IsFalling();
     bIsSprinting = CachedBaseCharacter->GetIsSprinting();
@@ -42,6 +49,11 @@ void URSBaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 void URSBaseCharacterAnimInstance::ToggleHanging(bool NewValue)
 {
     bIsHanging = NewValue;
+}
+
+void URSBaseCharacterAnimInstance::ToggleOnWall(bool NewValue)
+{
+    bIsClimbing = NewValue;
 }
 
 void URSBaseCharacterAnimInstance::SetFallHeight(float NewValue)

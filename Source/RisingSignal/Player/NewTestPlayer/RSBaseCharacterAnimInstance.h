@@ -22,6 +22,7 @@ public:
     virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
     void ToggleHanging(bool NewValue);
+    void ToggleOnWall(bool NewValue);
 
 protected:
 
@@ -33,6 +34,15 @@ protected:
 
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
     float Direction;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+    float OnWallSpeed;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+    float OnWallDirection;
+
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+    FVector VelocityOnWall = FVector::ZeroVector;
 
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
     float LadderDirection;
