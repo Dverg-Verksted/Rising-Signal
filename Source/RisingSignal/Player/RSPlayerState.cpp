@@ -35,7 +35,6 @@ void ARSPlayerState::SavePlayerState_Implementation(URSSaveGame* SaveObject)
             {
                 for (const auto State : AbilitySystem->States)
                 {
-                    LOG_RS(ELogRSVerb::Warning, FString::SanitizeFloat(State.CurrentValue));
 
                     SaveData.AbilityParams.Add(State);
                 }
@@ -50,8 +49,6 @@ void ARSPlayerState::SavePlayerState_Implementation(URSSaveGame* SaveObject)
             {
                 SaveData.InventoryItems = Inventory->GetItems();
 
-                LOG_RS(ELogRSVerb::Warning, SaveData.InventoryItems[0].Name.ToString());
-
             }
             else
             {
@@ -63,7 +60,6 @@ void ARSPlayerState::SavePlayerState_Implementation(URSSaveGame* SaveObject)
             {
                 SaveData.CraftingItems = Craft->GetItems();
 
-                LOG_RS(ELogRSVerb::Warning, SaveData.CraftingItems[0].Name.ToString());
             }
             else
             {
@@ -76,9 +72,6 @@ void ARSPlayerState::SavePlayerState_Implementation(URSSaveGame* SaveObject)
                 SaveData.EquipmentSlots = Equipment->GetItems();
                 SaveData.CurrentItemInHand = Equipment->GetEquippedItem();
 
-                LOG_RS(ELogRSVerb::Warning, SaveData.EquipmentSlots[0].Name.ToString());
-                LOG_RS(ELogRSVerb::Warning, FString::FromInt(SaveData.CurrentItemInHand));
-
             }
             else
             {
@@ -89,8 +82,6 @@ void ARSPlayerState::SavePlayerState_Implementation(URSSaveGame* SaveObject)
         {
             LOG_RS(ELogRSVerb::Error, "No Player found!");
         }
-
-        LOG_RS(ELogRSVerb::Warning, "PlayerSaved");
 
         SaveObject->SavedPlayer = SaveData;
 
@@ -112,8 +103,6 @@ void ARSPlayerState::LoadPlayerState_Implementation(URSSaveGame* SaveObject)
                 URSAbilitySystem* AbilitySystem = RSChar->GetAbilitySystem();
                 if (AbilitySystem)
                 {
-                    LOG_RS(ELogRSVerb::Warning, FString::FromInt(FoundData->AbilityParams[0].CurrentValue));
-
                     AbilitySystem->States = FoundData->AbilityParams;
                 }
                 else
@@ -124,7 +113,6 @@ void ARSPlayerState::LoadPlayerState_Implementation(URSSaveGame* SaveObject)
                 URSInventoryComponent* Inventory = RSChar->GetInventoryComponent();
                 if (Inventory)
                 {
-                    LOG_RS(ELogRSVerb::Warning, FoundData->InventoryItems[0].Name.ToString());
 
                     Inventory->LoadItems(FoundData->InventoryItems);
                 }
@@ -136,7 +124,6 @@ void ARSPlayerState::LoadPlayerState_Implementation(URSSaveGame* SaveObject)
                 URSCraftComponent* Craft = RSChar->FindComponentByClass<URSCraftComponent>();
                 if (Craft)
                 {
-                    LOG_RS(ELogRSVerb::Warning, FoundData->CraftingItems[0].Name.ToString());
 
                     Craft->LoadItems(FoundData->CraftingItems);
                 }
@@ -148,8 +135,6 @@ void ARSPlayerState::LoadPlayerState_Implementation(URSSaveGame* SaveObject)
                 URSEquipmentComponent* Equipment = RSChar->FindComponentByClass<URSEquipmentComponent>();
                 if (Equipment)
                 {
-                    LOG_RS(ELogRSVerb::Warning, FoundData->EquipmentSlots[0].Name.ToString());
-                    LOG_RS(ELogRSVerb::Warning, FString::FromInt(FoundData->CurrentItemInHand));
 
                     Equipment->LoadItems(FoundData->EquipmentSlots, FoundData->CurrentItemInHand);
                 }

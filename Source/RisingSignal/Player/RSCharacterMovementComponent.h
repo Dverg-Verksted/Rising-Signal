@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Game/InteractSystem/Environment/ClimbingWall/ClimbingWall.h"
 #include "Game/InteractSystem/Environment/Ladder/Ladder.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "RSCharacterMovementComponent.generated.h"
 
+class AClimbingWall;
 class ARSBaseCharacter;
 
 struct FMantlingMovementParameters
@@ -54,7 +56,10 @@ enum class ECustomMovementMode : uint8
     CMOVE_Mantling UMETA(DisplayName = "Mantling"),
     CMOVE_Rolling UMETA(DisplayName = "Rolling"),
     CMOVE_AttachingOnLadder UMETA(DisplayName = "AttachingOnLadder"),
-    CMOVE_OnLadder UMETA(DisplayName = "Ladder")
+    CMOVE_AttachingOnTopLadder UMETA(DisplayName = "AttachingOnTopLadder"),
+    CMOVE_OnLadder UMETA(DisplayName = "Ladder"),
+    CMOVE_OnRope UMETA(DisplayName = "Rope"),
+    CMOVE_OnWall UMETA(DisplayName = "Wall")
 };
 
 UCLASS()
@@ -64,9 +69,6 @@ class RISINGSIGNAL_API URSCharacterMovementComponent : public UCharacterMovement
 
 public:
     virtual void BeginPlay() override;
-
-    void StartSprint();
-    void StopSprint();
 
     virtual float GetMaxSpeed() const override;
 
@@ -80,8 +82,14 @@ public:
     void AttachToLadderFromTop();
     void DetachFromLadder(EDetachFromLadderMethod DetachFromLadderMethod);
     void SetLadderMovement();
+    void SetWalkingMovement();
     bool IsOnLadder() const;
+    bool IsOnWall() const;
     const ALadder* GetCurrentLadder() const { return CurrentLadder; }
+
+    void AttachToWall(const AClimbingWall* Wall);
+    const AClimbingWall* GetCurrentWall() const { return CurrentWall; }
+    void DetachFromWall();
 
     FORCEINLINE float GetRollCapsuleHalfHeight() const { return RollCapsuleHalfHeight; }
 
@@ -98,11 +106,20 @@ protected:
 
     void PhysAttachToLadder(float DeltaTime, int32 Iterations);
 
+    void PhysAttachOnTopLadder(float DeltaTime, int32 Iterations);
+
     void PhysLadder(float DeltaTime, int32 Iterations);
+
+    void PhysHanging(float DeltaTime, int32 Iterations);
+
+    void PhysOnWall(float DeltaTime, int32 Iterations);
 
     bool IsEnoughSpaceToStandUp();
 
     float GetActorToCurrentLadderProjection(FVector ActorLocation);
+
+    float GetActorToCurrentWallProjectionUpDown(FVector ActorLocation);
+    float GetActorToCurrentWallProjectionLeftRight(FVector ActorLocation);
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     FRollingMovementaParamaters CurrentRollingParameters;
@@ -137,11 +154,34 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character movement: ladder", meta=(ClampMin = 0.0f, UIMin = 0.0f));
     float JumpOffFromLadderSpeed = 500.0f;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character movement | OnWall", meta=(ClampMin = 0.0f, UIMin = 0.0f))
+    float MaxSpeedOnWall = 200.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character movement | OnWall", meta=(ClampMin = 0.0f, UIMin = 0.0f));
+    float MinWallBotomOffset = 90.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character movement | OnWall", meta=(ClampMin = 0.0f, UIMin = 0.0f));
+    float MaxWallTopOffset = 90.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character movement | OnWall");
+    float MinWallLeftOffset = -50.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character movement | OnWall");
+    float MaxWallRightOffset = -50.0f;
+
 private:
+
+    void DetectWall();
+    
     TSoftObjectPtr<ARSBaseCharacter> BaseCharacterOwner;
 
     UPROPERTY()
     const ALadder* CurrentLadder = nullptr;
+
+    UPROPERTY()
+    const AClimbingWall* CurrentWall = nullptr;
+
+    FHitResult CurrentHitWall;
 
     FMantlingMovementParameters CurrentMantlingParameters;
     FTimerHandle MantlingTimer;

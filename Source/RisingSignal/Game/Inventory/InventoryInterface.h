@@ -26,5 +26,7 @@ public:
     
     virtual void UpdateSlot(int32 Index) PURE_VIRTUAL(IInventoryInterface::UpdateSlot());
     virtual void UpdateSlot(int32 Index, const FInventoryItem& Item, int32 Count) PURE_VIRTUAL(IInventoryInterface::UpdateSlot());
+
+    virtual bool UseItem(const FInventoryItem& Item) PURE_VIRTUAL(IInventoryInterface::UseItem(), return false;);
     
 };

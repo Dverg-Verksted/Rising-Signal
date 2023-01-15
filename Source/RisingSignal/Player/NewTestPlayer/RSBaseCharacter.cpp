@@ -2,16 +2,19 @@
 
 
 #include "Player/NewTestPlayer/RSBaseCharacter.h"
+#include "RSBaseCharacterAnimInstance.h"
 #include "RSLedgeDetectorComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Curves/CurveVector.h"
 #include "Game/InteractSystem/Environment/Ladder/Ladder.h"
+#include "Game/InteractSystem/Environment/Rope/Rope.h"
 #include "Game/Inventory/RSCraftComponent.h"
 #include "Game/Inventory/RSEquipmentComponent.h"
 #include "Game/Inventory/RSInventoryComponent.h"
 #include "Game/WeaponSystem/WeaponComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Player/RSGamePlayerController.h"
 
@@ -65,6 +68,10 @@ void ARSBaseCharacter::Landed(const FHitResult& Hit)
     {
         OnLanded.Broadcast(FallHeight);
     }
+    if(FallHeight > MinHeightForRoll && FallHeight < MaxHeightForRoll)
+    {
+        Roll();
+    }
     if(IsValid(FallDamageCurve))
     {
         const float DamageAmount = FallDamageCurve->GetFloatValue(FallHeight);
@@ -81,6 +88,37 @@ void ARSBaseCharacter::NotifyJumpApex()
 void ARSBaseCharacter::Jump()
 {
     Super::Jump();
+
+    if(bIsHanging)
+    {
+        GetCapsuleComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+        RSCharacterMovementComponent->SetMovementMode(MOVE_Walking);
+        FRotator CurrentCharacterRotation = GetActorRotation();
+        SetActorRotation(FRotator(0.0f, CurrentCharacterRotation.Yaw, 0.0f));
+        bIsHanging = false;
+        URSBaseCharacterAnimInstance* AnimInstance = Cast<URSBaseCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+        AnimInstance->ToggleHanging(false);
+        ARope* CurrentRope = GetAvailableRope();
+        FVector RopePhysicLinearVelocity = CurrentRope->GetCableEndMeshComponent()->GetPhysicsLinearVelocity();
+        LaunchCharacter(FVector(RopePhysicLinearVelocity.X, RopePhysicLinearVelocity.Y, 100), false, false);
+    }
+
+    if(RSCharacterMovementComponent->IsOnLadder())
+    {
+        if(GetBaseCharacterMovementComponent()->IsOnLadder())
+        {
+            GetBaseCharacterMovementComponent()->DetachFromLadder(EDetachFromLadderMethod::JumpOff);
+        }
+    }
+
+    if(bIsClimbingOnWall)
+    {
+        RSCharacterMovementComponent->SetMovementMode(MOVE_Walking);
+        RSCharacterMovementComponent->bOrientRotationToMovement = true;
+        bIsClimbingOnWall = false;
+        URSBaseCharacterAnimInstance* AnimInstance = Cast<URSBaseCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+        AnimInstance->ToggleOnWall(false);
+    }
 }
 
 void ARSBaseCharacter::Mantle(bool bForce)
@@ -221,6 +259,37 @@ void ARSBaseCharacter::ClimbLadder(float Value)
     }
 }
 
+void ARSBaseCharacter::SwingRope(float Value)
+{
+    if(!FMath::IsNearlyZero(Value) && bIsHanging)
+    {
+        ARope* CurrentRope = GetAvailableRope();
+        FVector RightVector;
+        GetControlRightVector(RightVector);
+        RightVector *= Value;
+        HangingSpeed = Value * 600.0f;
+        CurrentRope->AddSwingForce(RightVector, false);
+    }
+}
+
+void ARSBaseCharacter::MoveWallForward(float Value)
+{
+    if(!FMath::IsNearlyZero(Value))
+    {
+        FVector WallUpVector = GetBaseCharacterMovementComponent()->GetCurrentWall()->GetActorUpVector();
+        AddMovementInput(WallUpVector, Value);
+    }
+}
+
+void ARSBaseCharacter::MoveWallRight(float Value)
+{
+    if(!FMath::IsNearlyZero(Value))
+    {
+        FVector WallRightVector = GetBaseCharacterMovementComponent()->GetCurrentWall()->GetActorRightVector();
+        AddMovementInput(-WallRightVector, Value);
+    }
+}
+
 void ARSBaseCharacter::RegisterInteractiveActor(AInteractiveActor* InteractiveActor)
 {
     AvailableInteractiveActors.AddUnique(InteractiveActor);
@@ -245,6 +314,42 @@ void ARSBaseCharacter::InteractWithLadder()
     }
 }
 
+void ARSBaseCharacter::InteractWithRope(ARope* Rope)
+{
+    if(!bIsHanging)
+    {
+        RSCharacterMovementComponent->StopMovementImmediately();
+        FRotator RopeRotation = Rope->GetCableEndMeshComponent()->GetComponentRotation();
+        SetActorRotation(FRotator(RopeRotation.Pitch, GetActorRotation().Yaw, GetActorRotation().Roll));
+        GetCapsuleComponent()->AttachToComponent(Rope->GetCableEndMeshComponent(), FAttachmentTransformRules::KeepWorldTransform);
+        URSBaseCharacterAnimInstance* AnimInstance = Cast<URSBaseCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+        AnimInstance->ToggleHanging(true);
+        bIsHanging = true;
+        RSCharacterMovementComponent->SetMovementMode(MOVE_Custom, StaticCast<uint8>(ECustomMovementMode::CMOVE_OnRope));
+    }
+}
+
+void ARSBaseCharacter::InteractWithWall()
+{
+    if(!bIsClimbingOnWall)
+    {
+        const AClimbingWall* AvailableWall = GetAvailableWall();
+        if(IsValid(AvailableWall))
+        {
+            bIsClimbingOnWall = true;
+            URSBaseCharacterAnimInstance* AnimInstance = Cast<URSBaseCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+            AnimInstance->ToggleOnWall(true);
+            RSCharacterMovementComponent->AttachToWall(AvailableWall);
+        }
+    }
+}
+
+void ARSBaseCharacter::DetachFromWall()
+{
+    bIsClimbingOnWall = false;
+    URSBaseCharacterAnimInstance* AnimInstance = Cast<URSBaseCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+    AnimInstance->ToggleOnWall(false);
+}
 
 void ARSBaseCharacter::UpdateCameraRotation()
 {
@@ -278,6 +383,10 @@ void ARSBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
     PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ThisClass::InputMoveRight);
 
     PlayerInputComponent->BindAxis(TEXT("ClimbLadder"), this, &ThisClass::InputLadder);
+    PlayerInputComponent->BindAxis(TEXT("SwingLadder"), this, &ThisClass::InputRope);
+
+    PlayerInputComponent->BindAxis(TEXT("MoveWallForward"), this, &ThisClass::InputWallForward);
+    PlayerInputComponent->BindAxis(TEXT("MoveWallRight"), this, &ThisClass::InputWallRight);
 
     PlayerInputComponent->BindAction(TEXT("Sprint"), IE_Pressed, this, &ThisClass::InputSprintPressed);
     PlayerInputComponent->BindAction(TEXT("Sprint"), IE_Released, this, &ThisClass::InputSprintReleased);
@@ -340,6 +449,23 @@ void ARSBaseCharacter::InputMoveRight(float Value)
 void ARSBaseCharacter::InputLadder(float Value)
 {
     ClimbLadder(Value);
+}
+
+void ARSBaseCharacter::InputRope(float Value)
+{
+    SwingRope(Value);
+}
+
+void ARSBaseCharacter::InputWallForward(float Value)
+{
+    if(bIsClimbingOnWall)
+    MoveWallForward(Value);
+}
+
+void ARSBaseCharacter::InputWallRight(float Value)
+{
+    if(bIsClimbingOnWall)
+    MoveWallRight(Value);
 }
 
 void ARSBaseCharacter::InputSprintPressed()
@@ -460,6 +586,11 @@ const FMantlingSettings& ARSBaseCharacter::GetMantlingSettings(float LedgeHeight
 	    return LedgeHeight > LowMantleMaxHeight ? HighMantlingSettings : LowMantlingSettings;
 }
 
+void ARSBaseCharacter::GetControlRightVector(FVector& Right)
+{
+    Right = UKismetMathLibrary::GetRightVector(FRotator(0.0f, GetControlRotation().Yaw, 0.0f));
+}
+
 const ALadder* ARSBaseCharacter::GetAvailableLadder() const
 {
     const ALadder* Result = nullptr;
@@ -468,6 +599,34 @@ const ALadder* ARSBaseCharacter::GetAvailableLadder() const
         if(InteractiveActor->IsA<ALadder>())
         {
             Result = StaticCast<const ALadder*>(InteractiveActor);
+            break;
+        }
+    }
+    return Result;
+}
+
+ARope* ARSBaseCharacter::GetAvailableRope() const
+{
+    ARope* Result = nullptr;
+    for(AInteractiveActor* InteractiveActor : AvailableInteractiveActors)
+    {
+        if(InteractiveActor->IsA<ARope>())
+        {
+            Result = StaticCast<ARope*>(InteractiveActor);
+            break;
+        }
+    }
+    return Result;
+}
+
+AClimbingWall* ARSBaseCharacter::GetAvailableWall() const
+{
+    AClimbingWall* Result = nullptr;
+    for(AInteractiveActor* InteractiveActor : AvailableInteractiveActors)
+    {
+        if(InteractiveActor->IsA<AClimbingWall>())
+        {
+            Result = StaticCast<AClimbingWall*>(InteractiveActor);
             break;
         }
     }
@@ -485,6 +644,14 @@ bool ARSBaseCharacter::CanMove()
         return false;
     }
     if(RSCharacterMovementComponent->IsOnLadder())
+    {
+        return false;
+    }
+    if(bIsHanging)
+    {
+        return false;
+    }
+    if(bIsClimbingOnWall)
     {
         return false;
     }
@@ -536,7 +703,7 @@ float ARSBaseCharacter::GetIKFootOffset(const FName& SocketName)
     FVector LineEndPostion = LineStartPosition - (CapsuleRadius + IKTraceDistance) * FVector::UpVector;
 
     FHitResult HitResult;
-    ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(ECC_Visibility);
+    ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1);
 
     FVector BoxFoot(2.0f, 15.0f, 7.0f);
     if(UKismetSystemLibrary::BoxTraceSingle(GetWorld(), LineStartPosition, LineEndPostion, BoxFoot, GetMesh()->GetSocketRotation(SocketName), TraceType, true, TArray<AActor*>(), EDrawDebugTrace::None, HitResult, true))
