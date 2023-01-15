@@ -370,6 +370,7 @@ private:
     float CapsuleRadius = 0.0f;
     float MinimumOffset = 3.0f;
 
+    FTimerHandle HangTimer;
     bool bIsMantling;
     bool bIsRolling;
     bool bIsSprinting;

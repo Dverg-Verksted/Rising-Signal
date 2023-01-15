@@ -99,8 +99,13 @@ void ARSBaseCharacter::Jump()
         URSBaseCharacterAnimInstance* AnimInstance = Cast<URSBaseCharacterAnimInstance>(GetMesh()->GetAnimInstance());
         AnimInstance->ToggleHanging(false);
         ARope* CurrentRope = GetAvailableRope();
+        GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        GetWorld()->GetTimerManager().SetTimer(HangTimer, [=]()
+        {
+            GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+        }, 0.5f, false);
         FVector RopePhysicLinearVelocity = CurrentRope->GetCableEndMeshComponent()->GetPhysicsLinearVelocity();
-        LaunchCharacter(FVector(RopePhysicLinearVelocity.X, RopePhysicLinearVelocity.Y, 100), false, false);
+        LaunchCharacter(FVector(RopePhysicLinearVelocity.X, RopePhysicLinearVelocity.Y * 2.0f, 400), false, false);
     }
 
     if(RSCharacterMovementComponent->IsOnLadder())

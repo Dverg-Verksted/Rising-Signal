@@ -44,7 +44,7 @@ void ALadder::OnConstruction(const FTransform& Transform)
         float MeshHeight = LeftRailMesh->GetBoundingBox().GetSize().Z;
         if(!FMath::IsNearlyZero(MeshHeight))
         {
-            LeftRailMeshComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, LadderHeight / MeshHeight + 0.7f));
+            LeftRailMeshComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, LadderHeight / MeshHeight));
         }
     }
 
@@ -54,7 +54,7 @@ void ALadder::OnConstruction(const FTransform& Transform)
         float MeshHeight = RightRailMesh->GetBoundingBox().GetSize().Z;
         if(!FMath::IsNearlyZero(MeshHeight))
         {
-            RightRailMeshComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, LadderHeight / MeshHeight + 0.7f));
+            RightRailMeshComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, LadderHeight / MeshHeight));
         }
     }
 
