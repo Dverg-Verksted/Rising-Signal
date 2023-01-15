@@ -409,7 +409,7 @@ void URSCharacterMovementComponent::PhysOnWall(float DeltaTime, int32 Iterations
     CalcVelocity(DeltaTime, 1.0f, false, ClimbingOnLadderBrakingDecelaration);
     DetectWall();
 
-    if(CurrentHitWall.Actor.IsValid())
+    if(CurrentWall)
     {
         FVector Delta = Velocity * DeltaTime;
         FVector NewPos = GetActorLocation() + Delta;
@@ -425,7 +425,7 @@ void URSCharacterMovementComponent::PhysOnWall(float DeltaTime, int32 Iterations
             return;
         }
         FVector CurrentWallForwardVector = -CurrentHitWall.Actor->GetActorForwardVector();
-        FRotator NextRotation = UKismetMathLibrary::RInterpTo(CharacterOwner->GetActorRotation(), CurrentWallForwardVector.ToOrientationRotator(), DeltaTime, 2.0f);
+        FRotator NextRotation = UKismetMathLibrary::RInterpTo(CharacterOwner->GetActorRotation(), CurrentWallForwardVector.ToOrientationRotator(), DeltaTime, CurrentWall->GetInterpSpeed());
         CharacterOwner->SetActorRotation(NextRotation, ETeleportType::TeleportPhysics);
         FHitResult Hit;
         SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), true, Hit);

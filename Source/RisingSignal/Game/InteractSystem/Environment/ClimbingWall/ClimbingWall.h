@@ -25,15 +25,21 @@ public:
 
     float GetWallWidth() const { return WallWidth; }
 
+    float GetInterpSpeed() const { return InterpSpeed; }
+
 protected:
 
     virtual void BeginPlay() override;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Wall | Parameters")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Wall | Parameters", DisplayName="Высота стены")
     float WallLength = 100.0f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Wall | Parameters")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Wall | Parameters", DisplayName="Ширина стены")
     float WallWidth = 100.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Wall | Parameters", DisplayName="Скорость интерполяции",
+    meta=(ToolTip="Скорость с которой будет интерполироваться поворот персонажа, при переходе на эту стенку"))
+    float InterpSpeed = 2.0f;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Components")
     UStaticMeshComponent* Wall;
