@@ -301,9 +301,6 @@ void AInteractItemActor::InitDataInteract(const FDataTableRowHandle NewInteractD
 
 void AInteractItemActor::MoveItemDown()
 {
-
-    LOG_RS(ELogRSVerb::Warning, GetName() + " " + FString::SanitizeFloat(GetItemZBound()));
-
     FHitResult Hit;
     GetWorld()->LineTraceSingleByChannel(Hit, GetActorLocation(), FVector::DownVector * 2000, ECC_WorldStatic);
 
@@ -361,7 +358,7 @@ void AInteractItemActor::SpawnItem(AActor* Spawner, FInventoryItem InventoryItem
     {
         float CharHeight = RSChar->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
         ItemSpawnLocation.Z -= CharHeight;
-        LOG_RS(ELogRSVerb::Warning, "IF STATEMENT");
+
     }
 
     FTransform ItemSpawnTransform{ItemSpawnLocation};

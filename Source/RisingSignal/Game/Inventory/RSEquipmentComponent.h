@@ -28,6 +28,7 @@ public:
     virtual void UpdateSlot(int32 Index) override;
     virtual bool SwapItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot) override;
     virtual void CombineItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot) override;
+    virtual bool UseItem(const FInventoryItem& Item) override;
 
     void TakeInHands(int32 Index);
 

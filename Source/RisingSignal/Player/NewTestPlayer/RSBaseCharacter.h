@@ -12,6 +12,7 @@
 #include "RSBaseCharacter.generated.h"
 
 class ALadder;
+class ARope;
 class ARSGamePlayerController;
 class UCameraComponent;
 class UWeaponComponent;
@@ -83,8 +84,7 @@ public:
     virtual void Falling() override;
     virtual void Landed(const FHitResult& Hit) override;
     virtual void NotifyJumpApex() override;
-
-
+    
     virtual void Jump() override;
 
     FORCEINLINE URSCharacterMovementComponent* GetBaseCharacterMovementComponent() const { return RSCharacterMovementComponent; }
@@ -96,6 +96,18 @@ public:
 
     UFUNCTION(BlueprintPure)
     FORCEINLINE USkeletalMeshComponent* GetExtraMesh() const { return ExtraSkeletalMesh; }
+
+    UFUNCTION(BlueprintCallable)
+    FORCEINLINE bool IsHanging() const { return bIsHanging; }
+
+    UFUNCTION(BlueprintCallable)
+    FORCEINLINE bool IsClimbingOnWall() const { return bIsClimbingOnWall; }
+
+    UFUNCTION(BlueprintCallable)
+    void SetIsHanging(bool NewValue) { bIsHanging = NewValue; }
+
+    UFUNCTION(BlueprintCallable)
+    void SetIsClimbingOnWall(bool NewValue) { bIsClimbingOnWall = NewValue; }
 
     void Mantle(bool bForce = false);
     void Roll();
@@ -112,17 +124,30 @@ public:
     void OnStopRoll(float HalfHeightAdjust);
 
     void ClimbLadder(float Value);
+    void SwingRope(float Value);
+    
+    void MoveWallForward(float Value);
+    
+    void MoveWallRight(float Value);
 
     void RegisterInteractiveActor(AInteractiveActor* InteractiveActor);
     void UnRegisterInteractiveActor(AInteractiveActor* InteractiveActor);
 
     void InteractWithLadder();
+    void InteractWithRope(ARope* Rope);
+    void InteractWithWall();
+
+    void DetachFromWall();
 
     UPROPERTY()
     float CurrentHeight = 0.0f;
 
     void UpdateCameraRotation();
 
+    const ALadder* GetAvailableLadder() const;
+    ARope* GetAvailableRope() const;
+    AClimbingWall* GetAvailableWall() const;
+    
     UFUNCTION(BlueprintCallable, BlueprintPure)
     FORCEINLINE float GetIKLeftFootOffset() const {return IKLeftFootOffset;}
 
@@ -132,11 +157,21 @@ public:
     UFUNCTION(BlueprintCallable, BlueprintPure)
     FORCEINLINE float GetIKPelvisOffset() const {return IKPelvisOffset;}
 
+    FORCEINLINE float GetHangingSpeed() const { return HangingSpeed; }
+
 protected:
     virtual void BeginPlay() override;
 
     UPROPERTY()
     TArray<AInteractiveActor*> AvailableInteractiveActors;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= "Landed settings", DisplayName="Минимальная высота для кувырка",
+    meta=(ToolTip="Выше этой высоты персонаж будет делать кувырок при приземлении. Должна быть меньше максимальной высоты для кувырка", ClampMin = 0.0f, UIMin = 0.0f))
+    float MinHeightForRoll = 1.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= "Landed settings", DisplayName="Максимальная высота для кувырка",
+    meta=(ToolTip="Выше этой высоты персонаж не сможет сделать кувырок при приземлении. Должна быть не меньше минимальной высоты для кувырка", ClampMin = 0.0f, UIMin = 0.0f))
+    float MaxHeightForRoll = 3.0f;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Falls")
     UCurveFloat* FallDamageCurve;
@@ -219,6 +254,12 @@ private:
     void InputMoveRight(float Value);
 
     void InputLadder(float Value);
+
+    void InputRope(float Value);
+
+    void InputWallForward(float Value);
+
+    void InputWallRight(float Value);
 
     void InputSprintPressed();
 
@@ -308,8 +349,8 @@ private:
 private:
     const FMantlingSettings& GetMantlingSettings(float LedgeHeight) const;
 
-    const ALadder* GetAvailableLadder() const;
-
+    void GetControlRightVector(FVector& Right);
+    
     bool CanMove();
     bool CanMantle();
     bool CanRoll();
@@ -317,6 +358,8 @@ private:
     float GetIKFootOffset(const FName& SocketName);
     float GetPelvisOffset();
     void CalculateOffsets(float DeltaSeconds);
+
+    float HangingSpeed = 0.0f;
 
     float IKLeftFootOffset = 0.0f;
     float IKRightFootOffset = 0.0f;
@@ -329,4 +372,6 @@ private:
     bool bIsMantling;
     bool bIsRolling;
     bool bIsSprinting;
+    bool bIsHanging;
+    bool bIsClimbingOnWall;
 };

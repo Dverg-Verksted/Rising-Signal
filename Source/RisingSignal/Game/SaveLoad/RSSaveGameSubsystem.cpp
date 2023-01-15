@@ -19,6 +19,7 @@
 void URSSaveGameSubsystem::HandleStartingNewPlayer(AController* NewPlayer)
 {
     ARSPlayerState* PS = NewPlayer->GetPlayerState<ARSPlayerState>();
+
     if (ensure(PS))
     {
         PS->LoadPlayerState(CurrentSaveGame);
@@ -66,8 +67,7 @@ void URSSaveGameSubsystem::SetSlotName(FString NewSlotName)
 
 void URSSaveGameSubsystem::WriteSaveGame()
 {
-
-    UE_LOG(LogTemp, Warning, TEXT("%s::%s() called"), *GetName(), *FString(__FUNCTION__));
+    OnSaveGameStartSaving.Broadcast(CurrentSaveGame);
 
     if (!CurrentSaveGame)
     {
@@ -130,8 +130,7 @@ void URSSaveGameSubsystem::WriteSaveGame()
     OnSaveGameWritten.Broadcast(CurrentSaveGame);
 }
 
-
-void URSSaveGameSubsystem::LoadSaveGame(FString InSlotName)
+bool URSSaveGameSubsystem::LoadSaveGame(FString InSlotName)
 {
     // Update slot name first if specified, otherwise keeps default name
     SetSlotName(InSlotName);
@@ -142,10 +141,8 @@ void URSSaveGameSubsystem::LoadSaveGame(FString InSlotName)
         if (CurrentSaveGame == nullptr)
         {
             UE_LOG(LogTemp, Warning, TEXT("Failed to load SaveGame Data."));
-            return;
+            return false;
         }
-
-        LOG_RS(ELogRSVerb::Warning, "SaveGame loaded");
 
         // Iterate the entire world of actors
         for (FActorIterator It(GetWorld()); It; ++It)
@@ -158,7 +155,6 @@ void URSSaveGameSubsystem::LoadSaveGame(FString InSlotName)
             }
 
             bool bFound = false;
-            LOG_RS(ELogRSVerb::Warning, "Loading actor: " + Actor->GetFName().ToString());
 
             for (FActorSaveData ActorData : CurrentSaveGame->SavedActors)
             {
@@ -188,16 +184,14 @@ void URSSaveGameSubsystem::LoadSaveGame(FString InSlotName)
             }
         }
 
-        OnSaveGameLoaded.Broadcast(CurrentSaveGame);
+        return true;
     }
-    else
-    {
-        CurrentSaveGame = Cast<URSSaveGame>(UGameplayStatics::CreateSaveGameObject(URSSaveGame::StaticClass()));
 
-        UE_LOG(LogTemp, Log, TEXT("Created New SaveGame Data."));
-    }
+    CurrentSaveGame = Cast<URSSaveGame>(UGameplayStatics::CreateSaveGameObject(URSSaveGame::StaticClass()));
+
+    UE_LOG(LogTemp, Log, TEXT("Created New SaveGame Data."));
+    return false;
 }
-
 
 void URSSaveGameSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -208,7 +202,7 @@ void URSSaveGameSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     CurrentSlotName = SGSettings->SaveSlotName;
 
     // Make sure it's loaded into memory .Get() only resolves if already loaded previously elsewhere in code
-    UDataTable* DummyTable = SGSettings->DummyTablePath.LoadSynchronous();
+    // UDataTable* DummyTable = SGSettings->DummyTablePath.LoadSynchronous();
     //DummyTable->GetAllRows() // We don't need this table for anything, just an content reference example
 }
 

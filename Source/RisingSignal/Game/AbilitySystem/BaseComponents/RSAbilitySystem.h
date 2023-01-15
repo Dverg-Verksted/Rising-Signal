@@ -143,7 +143,7 @@ public:
     UPROPERTY()
     ACharacter* OwnerRef;
 
-    UPROPERTY()
+    UPROPERTY(VisibleDefaultsOnly)
     USphereComponent* SphereCollision;
 
 protected:

@@ -27,15 +27,32 @@ void URSBaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
     Speed = FMath::Lerp(Speed, CharacterMovementComponent->Velocity.Size(), LerpAlpha);
     Direction = CalculateDirection(CharacterMovementComponent->Velocity, CachedBaseCharacter->GetActorRotation());
+    if(bIsClimbing)
+    {
+        VelocityOnWall = FVector(CharacterMovementComponent->Velocity.Z, CharacterMovementComponent->Velocity.Y, 0.0f);
+        OnWallSpeed = FMath::Lerp(OnWallSpeed, VelocityOnWall.Size(), LerpAlpha);
+        OnWallDirection = -CalculateDirection(VelocityOnWall, CachedBaseCharacter->GetActorRotation());
+    }
     LadderDirection = CharacterMovementComponent->Velocity.Z;
     bIsFalling = CharacterMovementComponent->IsFalling();
     bIsSprinting = CachedBaseCharacter->GetIsSprinting();
     bIsCrouching = CharacterMovementComponent->IsCrouching();
     bIsOnLadder = CharacterMovementComponent->IsOnLadder();
+    HangingSpeed = FMath::Lerp(HangingSpeed, CachedBaseCharacter->GetHangingSpeed(), LerpAlpha);
 
     LeftFootEffectorLocation = FVector(-(CachedBaseCharacter->GetIKLeftFootOffset() + CachedBaseCharacter->GetIKPelvisOffset()), 0.0f, 0.0f);
     RightFootEffectorLocation = FVector((CachedBaseCharacter->GetIKRightFootOffset() + CachedBaseCharacter->GetIKPelvisOffset()), 0.0f , 0.0f);
     PelvisOffset = FVector(0.0f, 0.0f, CachedBaseCharacter->GetIKPelvisOffset());
+}
+
+void URSBaseCharacterAnimInstance::ToggleHanging(bool NewValue)
+{
+    bIsHanging = NewValue;
+}
+
+void URSBaseCharacterAnimInstance::ToggleOnWall(bool NewValue)
+{
+    bIsClimbing = NewValue;
 }
 
 void URSBaseCharacterAnimInstance::SetFallHeight(float NewValue)
