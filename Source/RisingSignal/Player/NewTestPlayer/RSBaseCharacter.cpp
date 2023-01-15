@@ -346,9 +346,12 @@ void ARSBaseCharacter::InteractWithWall()
 
 void ARSBaseCharacter::DetachFromWall()
 {
+    RSCharacterMovementComponent->bOrientRotationToMovement = true;
     bIsClimbingOnWall = false;
     URSBaseCharacterAnimInstance* AnimInstance = Cast<URSBaseCharacterAnimInstance>(GetMesh()->GetAnimInstance());
     AnimInstance->ToggleOnWall(false);
+    FRotator CurrentCharacterRotation = GetActorRotation();
+    SetActorRotation(FRotator(0.0f, CurrentCharacterRotation.Yaw, 0.0f));
 }
 
 void ARSBaseCharacter::UpdateCameraRotation()

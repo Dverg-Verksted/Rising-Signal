@@ -2,6 +2,8 @@
 
 
 #include "Player/RSCharacterMovementComponent.h"
+
+#include "DrawDebugHelpers.h"
 #include "Components/CapsuleComponent.h"
 #include "Curves/CurveVector.h"
 #include "NewTestPlayer/RSBaseCharacter.h"
@@ -203,7 +205,6 @@ void URSCharacterMovementComponent::AttachToWall(const AClimbingWall* Wall)
 
 void URSCharacterMovementComponent::DetachFromWall()
 {
-    bOrientRotationToMovement = true;
     SetMovementMode(MOVE_Walking);
     BaseCharacterOwner->DetachFromWall();
 }
@@ -409,7 +410,7 @@ void URSCharacterMovementComponent::PhysOnWall(float DeltaTime, int32 Iterations
     CalcVelocity(DeltaTime, 1.0f, false, ClimbingOnLadderBrakingDecelaration);
     DetectWall();
 
-    if(CurrentWall)
+    if(IsValid(CurrentWall))
     {
         FVector Delta = Velocity * DeltaTime;
         FVector NewPos = GetActorLocation() + Delta;
@@ -421,10 +422,19 @@ void URSCharacterMovementComponent::PhysOnWall(float DeltaTime, int32 Iterations
         }
         if(NewPosProjectionUpDown > (CurrentWall->GetWallLength() - MaxWallTopOffset))
         {
-            Velocity = FVector::ZeroVector;
-            return;
+            FLedgeDescription LedgeDescription;
+            if(BaseCharacterOwner->GetLedgeDetectorComponent()->LedgeDetect(LedgeDescription))
+            {
+                BaseCharacterOwner->Mantle(true);
+                BaseCharacterOwner->DetachFromWall();
+            }
+            else
+            {
+                Velocity = FVector::ZeroVector;
+                return;
+            }
         }
-        FVector CurrentWallForwardVector = -CurrentHitWall.Actor->GetActorForwardVector();
+        FVector CurrentWallForwardVector = -CurrentHitWall.ImpactNormal;
         FRotator NextRotation = UKismetMathLibrary::RInterpTo(CharacterOwner->GetActorRotation(), CurrentWallForwardVector.ToOrientationRotator(), DeltaTime, CurrentWall->GetInterpSpeed());
         CharacterOwner->SetActorRotation(NextRotation, ETeleportType::TeleportPhysics);
         FHitResult Hit;
@@ -483,10 +493,17 @@ void URSCharacterMovementComponent::DetectWall()
     FHitResult TraceHit;
     FCollisionQueryParams QueryParams;
     QueryParams.AddIgnoredActor(CharacterOwner);
-    if(GetWorld()->LineTraceSingleByChannel(TraceHit, StartPosition, EndPosition, ECC_GameTraceChannel1, QueryParams, FCollisionResponseParams::DefaultResponseParam))
+    if(GetWorld()->LineTraceSingleByChannel(TraceHit, StartPosition, EndPosition, ECC_GameTraceChannel3, QueryParams, FCollisionResponseParams::DefaultResponseParam))
     {
-        CurrentHitWall = TraceHit;
-        CurrentWall = Cast<AClimbingWall>(CurrentHitWall.Actor);
+        CurrentWall = Cast<AClimbingWall>(TraceHit.Actor);
+        if(GetWorld()->LineTraceSingleByChannel(TraceHit, StartPosition, EndPosition, ECC_GameTraceChannel4, QueryParams, FCollisionResponseParams::DefaultResponseParam))
+        {
+            CurrentHitWall = TraceHit;
+        }
+        else
+        {
+            DetachFromWall();
+        }
     }
     else
     {

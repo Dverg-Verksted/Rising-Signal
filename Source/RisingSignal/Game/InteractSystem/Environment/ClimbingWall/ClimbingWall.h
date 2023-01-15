@@ -21,11 +21,11 @@ public:
 
     virtual void OnConstruction(const FTransform& Transform) override;
 
-    float GetWallLength() const { return WallLength; }
+    FORCEINLINE float GetWallLength() const { return WallLength; }
 
-    float GetWallWidth() const { return WallWidth; }
+    FORCEINLINE float GetWallWidth() const { return WallWidth; }
 
-    float GetInterpSpeed() const { return InterpSpeed; }
+    FORCEINLINE float GetInterpSpeed() const { return InterpSpeed; }
 
 protected:
 
