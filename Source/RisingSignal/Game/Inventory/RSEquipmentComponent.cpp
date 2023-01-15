@@ -72,20 +72,48 @@ void URSEquipmentComponent::CombineItem(const FInventoryItem& FirstInventorySlot
     RemoveItem(EquipmentSlots[FirstIndexSlot]);
 }
 
+bool URSEquipmentComponent::UseItem(const FInventoryItem& Item)
+{
+    URSAbilitySystem* AbilitySystem = GetOwner()->FindComponentByClass<URSAbilitySystem>();
+    if (Item.bCanUse && Item.InteractRowName != NAME_None)
+    {
+        for (auto& Effect : Item.ItemEffect)
+        {
+            if (Effect.EffectDuration == 0.0f)
+            {
+                AbilitySystem->ChangeCurrentStateValue(Effect.StateType, Effect.EffectValue);
+            }
+            else
+            {
+                AbilitySystem->AddEffect(Effect.EffectDuration,Effect.StateType,Effect.EffectValue);
+            }
+        }
+
+        RemoveItem(Item);
+        return true;
+    }
+
+    return false;
+}
+
 void URSEquipmentComponent::TakeInHands(int32 Index)
 {
     CurrentItemInHand = Index;
 
-    if(EquipmentSlots[CurrentItemInHand].bIsWeapon)
-    {
-        ARSBaseCharacter* PlayerCharacter = Cast<ARSBaseCharacter>(GetOwner());
-        PlayerCharacter->GetWeaponComponent()->EquipWeapon(EquipmentSlots[CurrentItemInHand].WeaponSettings.WeaponClassPtr);
-    }
 
     if (EquipmentSlots.Contains(CurrentItemInHand))
     {
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red,
             FString::Printf(TEXT("Current item in hands is %s"), *EquipmentSlots[CurrentItemInHand].Name.ToString()));
+        if(EquipmentSlots[CurrentItemInHand].bIsWeapon)
+        {
+            ARSBaseCharacter* PlayerCharacter = Cast<ARSBaseCharacter>(GetOwner());
+            PlayerCharacter->GetWeaponComponent()->EquipWeapon(EquipmentSlots[CurrentItemInHand].WeaponSettings.WeaponClassPtr);
+        }
+        if(EquipmentSlots[CurrentItemInHand].bCanUse)
+        {
+            UseItem(EquipmentSlots[CurrentItemInHand]);
+        }
     }
     else
     {

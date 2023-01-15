@@ -41,7 +41,7 @@ public:
     bool MoveItem(const FInventoryItem& FirstInventorySlot, const FInventoryItem& SecondInventorySlot);
 
     UFUNCTION(BlueprintCallable, Category = "Инвентарь")
-    bool UseItem(const FInventoryItem& InventorySlot);
+    virtual bool UseItem(const FInventoryItem& Item) override;
 
     UFUNCTION(BlueprintCallable, Category = "Инвентарь")
     TArray<FInventoryItem> GetItems();

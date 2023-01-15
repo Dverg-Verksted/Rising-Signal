@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Curves/CurveVector.h"
 #include "NewTestPlayer/RSBaseCharacter.h"
+#include "Game/InteractSystem/Environment/Rope/Rope.h"
 
 void URSCharacterMovementComponent::BeginPlay()
 {
@@ -26,6 +27,10 @@ float URSCharacterMovementComponent::GetMaxSpeed() const
     if(IsOnLadder())
     {
         Result = ClimbingOnLadderSpeed;
+    }
+    if(IsOnWall())
+    {
+        Result = MaxSpeedOnWall;
     }
 
     return Result;
@@ -127,7 +132,7 @@ void URSCharacterMovementComponent::AttachToLadderFromTop()
     float MontageDuration = BaseCharacter->PlayAnimMontage(CurrentLadder->GetAttachFromTopAnimMontage());
     bIsAttachingToLadder = true;
     SetMovementMode(MOVE_Custom, StaticCast<uint8>(ECustomMovementMode::CMOVE_AttachingOnLadder));
-    GetWorld()->GetTimerManager().SetTimer(LadderTimer, this, &URSCharacterMovementComponent::SetLadderMovement, MontageDuration, false);
+    GetWorld()->GetTimerManager().SetTimer(LadderTimer, this, &URSCharacterMovementComponent::SetLadderMovement, MontageDuration - 1.0f, false);
 }
 
 void URSCharacterMovementComponent::DetachFromLadder(EDetachFromLadderMethod DetachFromLadderMethod)
@@ -145,7 +150,10 @@ void URSCharacterMovementComponent::DetachFromLadder(EDetachFromLadderMethod Det
         }
         case EDetachFromLadderMethod::ReachingTheTop:
         {
-            BaseCharacterOwner->Mantle(true);
+            bIsAttachingToLadder = true;
+            float MontageDuration = BaseCharacterOwner->PlayAnimMontage(CurrentLadder->GetAttachOnTopAnimMontage());
+            GetWorld()->GetTimerManager().SetTimer(LadderTimer, this, &URSCharacterMovementComponent::SetWalkingMovement, MontageDuration, false);
+            SetMovementMode(MOVE_Custom, StaticCast<uint8>(ECustomMovementMode::CMOVE_AttachingOnTopLadder));
             break;
         }
         case EDetachFromLadderMethod::ReachingTheBottom:
@@ -168,9 +176,35 @@ void URSCharacterMovementComponent::SetLadderMovement()
     bIsAttachingToLadder = false;
 }
 
+void URSCharacterMovementComponent::SetWalkingMovement()
+{
+    SetMovementMode(MOVE_Walking);
+    bIsAttachingToLadder = false;
+}
+
 bool URSCharacterMovementComponent::IsOnLadder() const
 {
     return UpdatedComponent && MovementMode == MOVE_Custom && CustomMovementMode == StaticCast<uint8>(ECustomMovementMode::CMOVE_OnLadder);
+}
+
+bool URSCharacterMovementComponent::IsOnWall() const
+{
+    return UpdatedComponent && MovementMode == MOVE_Custom && CustomMovementMode == StaticCast<uint8>(ECustomMovementMode::CMOVE_OnWall);
+}
+
+void URSCharacterMovementComponent::AttachToWall(const AClimbingWall* Wall)
+{
+    CurrentWall = Wall;
+    bOrientRotationToMovement = false;
+    StopMovementImmediately();
+    SetMovementMode(MOVE_Custom, StaticCast<uint8>(ECustomMovementMode::CMOVE_OnWall));
+}
+
+void URSCharacterMovementComponent::DetachFromWall()
+{
+    bOrientRotationToMovement = true;
+    SetMovementMode(MOVE_Walking);
+    BaseCharacterOwner->DetachFromWall();
 }
 
 void URSCharacterMovementComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)
@@ -221,6 +255,20 @@ void URSCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations
         {
             PhysAttachToLadder(deltaTime, Iterations);
             break;
+        }
+        case ECustomMovementMode::CMOVE_AttachingOnTopLadder:
+        {
+            PhysAttachOnTopLadder(deltaTime, Iterations);
+            break;
+        }
+        case ECustomMovementMode::CMOVE_OnRope:
+        {
+            PhysHanging(deltaTime, Iterations);
+            break;
+        }
+        case ECustomMovementMode::CMOVE_OnWall:
+        {
+            PhysOnWall(deltaTime, Iterations);
         }
         default:
         {
@@ -290,7 +338,7 @@ void URSCharacterMovementComponent::PhysRolling(float DeltaTime, int32 Iteration
 void URSCharacterMovementComponent::PhysAttachToLadder(float DeltaTime, int32 Iterations)
 {
     const float ElapsedTime = GetWorld()->GetTimerManager().GetTimerElapsed(LadderTimer);
-    const FVector NewLocation = FMath::Lerp(GetOwner()->GetActorLocation(), CurrentLadder->GetAttachFromTopEndPosition(), CurrentLadder->GetAttachCurve()->GetFloatValue(ElapsedTime));
+    const FVector NewLocation = FMath::Lerp(GetOwner()->GetActorLocation(), CurrentLadder->GetAttachFromTopEndPosition(), CurrentLadder->GetAttachFromTopCurve()->GetFloatValue(ElapsedTime));
     const FVector Delta = NewLocation - GetActorLocation();
 
     Velocity = Delta / DeltaTime;
@@ -298,6 +346,19 @@ void URSCharacterMovementComponent::PhysAttachToLadder(float DeltaTime, int32 It
     FHitResult HitResult;
     SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), false, HitResult);
 }
+
+void URSCharacterMovementComponent::PhysAttachOnTopLadder(float DeltaTime, int32 Iterations)
+{
+    const float ElapsedTime = GetWorld()->GetTimerManager().GetTimerElapsed(LadderTimer);
+    const FVector NewLocation = FMath::Lerp(GetOwner()->GetActorLocation(), CurrentLadder->GetTopPosition(), CurrentLadder->GetAttachOnTopCurve()->GetFloatValue(ElapsedTime));
+    const FVector Delta = NewLocation - GetActorLocation();
+
+    Velocity = Delta / DeltaTime;
+
+    FHitResult HitResult;
+    SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), false, HitResult);
+}
+
 
 void URSCharacterMovementComponent::PhysLadder(float DeltaTime, int32 Iterations)
 {
@@ -329,6 +390,54 @@ void URSCharacterMovementComponent::PhysLadder(float DeltaTime, int32 Iterations
     SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), true, Hit);
 }
 
+void URSCharacterMovementComponent::PhysHanging(float DeltaTime, int32 Iterations)
+{
+    const ARope* CurrentRope = BaseCharacterOwner->GetAvailableRope();
+
+    const FVector NewLocation = FMath::Lerp(GetOwner()->GetActorLocation(), CurrentRope->GetCableEndMeshComponent()->GetComponentLocation(), 0.2f);
+    const FVector Delta = NewLocation - GetActorLocation();
+
+    Velocity = Delta / DeltaTime;
+
+    FHitResult HitResult;
+    SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), false, HitResult);
+}
+
+void URSCharacterMovementComponent::PhysOnWall(float DeltaTime, int32 Iterations)
+{
+    CalcVelocity(DeltaTime, 1.0f, false, ClimbingOnLadderBrakingDecelaration);
+    DetectWall();
+
+    if(CurrentHitWall.Actor.IsValid())
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::Printf(TEXT("Speed")));
+        FVector Delta = Velocity * DeltaTime;
+        FVector NewPos = GetActorLocation() + Delta;
+        float NewPosProjectionUpDown = GetActorToCurrentWallProjectionUpDown(NewPos);
+        if(NewPosProjectionUpDown < MinWallBotomOffset)
+        {
+            return;
+        }
+        if(NewPosProjectionUpDown > (CurrentWall->GetWallLength() - MaxWallTopOffset))
+        {
+            return;
+        }
+        /*float NewPosProjectionLeftRight = GetActorToCurrentWallProjectionLeftRight(NewPos);
+        if(NewPosProjectionLeftRight > MinWallLeftOffset)
+        {
+            return;
+        }
+        if(NewPosProjectionLeftRight < (-CurrentWall->GetWallWidth() + MaxWallRightOffset))
+        {
+            return;
+        }*/
+        FVector CurrentWallForwardVector = -CurrentHitWall.Actor->GetActorForwardVector();
+        CharacterOwner->SetActorRotation(CurrentWallForwardVector.ToOrientationRotator(), ETeleportType::TeleportPhysics);
+        FHitResult Hit;
+        SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), true, Hit);
+    }
+}
+
 bool URSCharacterMovementComponent::IsEnoughSpaceToStandUp()
 {
     FVector StandingLocation = UpdatedComponent->GetComponentLocation();
@@ -355,4 +464,38 @@ float URSCharacterMovementComponent::GetActorToCurrentLadderProjection(FVector A
     FVector LadderUpVector = CurrentLadder->GetActorUpVector();
     FVector LadderToCharacterDistance = ActorLocation - CurrentLadder->GetActorLocation();
     return FVector::DotProduct(LadderUpVector, LadderToCharacterDistance);
+}
+
+float URSCharacterMovementComponent::GetActorToCurrentWallProjectionUpDown(FVector ActorLocation)
+{
+    checkf(IsValid(CurrentWall), TEXT("URSCharacterMovementComponent::GetCharacterToCurrentWallProjection() can not be invoked when current wall is null"));
+    FVector WallUpVector = CurrentWall->GetActorUpVector();
+    FVector WallToCharacterDistance = ActorLocation - CurrentWall->GetActorLocation();
+    return FVector::DotProduct(WallUpVector, WallToCharacterDistance);
+}
+
+float URSCharacterMovementComponent::GetActorToCurrentWallProjectionLeftRight(FVector ActorLocation)
+{
+    checkf(IsValid(CurrentWall), TEXT("URSCharacterMovementComponent::GetCharacterToCurrentWallProjection() can not be invoked when current wall is null"));
+    FVector WallRightVector = CurrentWall->GetActorRightVector();
+    FVector WallToCharacterDistance = ActorLocation - CurrentWall->GetActorLocation();
+    return FVector::DotProduct(WallRightVector, WallToCharacterDistance);
+}
+
+void URSCharacterMovementComponent::DetectWall()
+{
+    FVector StartPosition = GetActorLocation();
+    FVector EndPosition =  StartPosition + 100.0f * BaseCharacterOwner->GetActorForwardVector();
+    FHitResult TraceHit;
+    FCollisionQueryParams QueryParams;
+    QueryParams.AddIgnoredActor(CharacterOwner);
+    if(GetWorld()->LineTraceSingleByChannel(TraceHit, StartPosition, EndPosition, ECC_GameTraceChannel1, QueryParams, FCollisionResponseParams::DefaultResponseParam))
+    {
+        CurrentHitWall = TraceHit;
+        CurrentWall = Cast<AClimbingWall>(CurrentHitWall.Actor);
+    }
+    else
+    {
+        DetachFromWall();
+    }
 }

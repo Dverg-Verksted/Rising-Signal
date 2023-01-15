@@ -75,6 +75,8 @@ class RISINGSIGNAL_API URSSaveGame : public USaveGame
     GENERATED_BODY()
 
 public:
+    FName SavedLevelName = NAME_None;
+
     UPROPERTY()
     FPlayerSaveData SavedPlayer{};
 
@@ -88,6 +90,5 @@ public:
     FPlayerSaveData* GetPlayerData();
 
     void ClearData();
-
 
 };

@@ -2,7 +2,6 @@
 
 
 #include "Game/InteractSystem/Environment/Ladder/Ladder.h"
-
 #include "Components/BoxComponent.h"
 #include "Player/NewTestPlayer/RSBaseCharacter.h"
 
@@ -95,25 +94,20 @@ void ALadder::BeginPlay()
     TopInteractionVolume->OnComponentEndOverlap.AddDynamic(this, &ALadder::OnInteractionVolumeEndOverlap);
 }
 
-float ALadder::GetLadderHeight() const
-{
-    return LadderHeight;
-}
-
-bool ALadder::GetIsOnTop() const
-{
-    return bIsOnTop;
-}
-
-UAnimMontage* ALadder::GetAttachFromTopAnimMontage() const
-{
-    return AttachFromTopAnimMontage;
-}
-
 FVector ALadder::GetAttachFromTopEndPosition() const
 {
     FRotator OrientationRotation = GetActorForwardVector().ToOrientationRotator();
     FVector Offset = OrientationRotation.RotateVector(OffsetAttachFromTopEndPosition);
+    FVector LadderTop = GetActorLocation() + GetActorUpVector() * LadderHeight;
+    return LadderTop + Offset;
+}
+
+FVector ALadder::GetTopPosition() const
+{
+    FRotator OrientationRotation = GetActorForwardVector().ToOrientationRotator();
+    FVector Offset = OrientationRotation.RotateVector(AttachFromTopStartPosition);
+    Offset.Z = OffsetZFromTopStartPosition;
+    Offset.X = -10.0f;
     FVector LadderTop = GetActorLocation() + GetActorUpVector() * LadderHeight;
     return LadderTop + Offset;
 }
