@@ -6,6 +6,7 @@
 #include "Curves/CurveVector.h"
 #include "NewTestPlayer/RSBaseCharacter.h"
 #include "Game/InteractSystem/Environment/Rope/Rope.h"
+#include "Kismet/KismetMathLibrary.h"
 
 void URSCharacterMovementComponent::BeginPlay()
 {
@@ -410,29 +411,22 @@ void URSCharacterMovementComponent::PhysOnWall(float DeltaTime, int32 Iterations
 
     if(CurrentHitWall.Actor.IsValid())
     {
-        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::Printf(TEXT("Speed")));
         FVector Delta = Velocity * DeltaTime;
         FVector NewPos = GetActorLocation() + Delta;
         float NewPosProjectionUpDown = GetActorToCurrentWallProjectionUpDown(NewPos);
         if(NewPosProjectionUpDown < MinWallBotomOffset)
         {
+            Velocity = FVector::ZeroVector;
             return;
         }
         if(NewPosProjectionUpDown > (CurrentWall->GetWallLength() - MaxWallTopOffset))
         {
+            Velocity = FVector::ZeroVector;
             return;
         }
-        /*float NewPosProjectionLeftRight = GetActorToCurrentWallProjectionLeftRight(NewPos);
-        if(NewPosProjectionLeftRight > MinWallLeftOffset)
-        {
-            return;
-        }
-        if(NewPosProjectionLeftRight < (-CurrentWall->GetWallWidth() + MaxWallRightOffset))
-        {
-            return;
-        }*/
         FVector CurrentWallForwardVector = -CurrentHitWall.Actor->GetActorForwardVector();
-        CharacterOwner->SetActorRotation(CurrentWallForwardVector.ToOrientationRotator(), ETeleportType::TeleportPhysics);
+        FRotator NextRotation = UKismetMathLibrary::RInterpTo(CharacterOwner->GetActorRotation(), CurrentWallForwardVector.ToOrientationRotator(), DeltaTime, 2.0f);
+        CharacterOwner->SetActorRotation(NextRotation, ETeleportType::TeleportPhysics);
         FHitResult Hit;
         SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), true, Hit);
     }
