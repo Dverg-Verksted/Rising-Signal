@@ -26,6 +26,9 @@ public:
     void AddSwingForce(FVector& Force, bool bForce);
 
     FORCEINLINE UStaticMeshComponent* GetCableEndMeshComponent() const { return CableEndMeshComponent; }
+
+    FORCEINLINE float GetLaunchY() const { return LaunchYMultiplier; }
+    FORCEINLINE float GetLaunchZ() const { return LaunchZValue; }
     
 protected:
 
@@ -46,6 +49,14 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Rope|Parameters", DisplayName="Ограничение на расскачивание",
     meta=(ToolTip="Чем ниже установленное значение тем быстрее персонаж будет расскачивать верёвку. 1000 - отключение раскачивания;"))
     float SwingLimit;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Rope|Parameters", DisplayName="Множитель прыжка Y",
+    meta=(ToolTip="Множитель, который умножается на силу расскачки веревки и получаемое значение, применяется к персонажу. Чем больше множитель, тем дальше персонаж будет улетать."))
+    float LaunchYMultiplier = 1.2f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Rope|Parameters", DisplayName="Сила прыжка Z",
+    meta=(ToolTip="Сила по оси Z, которое будет применяться к персонажу при прыжке. Чем больше, тем выше персонаж будет взлетать."))
+    float LaunchZValue = 300.0f;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Components")
     UCableComponent* CableComponent;

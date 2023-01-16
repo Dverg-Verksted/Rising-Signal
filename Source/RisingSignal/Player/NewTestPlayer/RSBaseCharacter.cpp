@@ -105,7 +105,7 @@ void ARSBaseCharacter::Jump()
             GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
         }, 0.5f, false);
         FVector RopePhysicLinearVelocity = CurrentRope->GetCableEndMeshComponent()->GetPhysicsLinearVelocity();
-        LaunchCharacter(FVector(RopePhysicLinearVelocity.X, RopePhysicLinearVelocity.Y * 2.0f, 400), false, false);
+        LaunchCharacter(FVector(RopePhysicLinearVelocity.X, RopePhysicLinearVelocity.Y * CurrentRope->GetLaunchY(), CurrentRope->GetLaunchZ()), false, false);
     }
 
     if(RSCharacterMovementComponent->IsOnLadder())
