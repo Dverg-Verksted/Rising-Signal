@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Game/HUD/GameHUD.h"
+#include "Game/HUD/HUD/GameHUD.h"
 #include "GameFramework/GameModeBase.h"
 #include "RSGameMode.generated.h"
 
