@@ -2,6 +2,8 @@
 
 
 #include "Player/RSCharacterMovementComponent.h"
+
+#include "DrawDebugHelpers.h"
 #include "Components/CapsuleComponent.h"
 #include "Curves/CurveVector.h"
 #include "NewTestPlayer/RSBaseCharacter.h"
@@ -487,16 +489,27 @@ float URSCharacterMovementComponent::GetActorToCurrentWallProjectionLeftRight(FV
 void URSCharacterMovementComponent::DetectWall()
 {
     FVector StartPosition = GetActorLocation();
-    FVector EndPosition =  StartPosition + 100.0f * BaseCharacterOwner->GetActorForwardVector();
+    FVector EndPosition;
+    EndPosition = StartPosition + 100.0f * BaseCharacterOwner->GetActorForwardVector();
     FHitResult TraceHit;
     FCollisionQueryParams QueryParams;
     QueryParams.AddIgnoredActor(CharacterOwner);
+    DrawDebugLine(GetWorld(), StartPosition, EndPosition, FColor::Red, false, 2.0f);
     if(GetWorld()->LineTraceSingleByChannel(TraceHit, StartPosition, EndPosition, ECC_GameTraceChannel3, QueryParams, FCollisionResponseParams::DefaultResponseParam))
     {
         CurrentWall = Cast<AClimbingWall>(TraceHit.Actor);
         if(GetWorld()->LineTraceSingleByChannel(TraceHit, StartPosition, EndPosition, ECC_GameTraceChannel4, QueryParams, FCollisionResponseParams::DefaultResponseParam))
         {
             CurrentHitWall = TraceHit;
+            GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::Printf(TEXT("Distance: %f"), CurrentHitWall.Distance));
+            if(CurrentHitWall.Distance < 45.0f)
+            {
+                Velocity += CurrentHitWall.ImpactNormal * 10.0f;
+            }
+            if(CurrentHitWall.Distance > 50.0f)
+            {
+                Velocity += -CurrentHitWall.ImpactNormal * 10.0f;
+            }
         }
         else
         {
