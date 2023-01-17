@@ -1,6 +1,6 @@
 // It is owned by the company Dverg Verksted.
 
-#include "Game/HUD/HUD/Debug/DebugHUD.h"
+#include "Game/HUD/DebugHUD.h"
 #include "Engine/Canvas.h"
 
 ADebugHUD::ADebugHUD()

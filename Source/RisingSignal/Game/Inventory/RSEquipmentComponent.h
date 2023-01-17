@@ -35,6 +35,10 @@ public:
     TMap<int32, FInventoryItem> GetItems() const { return EquipmentSlots; }
     int32 GetEquippedItem() const { return CurrentItemInHand; }
 
+    UFUNCTION(BlueprintPure)
+    TMap<int32, FInventoryItem> GetEquipments() const { return EquipmentSlots; }
+    
+    
     void LoadItems(TMap<int32, FInventoryItem> ItemsMap, int32 EquippedItem)
     {
         EquipmentSlots = ItemsMap;

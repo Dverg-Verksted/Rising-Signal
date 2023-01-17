@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Game/HUD/HUD/Debug/DebugHUD.h"
+#include "Game/HUD/DebugHUD.h"
 #include "Player/NewTestPlayer/RSBaseCharacter.h"
 //#include "Player/NewTestPlayer/RSBaseCharacter.h"
 #include "GameHUD.generated.h"
