@@ -3,6 +3,7 @@
 #include "Game/Inventory/RSCraftComponent.h"
 #include "Game/InteractSystem/InteractItemActor.h"
 #include "Game/InteractSystem/RSInteractStaticItemBase.h"
+#include "Library/RSFunctionLibrary.h"
 
 
 FInventoryItem::FInventoryItem(const FInventoryItem* OtherItem)
@@ -111,7 +112,7 @@ bool URSInventoryComponent::UseItem(const FInventoryItem& InventorySlot)
             }
             else
             {
-                AbilitySystem->AddEffect(Effect.EffectDuration,Effect.StateType,Effect.EffectValue);
+                AbilitySystem->AddEffect(Effect.EffectDuration, Effect.StateType, Effect.EffectValue);
             }
         }
 
@@ -370,18 +371,29 @@ bool URSInventoryComponent::FindItemsToUse(TArray<FNeededItem>& NeedItems)
         {
             return Item == NeedInventoryItem && NeedItem.ItemCount <= Item.Count;
         });
+
         if (CurrentItem)
         {
             FoundItems.Add(*CurrentItem);
         }
     }
 
+    LOG_RS(ELogRSVerb::Warning, FoundItems.Num() + "/" + NeedItems.Num());
+
     if (FoundItems.Num() == NeedItems.Num())
     {
         for (const FInventoryItem& Item : FoundItems)
         {
-            RemoveItem(Item, Item.Count, true);
-            GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Items found")));
+            for (FNeededItem NItem : NeedItems)
+            {
+                const FInventoryItem NeedInventoryItem = FindItemData(NItem.ItemRowHandle);
+
+                if (Item == NeedInventoryItem)
+                {
+                    RemoveItem(Item, NItem.ItemCount, true);
+                    GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Items found")));
+                }
+            }
         }
         return true;
     }

@@ -90,6 +90,7 @@ public:
     FORCEINLINE URSCharacterMovementComponent* GetBaseCharacterMovementComponent() const { return RSCharacterMovementComponent; }
     FORCEINLINE URSInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
     FORCEINLINE UWeaponComponent* GetWeaponComponent() const { return WeaponComponent; }
+    FORCEINLINE URSLedgeDetectorComponent* GetLedgeDetectorComponent() const { return LedgeDetectorComponent; }
 
     UFUNCTION(BlueprintCallable)
     FORCEINLINE URSAbilitySystem* GetAbilitySystem() const { return AbilitySystem; }
@@ -369,6 +370,7 @@ private:
     float CapsuleRadius = 0.0f;
     float MinimumOffset = 3.0f;
 
+    FTimerHandle HangTimer;
     bool bIsMantling;
     bool bIsRolling;
     bool bIsSprinting;
