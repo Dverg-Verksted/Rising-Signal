@@ -99,8 +99,13 @@ void ARSBaseCharacter::Jump()
         URSBaseCharacterAnimInstance* AnimInstance = Cast<URSBaseCharacterAnimInstance>(GetMesh()->GetAnimInstance());
         AnimInstance->ToggleHanging(false);
         ARope* CurrentRope = GetAvailableRope();
+        GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        GetWorld()->GetTimerManager().SetTimer(HangTimer, [=]()
+        {
+            GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+        }, 0.5f, false);
         FVector RopePhysicLinearVelocity = CurrentRope->GetCableEndMeshComponent()->GetPhysicsLinearVelocity();
-        LaunchCharacter(FVector(RopePhysicLinearVelocity.X, RopePhysicLinearVelocity.Y, 100), false, false);
+        LaunchCharacter(FVector(RopePhysicLinearVelocity.X, RopePhysicLinearVelocity.Y * CurrentRope->GetLaunchY(), CurrentRope->GetLaunchZ()), false, false);
     }
 
     if(RSCharacterMovementComponent->IsOnLadder())
@@ -346,9 +351,12 @@ void ARSBaseCharacter::InteractWithWall()
 
 void ARSBaseCharacter::DetachFromWall()
 {
+    RSCharacterMovementComponent->bOrientRotationToMovement = true;
     bIsClimbingOnWall = false;
     URSBaseCharacterAnimInstance* AnimInstance = Cast<URSBaseCharacterAnimInstance>(GetMesh()->GetAnimInstance());
     AnimInstance->ToggleOnWall(false);
+    FRotator CurrentCharacterRotation = GetActorRotation();
+    SetActorRotation(FRotator(0.0f, CurrentCharacterRotation.Yaw, 0.0f));
 }
 
 void ARSBaseCharacter::UpdateCameraRotation()

@@ -26,11 +26,11 @@ public:
     USceneComponent* SceneComponent;
 
     // Component for sphere collision
-    UPROPERTY()
+    UPROPERTY(EditDefaultsOnly)
     USphereComponent* SphereComponent;
 
     // Component for box collision
-    UPROPERTY()
+    UPROPERTY(EditDefaultsOnly)
     UBoxComponent* BoxComponent;
 
     // Shape radius

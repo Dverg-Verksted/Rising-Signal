@@ -8,7 +8,7 @@
 #include "Components/InputComponent.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
 #include "Game/GameModes/RSGameMode.h"
-#include "Game/HUD/GameHUD.h"
+#include "Game/HUD/HUD/GameHUD.h"
 #include "Game/Inventory/RSEquipmentComponent.h"
 #include "Game/WeaponSystem/WeaponComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -316,7 +316,7 @@ void ARSGamePLayer::RegisterDeath()
 {
     // some death logic for player
     this->GetCharacterMovement()->DisableMovement();
-    this->SetLifeSpan(5);
+    // this->SetLifeSpan(5);
     this->GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
     this->GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
     this->GetMesh()->SetSimulatePhysics(true);
