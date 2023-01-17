@@ -100,11 +100,11 @@ void URSEquipmentComponent::TakeInHands(int32 Index)
 {
     CurrentItemInHand = Index;
 
-
     if (EquipmentSlots.Contains(CurrentItemInHand))
     {
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red,
             FString::Printf(TEXT("Current item in hands is %s"), *EquipmentSlots[CurrentItemInHand].Name.ToString()));
+        UpdateSlot(Index);
         if(EquipmentSlots[CurrentItemInHand].bIsWeapon)
         {
             ARSBaseCharacter* PlayerCharacter = Cast<ARSBaseCharacter>(GetOwner());
