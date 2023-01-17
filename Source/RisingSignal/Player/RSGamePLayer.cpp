@@ -316,7 +316,7 @@ void ARSGamePLayer::RegisterDeath()
 {
     // some death logic for player
     this->GetCharacterMovement()->DisableMovement();
-    this->SetLifeSpan(5);
+    // this->SetLifeSpan(5);
     this->GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
     this->GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
     this->GetMesh()->SetSimulatePhysics(true);
