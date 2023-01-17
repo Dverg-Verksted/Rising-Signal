@@ -2,10 +2,13 @@
 
 
 #include "Player/RSCharacterMovementComponent.h"
+
+#include "DrawDebugHelpers.h"
 #include "Components/CapsuleComponent.h"
 #include "Curves/CurveVector.h"
 #include "NewTestPlayer/RSBaseCharacter.h"
 #include "Game/InteractSystem/Environment/Rope/Rope.h"
+#include "Kismet/KismetMathLibrary.h"
 
 void URSCharacterMovementComponent::BeginPlay()
 {
@@ -202,7 +205,6 @@ void URSCharacterMovementComponent::AttachToWall(const AClimbingWall* Wall)
 
 void URSCharacterMovementComponent::DetachFromWall()
 {
-    bOrientRotationToMovement = true;
     SetMovementMode(MOVE_Walking);
     BaseCharacterOwner->DetachFromWall();
 }
@@ -408,31 +410,33 @@ void URSCharacterMovementComponent::PhysOnWall(float DeltaTime, int32 Iterations
     CalcVelocity(DeltaTime, 1.0f, false, ClimbingOnLadderBrakingDecelaration);
     DetectWall();
 
-    if(CurrentHitWall.Actor.IsValid())
+    if(IsValid(CurrentWall))
     {
-        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::Printf(TEXT("Speed")));
         FVector Delta = Velocity * DeltaTime;
         FVector NewPos = GetActorLocation() + Delta;
         float NewPosProjectionUpDown = GetActorToCurrentWallProjectionUpDown(NewPos);
         if(NewPosProjectionUpDown < MinWallBotomOffset)
         {
+            Velocity = FVector::ZeroVector;
             return;
         }
         if(NewPosProjectionUpDown > (CurrentWall->GetWallLength() - MaxWallTopOffset))
         {
-            return;
+            FLedgeDescription LedgeDescription;
+            if(BaseCharacterOwner->GetLedgeDetectorComponent()->LedgeDetect(LedgeDescription))
+            {
+                BaseCharacterOwner->Mantle(true);
+                BaseCharacterOwner->DetachFromWall();
+            }
+            else
+            {
+                Velocity = FVector::ZeroVector;
+                return;
+            }
         }
-        /*float NewPosProjectionLeftRight = GetActorToCurrentWallProjectionLeftRight(NewPos);
-        if(NewPosProjectionLeftRight > MinWallLeftOffset)
-        {
-            return;
-        }
-        if(NewPosProjectionLeftRight < (-CurrentWall->GetWallWidth() + MaxWallRightOffset))
-        {
-            return;
-        }*/
-        FVector CurrentWallForwardVector = -CurrentHitWall.Actor->GetActorForwardVector();
-        CharacterOwner->SetActorRotation(CurrentWallForwardVector.ToOrientationRotator(), ETeleportType::TeleportPhysics);
+        FVector CurrentWallForwardVector = -CurrentHitWall.ImpactNormal;
+        FRotator NextRotation = UKismetMathLibrary::RInterpTo(CharacterOwner->GetActorRotation(), CurrentWallForwardVector.ToOrientationRotator(), DeltaTime, CurrentWall->GetInterpSpeed());
+        CharacterOwner->SetActorRotation(NextRotation, ETeleportType::TeleportPhysics);
         FHitResult Hit;
         SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), true, Hit);
     }
@@ -485,14 +489,32 @@ float URSCharacterMovementComponent::GetActorToCurrentWallProjectionLeftRight(FV
 void URSCharacterMovementComponent::DetectWall()
 {
     FVector StartPosition = GetActorLocation();
-    FVector EndPosition =  StartPosition + 100.0f * BaseCharacterOwner->GetActorForwardVector();
+    FVector EndPosition;
+    EndPosition = StartPosition + 100.0f * BaseCharacterOwner->GetActorForwardVector();
     FHitResult TraceHit;
     FCollisionQueryParams QueryParams;
     QueryParams.AddIgnoredActor(CharacterOwner);
-    if(GetWorld()->LineTraceSingleByChannel(TraceHit, StartPosition, EndPosition, ECC_GameTraceChannel1, QueryParams, FCollisionResponseParams::DefaultResponseParam))
+    DrawDebugLine(GetWorld(), StartPosition, EndPosition, FColor::Red, false, 2.0f);
+    if(GetWorld()->LineTraceSingleByChannel(TraceHit, StartPosition, EndPosition, ECC_GameTraceChannel3, QueryParams, FCollisionResponseParams::DefaultResponseParam))
     {
-        CurrentHitWall = TraceHit;
-        CurrentWall = Cast<AClimbingWall>(CurrentHitWall.Actor);
+        CurrentWall = Cast<AClimbingWall>(TraceHit.Actor);
+        if(GetWorld()->LineTraceSingleByChannel(TraceHit, StartPosition, EndPosition, ECC_GameTraceChannel4, QueryParams, FCollisionResponseParams::DefaultResponseParam))
+        {
+            CurrentHitWall = TraceHit;
+            GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::Printf(TEXT("Distance: %f"), CurrentHitWall.Distance));
+            if(CurrentHitWall.Distance < 45.0f)
+            {
+                Velocity += CurrentHitWall.ImpactNormal * 10.0f;
+            }
+            if(CurrentHitWall.Distance > 50.0f)
+            {
+                Velocity += -CurrentHitWall.ImpactNormal * 10.0f;
+            }
+        }
+        else
+        {
+            DetachFromWall();
+        }
     }
     else
     {

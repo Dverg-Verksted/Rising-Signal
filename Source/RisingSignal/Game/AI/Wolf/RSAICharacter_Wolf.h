@@ -54,5 +54,8 @@ protected:
         meta = (ToolTip = "Эффект выплеска крови. Вылетает из игрока"))
     UNiagaraSystem* BloodEffect;
 
+    UPROPERTY(VisibleAnywhere)
+    URSAbilitySystem* AbilitySystemComponent;
+
     void InitAnimations();
 };

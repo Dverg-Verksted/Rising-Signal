@@ -186,6 +186,8 @@ void ARSAICharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
+    if (AbilitySystem->GetIsDead()) return;
+
     CalculateTurnOffset();
 
     if (AIController && ShouldNoticePlayer)

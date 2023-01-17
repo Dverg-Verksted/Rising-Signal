@@ -1,6 +1,6 @@
 // It is owned by the company Dverg Verksted.
 
-#include "Game/HUD/GameHUD.h"
+#include "Game/HUD/HUD/GameHUD.h"
 #include "Player/RSGamePLayer.h"
 #include "Player/NewTestPlayer/RSBaseCharacter.h"
 //#include "Player/NewTestPlayer/RSBaseCharacter.h"

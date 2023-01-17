@@ -15,6 +15,7 @@
 
 ARSAICharacter_Wolf::ARSAICharacter_Wolf()
 {
+    
 }
 
 void ARSAICharacter_Wolf::BeginPlay()
@@ -73,13 +74,15 @@ void ARSAICharacter_Wolf::Attack(AActor* ActorToAttack)
 
 void ARSAICharacter_Wolf::ProvideDamage(USkeletalMeshComponent* FromMeshComponent)
 {
-    if (GetMesh() != FromMeshComponent) return;
+    if (!FromMeshComponent || GetMesh() != FromMeshComponent) return;
 
     ARSBaseCharacter* Player = GetWorld()->GetFirstPlayerController()->GetPawn<ARSBaseCharacter>();
 
+    if(!Player) return;
+
     const FVector EnemyLocation = Player->GetActorLocation();
 
-    const FVector JawLocation = FindComponentByClass<USkeletalMeshComponent>()->GetSocketLocation("JawSocket");
+    const FVector JawLocation = FromMeshComponent->GetSocketLocation("JawSocket");
 
     const float DistanceToAttackActor = FVector::Distance(EnemyLocation, JawLocation);
 
