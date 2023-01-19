@@ -175,6 +175,8 @@ private:
     
     TSoftObjectPtr<ARSBaseCharacter> BaseCharacterOwner;
 
+    bool bAttachingLadderFromTop = false;
+
     UPROPERTY()
     const ALadder* CurrentLadder = nullptr;
 
