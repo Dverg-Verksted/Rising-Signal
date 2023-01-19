@@ -27,12 +27,21 @@ void URSEquipmentComponent::EquipItemInSlot(const FInventoryItem& Item, int32 In
     UpdateSlot(Index);
 }
 
-void URSEquipmentComponent::RemoveItem(const FInventoryItem& Item)
+void URSEquipmentComponent::RemoveItem(const FInventoryItem& InventorySlot, int32 CountRemove, bool bItemUsed)
 {
-    int32 SlotIndex = Item.SlotIndex;
-    EquipmentSlots[SlotIndex] = FInventoryItem(SlotIndex);
-    EquipmentSlots[SlotIndex].TypeComponent = ETypeComponent::Equipment;
-    UpdateSlot(SlotIndex);
+    const int32 SlotIndex = InventorySlot.SlotIndex;
+
+    if (InventorySlot.Count - CountRemove <= 0)
+    {
+        EquipmentSlots[SlotIndex] = FInventoryItem(SlotIndex);
+        EquipmentSlots[SlotIndex].TypeComponent = ETypeComponent::Equipment;
+        UpdateSlot(SlotIndex);
+    }
+    else
+    {
+        EquipmentSlots[SlotIndex].Count -= CountRemove;
+        UpdateSlot(SlotIndex);
+    }
 }
 
 void URSEquipmentComponent::UpdateSlot(int32 Index)
@@ -69,7 +78,7 @@ void URSEquipmentComponent::CombineItem(const FInventoryItem& FirstInventorySlot
 
     EquipmentSlots[SecondIndexSlot].Count = FirstInventorySlot.Count + SecondInventorySlot.Count;
     UpdateSlot(SecondIndexSlot);
-    RemoveItem(EquipmentSlots[FirstIndexSlot]);
+    RemoveItem(EquipmentSlots[FirstIndexSlot], EquipmentSlots[FirstIndexSlot].Count, false);
 }
 
 bool URSEquipmentComponent::UseItem(const FInventoryItem& Item)
@@ -89,7 +98,7 @@ bool URSEquipmentComponent::UseItem(const FInventoryItem& Item)
             }
         }
 
-        RemoveItem(Item);
+        RemoveItem(Item, 1, false);
         return true;
     }
 
