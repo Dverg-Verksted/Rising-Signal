@@ -128,7 +128,8 @@ void URSCharacterMovementComponent::AttachToLadder(const ALadder* Ladder)
 void URSCharacterMovementComponent::AttachToLadderFromTop()
 {
     FRotator TargetOrientationRotation = CurrentLadder->GetActorForwardVector().ToOrientationRotator();
-    FVector StartPos = CurrentLadder->GetActorLocation() + CurrentLadder->GetAttachFromTopStartPosition();
+    FVector StartPos = CurrentLadder->GetActorLocation();
+    StartPos.Z += CurrentLadder->GetLadderHeight() + 80.0f;
     GetOwner()->SetActorLocation(StartPos);
     ARSBaseCharacter* BaseCharacter = Cast<ARSBaseCharacter>(GetOwner());
     GetOwner()->SetActorRotation(TargetOrientationRotation);
