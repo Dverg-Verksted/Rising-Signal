@@ -109,7 +109,7 @@ void URSEquipmentComponent::TakeInHands(int32 Index)
 {
     CurrentItemInHand = Index;
 
-    if (EquipmentSlots.Contains(CurrentItemInHand))
+    if (!EquipmentSlots[CurrentItemInHand].IsEmpty())
     {
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red,
             FString::Printf(TEXT("Current item in hands is %s"), *EquipmentSlots[CurrentItemInHand].Name.ToString()));
