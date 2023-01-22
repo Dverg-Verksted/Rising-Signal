@@ -13,7 +13,8 @@ URSEquipmentComponent::URSEquipmentComponent()
     {
         for (int i = 0; i < MAX_SLOTS; i++)
         {
-            EquipmentSlots.Add(i, FInventoryItem());
+            EquipmentSlots.Add(i, FInventoryItem(i));
+            EquipmentSlots[i].TypeComponent = ETypeComponent::Equipment;
         }
     }
 }

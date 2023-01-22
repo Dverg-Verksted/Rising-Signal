@@ -15,6 +15,7 @@ URSCraftComponent::URSCraftComponent()
         for (int i = 0; i < MaxCraftingSlots; i++)
         {
             CraftingItems.Add(FInventoryItem(i));
+            CraftingItems[i].TypeComponent = ETypeComponent::Craft;
         }
     }
 }
