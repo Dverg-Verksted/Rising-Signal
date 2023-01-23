@@ -5,7 +5,7 @@
  **/
 
 #include "Game/UIMenu/UI/MSWelcomeUserWidget.h"
-#include "Game/UIMenu/Base/HUDGameMode/MSGameMode.h"
+#include "Game/UIMenu/Base/MSGameMode/MSGameMode.h"
 
 void UMSWelcomeUserWidget::SetupStateWidget(const EMSStateObject NewState)
 {

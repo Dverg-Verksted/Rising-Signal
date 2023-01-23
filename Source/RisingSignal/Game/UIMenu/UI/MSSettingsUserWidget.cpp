@@ -5,8 +5,8 @@
  **/
 
 #include "Game/UIMenu/UI/MSSettingsUserWidget.h"
-#include "Game/UIMenu/Base/HUDGameInstance/MSGameInstance.h"
-#include "Game/UIMenu/Base/HUDGameMode/MSGameMode.h"
+#include "Game/UIMenu/Base/MSGameInstance/MSGameInstance.h"
+#include "Game/UIMenu/Base/MSGameMode/MSGameMode.h"
 #include "Components/Button.h"
 #include "Components/CheckBox.h"
 #include "Components/ComboBoxString.h"

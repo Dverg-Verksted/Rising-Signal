@@ -27,28 +27,28 @@ protected:
 private:
     // @private Button to switch to a new game
     UPROPERTY(Transient, meta = (BindWidget))
-    UButton* NewGameButton;
+    UButton* MSNewGameButton;
     // @private Animation Button to switch to a new game
     UPROPERTY(Transient, meta = (BindWidgetAnim))
-    UWidgetAnimation* NewGameButtonAnim;
+    UWidgetAnimation* MSNewGameButtonAnim;
     
     // @private Button to switch to a settings
     UPROPERTY(Transient, meta = (BindWidget))
-    UButton* SettingsButton;
+    UButton* MSSettingsButton;
     // @private Animation Button to switch to a settings
     UPROPERTY(Transient, meta = (BindWidgetAnim))
-    UWidgetAnimation* SettingsButtonAnim;
+    UWidgetAnimation* MSSettingsButtonAnim;
 
     // @private Button to switch to a credits game
     UPROPERTY(Transient, meta = (BindWidget))
-    UButton* CreditsButton;
+    UButton* MSCreditsButton;
     // @private Animation Button to switch to a credits game
     UPROPERTY(Transient, meta = (BindWidgetAnim))
-    UWidgetAnimation* CreditsButtonAnim;
+    UWidgetAnimation* MSCreditsButtonAnim;
 
     // @private Button to close game
     UPROPERTY(Transient, meta = (BindWidget))
-    UButton* ExitButton;
+    UButton* MSExitButton;
 
     /**
      * @private Setup a new game

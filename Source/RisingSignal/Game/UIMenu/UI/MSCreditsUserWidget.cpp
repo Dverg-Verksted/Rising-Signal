@@ -5,7 +5,7 @@
  **/
 
 #include "Game/UIMenu/UI/MSCreditsUserWidget.h"
-#include "Game/UIMenu/Base/HUDGameMode/MSGameMode.h"
+#include "Game/UIMenu/Base/MSGameMode/MSGameMode.h"
 #include "Game/UIMenu/Base/MSDataTypes.h"
 #include "Components/Button.h"
 

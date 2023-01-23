@@ -5,7 +5,7 @@
  **/
 
 #include "Game/UIMenu/UI/MSLoadingUserWidget.h"
-#include "Game/UIMenu/Base/HUDGameInstance/MSGameInstance.h"
+#include "Game/UIMenu/Base/MSGameInstance/MSGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 
 void UMSLoadingUserWidget::SetupStateWidget(const EMSStateObject NewState)
