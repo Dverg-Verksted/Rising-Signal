@@ -224,13 +224,13 @@ bool URSInventoryComponent::MoveItemEquipment(const FInventoryItem& FirstInvento
         {
             if (SecondInventorySlot.InteractRowName == NAME_None)
             {
-                EquipmentComponent->RemoveItem(FirstInventorySlot);
+                EquipmentComponent->RemoveItem(FirstInventorySlot, FirstInventorySlot.Count, false);
                 UpdateSlot(SecondInventorySlot.SlotIndex, FirstInventorySlot, FirstInventorySlot.Count);
                 return true;
             }
             if (SecondInventorySlot.InteractRowName != NAME_None)
             {
-                EquipmentComponent->RemoveItem(FirstInventorySlot);
+                EquipmentComponent->RemoveItem(FirstInventorySlot, FirstInventorySlot.Count, false);
                 EquipmentComponent->EquipItemInSlot(SecondInventorySlot, FirstInventorySlot.SlotIndex);
                 UpdateSlot(SecondInventorySlot.SlotIndex, FirstInventorySlot, FirstInventorySlot.Count);
                 return true;
@@ -251,7 +251,7 @@ bool URSInventoryComponent::MoveItemEquipment(const FInventoryItem& FirstInvento
                 return true;
             }
             EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex);
-            EquipmentComponent->RemoveItem(FirstInventorySlot);
+            EquipmentComponent->RemoveItem(FirstInventorySlot, FirstInventorySlot.Count, false);
             return true;
         }
         case ETypeComponent::Craft:

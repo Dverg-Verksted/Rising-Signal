@@ -36,7 +36,10 @@ void ALadder::OnConstruction(const FTransform& Transform)
     LeftRailMeshComponent->SetRelativeLocation(FVector(0.0f, -LadderWeight * 0.5f, LadderHeight * 0.5f));
     RightRailMeshComponent->SetRelativeLocation(FVector(0.0f, LadderWeight * 0.5f, LadderHeight * 0.5f));
 
-    AttachFromTopStartPosition = FVector(AttachFromTopStartPosition.X, AttachFromTopStartPosition.Y, LadderHeight + OffsetZFromTopStartPosition);
+    //AttachFromTopStartPosition = FVector(AttachFromTopStartPosition.X, AttachFromTopStartPosition.Y, LadderHeight + OffsetZFromTopStartPosition);
+
+    /*FRotator OrientationRotation = GetActorForwardVector().ToOrientationRotator();
+    AttachFromTopStartPosition = OrientationRotation.RotateVector(AttachFromTopStartPosition);*/
 
     UStaticMesh* LeftRailMesh = LeftRailMeshComponent->GetStaticMesh();
     if(IsValid(LeftRailMesh))
@@ -96,20 +99,18 @@ void ALadder::BeginPlay()
 
 FVector ALadder::GetAttachFromTopEndPosition() const
 {
-    FRotator OrientationRotation = GetActorForwardVector().ToOrientationRotator();
-    FVector Offset = OrientationRotation.RotateVector(OffsetAttachFromTopEndPosition);
-    FVector LadderTop = GetActorLocation() + GetActorUpVector() * LadderHeight;
-    return LadderTop + Offset;
+    FVector Position = GetActorLocation();
+    Position.Z += LadderHeight - 100.0f;
+    Position += GetActorForwardVector() * 70.0f;
+    return Position;
 }
 
 FVector ALadder::GetTopPosition() const
 {
-    FRotator OrientationRotation = GetActorForwardVector().ToOrientationRotator();
-    FVector Offset = OrientationRotation.RotateVector(AttachFromTopStartPosition);
-    Offset.Z = OffsetZFromTopStartPosition;
-    Offset.X = -10.0f;
-    FVector LadderTop = GetActorLocation() + GetActorUpVector() * LadderHeight;
-    return LadderTop + Offset;
+    FVector Position = GetActorLocation();
+    Position.Z += LadderHeight + 100.0f;
+    Position -= GetActorForwardVector() * 20.0f;
+    return Position;
 }
 
 void ALadder::OnInteractionVolumeStartOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,

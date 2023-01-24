@@ -162,6 +162,8 @@ struct FInventoryItem : public FTableRowBase
     {
         return this->InteractRowName != Other.InteractRowName;
     }
+    
+    bool IsEmpty() const { return this->InteractRowName == NAME_None; }
 };
 
 USTRUCT(BlueprintType)

@@ -62,6 +62,7 @@ public:
     UPROPERTY()
     TMap<int32, FInventoryItem> EquipmentSlots;
 
+    UPROPERTY()
     int32 CurrentItemInHand = 0;
 };
 
