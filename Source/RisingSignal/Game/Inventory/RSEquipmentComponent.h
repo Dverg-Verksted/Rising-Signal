@@ -33,6 +33,8 @@ public:
     void TakeInHands(int32 Index);
 
     TMap<int32, FInventoryItem> GetItems() const { return EquipmentSlots; }
+    
+    UFUNCTION(BlueprintPure)
     int32 GetEquippedItem() const { return CurrentItemInHand; }
 
     UFUNCTION(BlueprintPure)
