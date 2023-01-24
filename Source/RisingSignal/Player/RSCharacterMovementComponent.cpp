@@ -128,7 +128,8 @@ void URSCharacterMovementComponent::AttachToLadder(const ALadder* Ladder)
 void URSCharacterMovementComponent::AttachToLadderFromTop()
 {
     FRotator TargetOrientationRotation = CurrentLadder->GetActorForwardVector().ToOrientationRotator();
-    FVector StartPos = CurrentLadder->GetActorLocation() + CurrentLadder->GetAttachFromTopStartPosition();
+    FVector StartPos = CurrentLadder->GetActorLocation();
+    StartPos.Z += CurrentLadder->GetLadderHeight() + 80.0f;
     GetOwner()->SetActorLocation(StartPos);
     ARSBaseCharacter* BaseCharacter = Cast<ARSBaseCharacter>(GetOwner());
     GetOwner()->SetActorRotation(TargetOrientationRotation);
@@ -156,6 +157,7 @@ void URSCharacterMovementComponent::DetachFromLadder(EDetachFromLadderMethod Det
             bIsAttachingToLadder = true;
             float MontageDuration = BaseCharacterOwner->PlayAnimMontage(CurrentLadder->GetAttachOnTopAnimMontage());
             GetWorld()->GetTimerManager().SetTimer(LadderTimer, this, &URSCharacterMovementComponent::SetWalkingMovement, MontageDuration, false);
+            bAttachingLadderFromTop = false;
             SetMovementMode(MOVE_Custom, StaticCast<uint8>(ECustomMovementMode::CMOVE_AttachingOnTopLadder));
             break;
         }
@@ -340,7 +342,8 @@ void URSCharacterMovementComponent::PhysRolling(float DeltaTime, int32 Iteration
 void URSCharacterMovementComponent::PhysAttachToLadder(float DeltaTime, int32 Iterations)
 {
     const float ElapsedTime = GetWorld()->GetTimerManager().GetTimerElapsed(LadderTimer);
-    const FVector NewLocation = FMath::Lerp(GetOwner()->GetActorLocation(), CurrentLadder->GetAttachFromTopEndPosition(), CurrentLadder->GetAttachFromTopCurve()->GetFloatValue(ElapsedTime));
+    float Fps = 1.0f / DeltaTime;
+    FVector NewLocation = FMath::Lerp(GetOwner()->GetActorLocation(), CurrentLadder->GetAttachFromTopEndPosition(), CurrentLadder->GetAttachFromTopCurve()->GetFloatValue(Fps * DeltaTime * ElapsedTime) * DeltaTime);;
     const FVector Delta = NewLocation - GetActorLocation();
 
     Velocity = Delta / DeltaTime;
@@ -352,7 +355,8 @@ void URSCharacterMovementComponent::PhysAttachToLadder(float DeltaTime, int32 It
 void URSCharacterMovementComponent::PhysAttachOnTopLadder(float DeltaTime, int32 Iterations)
 {
     const float ElapsedTime = GetWorld()->GetTimerManager().GetTimerElapsed(LadderTimer);
-    const FVector NewLocation = FMath::Lerp(GetOwner()->GetActorLocation(), CurrentLadder->GetTopPosition(), CurrentLadder->GetAttachOnTopCurve()->GetFloatValue(ElapsedTime));
+    float Fps = 1.0f / DeltaTime;
+    FVector NewLocation = FMath::Lerp(GetOwner()->GetActorLocation(), CurrentLadder->GetTopPosition(), CurrentLadder->GetAttachOnTopCurve()->GetFloatValue(Fps * DeltaTime * ElapsedTime) * DeltaTime);
     const FVector Delta = NewLocation - GetActorLocation();
 
     Velocity = Delta / DeltaTime;

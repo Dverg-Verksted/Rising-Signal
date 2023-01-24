@@ -8,7 +8,7 @@
 #include "Components/InputComponent.h"
 #include "Game/AbilitySystem/BaseComponents/RSAbilitySystem.h"
 #include "Game/GameModes/RSGameMode.h"
-#include "Game/HUD/HUD/GameHUD.h"
+#include "Game/HUD/GameHUD.h"
 #include "Game/Inventory/RSEquipmentComponent.h"
 #include "Game/WeaponSystem/WeaponComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
