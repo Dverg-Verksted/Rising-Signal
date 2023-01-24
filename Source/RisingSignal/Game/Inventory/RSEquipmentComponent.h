@@ -9,6 +9,8 @@
 
 #define MAX_SLOTS 4
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActiveSlotChanged, int32, Index);
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent),
     HideCategories = ("Variable", "Transform", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
         "Mobile", "Activation", "Component Replication", "Events", "Asset User Data", "Collision"))
@@ -18,9 +20,12 @@ class RISINGSIGNAL_API URSEquipmentComponent : public UActorComponent, public II
 
 public:
     URSEquipmentComponent();
-
+ 
     UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite)
     FOnSlotChangedSignature OnEquipmentSlotChanged;
+
+    UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
+    FOnActiveSlotChanged OnActiveSlotChanged;
 
     void EquipItemInSlot(const FInventoryItem& Item, int32 Index);
 
@@ -32,6 +37,8 @@ public:
 
     void TakeInHands(int32 Index);
 
+    void EraseActiveSlotIndex();
+    
     TMap<int32, FInventoryItem> GetItems() const { return EquipmentSlots; }
     
     UFUNCTION(BlueprintPure)
@@ -53,4 +60,6 @@ protected:
 
 private:
     int32 CurrentItemInHand;
+
+    int32 ActiveSlotIndex;
 };

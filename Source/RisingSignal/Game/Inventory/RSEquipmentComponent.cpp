@@ -58,6 +58,8 @@ bool URSEquipmentComponent::SwapItem(const FInventoryItem& FirstInventorySlot, c
     EquipmentSlots[SecondInventorySlot.SlotIndex].SlotIndex = SecondInventorySlot.SlotIndex; 
     UpdateSlot(FirstInventorySlot.SlotIndex);
     UpdateSlot(SecondInventorySlot.SlotIndex);
+    if(FirstInventorySlot.SlotIndex == ActiveSlotIndex) OnActiveSlotChanged.Broadcast(SecondInventorySlot.SlotIndex);
+    if(SecondInventorySlot.SlotIndex == ActiveSlotIndex) OnActiveSlotChanged.Broadcast(FirstInventorySlot.SlotIndex);
     
     return true;
 }
@@ -114,7 +116,8 @@ void URSEquipmentComponent::TakeInHands(int32 Index)
     {
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red,
             FString::Printf(TEXT("Current item in hands is %s"), *EquipmentSlots[CurrentItemInHand].Name.ToString()));
-        UpdateSlot(Index);
+        ActiveSlotIndex = Index;
+        OnActiveSlotChanged.Broadcast(Index);
         if(EquipmentSlots[CurrentItemInHand].bIsWeapon)
         {
             ARSBaseCharacter* PlayerCharacter = Cast<ARSBaseCharacter>(GetOwner());
@@ -129,4 +132,9 @@ void URSEquipmentComponent::TakeInHands(int32 Index)
     {
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::Printf(TEXT("Current slot is empty")));
     }
+}
+
+void URSEquipmentComponent::EraseActiveSlotIndex()
+{
+    ActiveSlotIndex = -1;
 }
