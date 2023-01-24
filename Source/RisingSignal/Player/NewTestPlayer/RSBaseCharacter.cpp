@@ -307,11 +307,6 @@ void ARSBaseCharacter::UnRegisterInteractiveActor(AInteractiveActor* Interactive
 
 void ARSBaseCharacter::InteractWithLadder()
 {
-    /*if(GetBaseCharacterMovementComponent()->IsOnLadder())
-    {
-        GetBaseCharacterMovementComponent()->DetachFromLadder(EDetachFromLadderMethod::JumpOff);
-    }*/
-    
     const ALadder* AvailableLadder = GetAvailableLadder();
     if(IsValid(AvailableLadder))
     {
