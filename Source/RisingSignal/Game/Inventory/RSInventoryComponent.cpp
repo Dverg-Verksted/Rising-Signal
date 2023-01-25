@@ -225,8 +225,6 @@ bool URSInventoryComponent::MoveItemEquipment(const FInventoryItem& FirstInvento
             if (SecondInventorySlot.InteractRowName == NAME_None)
             {
                 EquipmentComponent->RemoveItem(FirstInventorySlot, FirstInventorySlot.Count, false);
-                EquipmentComponent->OnActiveSlotChanged.Broadcast(-1);
-                EquipmentComponent->EraseActiveSlotIndex();
                 UpdateSlot(SecondInventorySlot.SlotIndex, FirstInventorySlot, FirstInventorySlot.Count);
                 return true;
             }
@@ -250,11 +248,11 @@ bool URSInventoryComponent::MoveItemEquipment(const FInventoryItem& FirstInvento
                     return true;
                 }
                 EquipmentComponent->SwapItem(FirstInventorySlot, SecondInventorySlot);
-                EquipmentComponent->OnActiveSlotChanged.Broadcast(SecondInventorySlot.SlotIndex);
+
                 return true;
             }
             EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex);
-            EquipmentComponent->OnActiveSlotChanged.Broadcast(SecondInventorySlot.SlotIndex);
+
             EquipmentComponent->RemoveItem(FirstInventorySlot, FirstInventorySlot.Count, false);
             return true;
         }

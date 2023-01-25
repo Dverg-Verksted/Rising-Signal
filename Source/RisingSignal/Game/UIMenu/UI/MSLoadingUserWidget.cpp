@@ -10,10 +10,13 @@
 
 void UMSLoadingUserWidget::SetupStateWidget(const EMSStateObject NewState)
 {
+
+
     Super::SetupStateWidget(NewState);
+
     if (NewState == EMSStateObject::Active)
     {
-        UGameplayStatics::OpenLevel(GetWorld(), GetGameInst()->GetNameStartLevel());
+        UGameplayStatics::OpenLevel(GetWorld(), GetGameInst()->GetContinueLevelName(), true, L"LoadCheckpoint=True?Save=False");
     }
 }
 

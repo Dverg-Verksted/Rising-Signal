@@ -13,6 +13,7 @@ void UMSMainMenuUserWidget::NativeOnInitialized()
     Super::NativeOnInitialized();
 
     this->MSNewGameButton->OnClicked.AddDynamic(this, &UMSMainMenuUserWidget::NewGame);
+    this->MSContinueButton->OnClicked.AddDynamic(this, &UMSMainMenuUserWidget::ContinueGame);
     this->MSSettingsButton->OnClicked.AddDynamic(this, &UMSMainMenuUserWidget::SwitchToSettings);
     this->MSCreditsButton->OnClicked.AddDynamic(this, &UMSMainMenuUserWidget::SwitchToCredits);
     this->MSExitButton->OnClicked.AddDynamic(this, &UMSMainMenuUserWidget::CloseGame);
@@ -22,7 +23,14 @@ void UMSMainMenuUserWidget::NewGame()
 {
     if (GetStateButton() == EMSStateObject::Inactive) return;
     ShowAnim(this->MSNewGameButtonAnim);
-    GetGameMode()->ChangeMenuStateTimer(EMSMenuState::Loading, this->MSNewGameButtonAnim->GetEndTime());
+    GetGameMode()->ChangeMenuStateTimer(EMSMenuState::NewGame, this->MSNewGameButtonAnim->GetEndTime());
+}
+
+void UMSMainMenuUserWidget::ContinueGame()
+{
+    if (GetStateButton() == EMSStateObject::Inactive) return;
+    ShowAnim(this->MSContinueButtonAnim);
+    GetGameMode()->ChangeMenuStateTimer(EMSMenuState::Loading, this->MSContinueButtonAnim->GetEndTime());
 }
 
 void UMSMainMenuUserWidget::SwitchToSettings()

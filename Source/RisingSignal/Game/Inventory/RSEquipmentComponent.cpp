@@ -55,12 +55,10 @@ bool URSEquipmentComponent::SwapItem(const FInventoryItem& FirstInventorySlot, c
     EquipmentSlots[FirstInventorySlot.SlotIndex] = SecondInventorySlot;
     EquipmentSlots[FirstInventorySlot.SlotIndex].SlotIndex = FirstInventorySlot.SlotIndex;
     EquipmentSlots[SecondInventorySlot.SlotIndex] = FirstInventorySlot;
-    EquipmentSlots[SecondInventorySlot.SlotIndex].SlotIndex = SecondInventorySlot.SlotIndex; 
+    EquipmentSlots[SecondInventorySlot.SlotIndex].SlotIndex = SecondInventorySlot.SlotIndex;
     UpdateSlot(FirstInventorySlot.SlotIndex);
     UpdateSlot(SecondInventorySlot.SlotIndex);
-    if(FirstInventorySlot.SlotIndex == ActiveSlotIndex) OnActiveSlotChanged.Broadcast(SecondInventorySlot.SlotIndex);
-    if(SecondInventorySlot.SlotIndex == ActiveSlotIndex) OnActiveSlotChanged.Broadcast(FirstInventorySlot.SlotIndex);
-    
+
     return true;
 }
 
@@ -97,7 +95,7 @@ bool URSEquipmentComponent::UseItem(const FInventoryItem& Item)
             }
             else
             {
-                AbilitySystem->AddEffect(Effect.EffectDuration,Effect.StateType,Effect.EffectValue);
+                AbilitySystem->AddEffect(Effect.EffectDuration, Effect.StateType, Effect.EffectValue);
             }
         }
 
@@ -110,20 +108,17 @@ bool URSEquipmentComponent::UseItem(const FInventoryItem& Item)
 
 void URSEquipmentComponent::TakeInHands(int32 Index)
 {
-    CurrentItemInHand = Index;
-
     if (!EquipmentSlots[CurrentItemInHand].IsEmpty())
     {
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red,
             FString::Printf(TEXT("Current item in hands is %s"), *EquipmentSlots[CurrentItemInHand].Name.ToString()));
-        ActiveSlotIndex = Index;
-        OnActiveSlotChanged.Broadcast(Index);
-        if(EquipmentSlots[CurrentItemInHand].bIsWeapon)
+        if (EquipmentSlots[CurrentItemInHand].bIsWeapon)
         {
             ARSBaseCharacter* PlayerCharacter = Cast<ARSBaseCharacter>(GetOwner());
             PlayerCharacter->GetWeaponComponent()->EquipWeapon(EquipmentSlots[CurrentItemInHand].WeaponSettings.WeaponClassPtr);
         }
-        if(EquipmentSlots[CurrentItemInHand].bCanUse)
+
+        if (EquipmentSlots[CurrentItemInHand].bCanUse && CurrentItemInHand == Index)
         {
             UseItem(EquipmentSlots[CurrentItemInHand]);
         }
@@ -132,9 +127,7 @@ void URSEquipmentComponent::TakeInHands(int32 Index)
     {
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::Printf(TEXT("Current slot is empty")));
     }
-}
 
-void URSEquipmentComponent::EraseActiveSlotIndex()
-{
-    ActiveSlotIndex = -1;
+    CurrentItemInHand = Index;
+    OnActiveSlotChanged.Broadcast(CurrentItemInHand);
 }

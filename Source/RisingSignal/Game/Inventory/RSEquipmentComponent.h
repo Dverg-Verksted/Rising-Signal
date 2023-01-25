@@ -20,7 +20,7 @@ class RISINGSIGNAL_API URSEquipmentComponent : public UActorComponent, public II
 
 public:
     URSEquipmentComponent();
- 
+
     UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite)
     FOnSlotChangedSignature OnEquipmentSlotChanged;
 
@@ -37,17 +37,15 @@ public:
 
     void TakeInHands(int32 Index);
 
-    void EraseActiveSlotIndex();
-    
     TMap<int32, FInventoryItem> GetItems() const { return EquipmentSlots; }
-    
+
     UFUNCTION(BlueprintPure)
     int32 GetEquippedItem() const { return CurrentItemInHand; }
 
     UFUNCTION(BlueprintPure)
     TMap<int32, FInventoryItem> GetEquipments() const { return EquipmentSlots; }
-    
-    
+
+
     void LoadItems(TMap<int32, FInventoryItem> ItemsMap, int32 EquippedItem)
     {
         EquipmentSlots = ItemsMap;
@@ -60,6 +58,4 @@ protected:
 
 private:
     int32 CurrentItemInHand;
-
-    int32 ActiveSlotIndex;
 };

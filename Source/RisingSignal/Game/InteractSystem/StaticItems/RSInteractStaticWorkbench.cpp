@@ -9,6 +9,7 @@
 #include "Game/InteractSystem/InteractItemActor.h"
 #include "GameFramework/Character.h"
 #include "Library/RSFunctionLibrary.h"
+#include "Player/RSGamePLayer.h"
 
 ARSInteractStaticWorkbench::ARSInteractStaticWorkbench()
 {
@@ -57,6 +58,13 @@ void ARSInteractStaticWorkbench::OnVolumeEndOverlap(UPrimitiveComponent* Overlap
 void ARSInteractStaticWorkbench::Interact(ACharacter* InteractingCharacter)
 {
     Super::Interact(InteractingCharacter);
+
+    UE_LOG(LogTemp, Error, TEXT("%s::%s() called"), *GetName(), *FString(__FUNCTION__));
+    
+    if (ARSGamePLayer* Player = Cast<ARSGamePLayer>(InteractingCharacter))
+    {
+        Player->OpenCloseInventory();
+    }
 }
 
 void ARSInteractStaticWorkbench::CharacterInsideVolume(ACharacter* Character, const bool bCharInside)
@@ -65,7 +73,6 @@ void ARSInteractStaticWorkbench::CharacterInsideVolume(ACharacter* Character, co
 
     if (const auto CraftComp = Character->FindComponentByClass<URSCraftComponent>())
     {
-        LOG_RS(ELogRSVerb::Warning, "Workbench near");
 
         CraftComp->SetWorkbenchNearBy(bCharInside);
     }

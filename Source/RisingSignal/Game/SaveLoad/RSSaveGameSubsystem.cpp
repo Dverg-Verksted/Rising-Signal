@@ -1,8 +1,5 @@
 // It is owned by the company Dverg Verksted.
-
-
 #include "Game/SaveLoad/RSSaveGameSubsystem.h"
-
 #include "EngineUtils.h"
 #include "RSSavableObjectInterface.h"
 #include "RSSaveGame.h"
@@ -19,7 +16,6 @@
 void URSSaveGameSubsystem::HandleStartingNewPlayer(AController* NewPlayer)
 {
     ARSPlayerState* PS = NewPlayer->GetPlayerState<ARSPlayerState>();
-
     if (ensure(PS))
     {
         PS->LoadPlayerState(CurrentSaveGame);
@@ -32,13 +28,11 @@ bool URSSaveGameSubsystem::OverrideSpawnTransform(AController* NewPlayer)
     {
         return false;
     }
-
     APlayerState* PS = NewPlayer->GetPlayerState<APlayerState>();
     if (PS == nullptr)
     {
         return false;
     }
-
     if (APawn* MyPawn = PS->GetPawn())
     {
         FPlayerSaveData* FoundData = CurrentSaveGame->GetPlayerData();
@@ -46,11 +40,9 @@ bool URSSaveGameSubsystem::OverrideSpawnTransform(AController* NewPlayer)
         {
             MyPawn->SetActorLocation(FoundData->Location);
             MyPawn->SetActorRotation(FoundData->Rotation);
-
             return true;
         }
     }
-
     return false;
 }
 
@@ -61,23 +53,19 @@ void URSSaveGameSubsystem::SetSlotName(FString NewSlotName)
     {
         return;
     }
-
     CurrentSlotName = NewSlotName;
 }
 
 void URSSaveGameSubsystem::WriteSaveGame()
 {
     OnSaveGameStartSaving.Broadcast(CurrentSaveGame);
-
     if (!CurrentSaveGame)
     {
         LOG_RS(ELogRSVerb::Error, "No SaveGame Found!");
         return;
     }
-
     // Clear arrays, may contain data from previously loaded SaveGame
     CurrentSaveGame->ClearData();
-
     AGameStateBase* GS = GetWorld()->GetGameState();
     if (GS == nullptr)
     {
@@ -85,6 +73,9 @@ void URSSaveGameSubsystem::WriteSaveGame()
         return;
     }
 
+    CurrentSaveGame->SavedLevelName = GetWorld()->GetFName();
+    GEngine->AddOnScreenDebugMessage(0, 2, FColor::Red, CurrentSaveGame->SavedLevelName.ToString());
+    
     // Iterate all player states, we don't have proper ID to match yet (requires Steam or EOS)
     for (int32 i = 0; i < GS->PlayerArray.Num(); i++)
     {
@@ -95,7 +86,6 @@ void URSSaveGameSubsystem::WriteSaveGame()
             break; // single player only at this point
         }
     }
-
     // Iterate the entire world of actors
     for (FActorIterator It(GetWorld()); It; ++It)
     {
@@ -106,27 +96,20 @@ void URSSaveGameSubsystem::WriteSaveGame()
         {
             continue;
         }
-
         LOG_RS(ELogRSVerb::Warning, "Saving actor: " + Actor->GetFName().ToString());
-
         FActorSaveData ActorData;
         ActorData.ActorName = Actor->GetFName();
         ActorData.Transform = Actor->GetActorTransform();
-
         // Pass the array to fill with data from Actor
         FMemoryWriter MemWriter(ActorData.ByteData);
-
         FObjectAndNameAsStringProxyArchive Ar(MemWriter, true);
         // Find only variables with UPROPERTY(SaveGame)
         Ar.ArIsSaveGame = true;
         // Converts Actor's SaveGame UPROPERTIES into binary array
         Actor->Serialize(Ar);
-
         CurrentSaveGame->SavedActors.Add(ActorData);
     }
-
     UGameplayStatics::SaveGameToSlot(CurrentSaveGame, CurrentSlotName, 0);
-
     OnSaveGameWritten.Broadcast(CurrentSaveGame);
 }
 
@@ -134,7 +117,6 @@ bool URSSaveGameSubsystem::LoadSaveGame(FString InSlotName)
 {
     // Update slot name first if specified, otherwise keeps default name
     SetSlotName(InSlotName);
-
     if (UGameplayStatics::DoesSaveGameExist(CurrentSlotName, 0))
     {
         CurrentSaveGame = Cast<URSSaveGame>(UGameplayStatics::LoadGameFromSlot(CurrentSlotName, 0));
@@ -144,6 +126,14 @@ bool URSSaveGameSubsystem::LoadSaveGame(FString InSlotName)
             return false;
         }
 
+        LOG_RS(ELogRSVerb::Warning, CurrentSaveGame->SavedLevelName.ToString());
+        
+        if (GetWorld()->GetFName() != CurrentSaveGame->SavedLevelName)
+        {
+            UGameplayStatics::OpenLevel(GetWorld(), CurrentSaveGame->SavedLevelName, true, L"LoadCheckpoint=True;Save=False");
+            return true;
+        }
+        
         // Iterate the entire world of actors
         for (FActorIterator It(GetWorld()); It; ++It)
         {
@@ -153,42 +143,31 @@ bool URSSaveGameSubsystem::LoadSaveGame(FString InSlotName)
             {
                 continue;
             }
-
             bool bFound = false;
-
             for (FActorSaveData ActorData : CurrentSaveGame->SavedActors)
             {
                 if (ActorData.ActorName == Actor->GetFName())
                 {
                     Actor->SetActorTransform(ActorData.Transform);
-
                     FMemoryReader MemReader(ActorData.ByteData);
-
                     FObjectAndNameAsStringProxyArchive Ar(MemReader, true);
                     Ar.ArIsSaveGame = true;
                     // Convert binary array back into actor's variables
                     Actor->Serialize(Ar);
-
                     IRSSavableObjectInterface::Execute_OnActorLoaded(Actor);
-
                     bFound = true;
-
                     break;
                 }
             }
-
             if (!bFound)
             {
                 //If actor not in savegame - destroy
                 Actor->Destroy();
             }
         }
-
         return true;
     }
-
     CurrentSaveGame = Cast<URSSaveGame>(UGameplayStatics::CreateSaveGameObject(URSSaveGame::StaticClass()));
-
     UE_LOG(LogTemp, Log, TEXT("Created New SaveGame Data."));
     return false;
 }
@@ -196,11 +175,9 @@ bool URSSaveGameSubsystem::LoadSaveGame(FString InSlotName)
 void URSSaveGameSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
-
     const URSSaveGameSettings* SGSettings = GetDefault<URSSaveGameSettings>();
     // Access defaults from DefaultGame.ini
     CurrentSlotName = SGSettings->SaveSlotName;
-
     // Make sure it's loaded into memory .Get() only resolves if already loaded previously elsewhere in code
     // UDataTable* DummyTable = SGSettings->DummyTablePath.LoadSynchronous();
     //DummyTable->GetAllRows() // We don't need this table for anything, just an content reference example
