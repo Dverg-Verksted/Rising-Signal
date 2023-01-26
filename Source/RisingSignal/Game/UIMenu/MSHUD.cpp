@@ -31,6 +31,8 @@ void AMSHUD::BeginPlay()
         CreateWidget<UMSMenuUserWidgetBase>(GetWorld(), this->CreditsHudWidgetClass));
     this->MenuWidgets.Add(EMSMenuState::Loading,
         CreateWidget<UMSMenuUserWidgetBase>(GetWorld(), this->LoadingHudWidgetClass));
+    this->MenuWidgets.Add(EMSMenuState::NewGame,
+        CreateWidget<UMSMenuUserWidgetBase>(GetWorld(), this->NewGameHudWidgetClass));
 
     for (const auto Widget : this->MenuWidgets)
     {

@@ -35,7 +35,7 @@ public:
     virtual void StartPlay() override;
 
     UFUNCTION(BlueprintCallable)
-    void CheckpointReached(AActor* ReachedActor);
+    void CheckpointReached();
 
     virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 
@@ -43,11 +43,7 @@ public:
     void LoadCheckpoint();
 
     UFUNCTION(BlueprintCallable)
-    void LoadLevel(FName LevelName, bool FromBegin);
-
-    void RestartLevel();
-
-    
+    void LoadLevel(FName LevelName, bool FromBegin, bool SaveOnLoad);
 
 protected:
     virtual void BeginPlay() override;
@@ -62,7 +58,7 @@ private:
     // Current pointer on AGameHUD
     UPROPERTY()
     AGameHUD* GameHUD;
-    
+
     UPROPERTY()
     class URSSaveGameSubsystem* SG;
 
