@@ -9,6 +9,8 @@
 
 #define MAX_SLOTS 4
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActiveSlotChanged, int32, Index);
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent),
     HideCategories = ("Variable", "Transform", "Sockets", "Shape", "Navigation", "ComponentTick", "Physics", "Tags", "Cooking", "HLOD",
         "Mobile", "Activation", "Component Replication", "Events", "Asset User Data", "Collision"))
@@ -22,6 +24,9 @@ public:
     UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite)
     FOnSlotChangedSignature OnEquipmentSlotChanged;
 
+    UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
+    FOnActiveSlotChanged OnActiveSlotChanged;
+
     void EquipItemInSlot(const FInventoryItem& Item, int32 Index);
 
     virtual void RemoveItem(const FInventoryItem& InventorySlot, int32 CountRemove, bool bItemUsed) override;
@@ -33,14 +38,14 @@ public:
     void TakeInHands(int32 Index);
 
     TMap<int32, FInventoryItem> GetItems() const { return EquipmentSlots; }
-    
+
     UFUNCTION(BlueprintPure)
     int32 GetEquippedItem() const { return CurrentItemInHand; }
 
     UFUNCTION(BlueprintPure)
     TMap<int32, FInventoryItem> GetEquipments() const { return EquipmentSlots; }
-    
-    
+
+
     void LoadItems(TMap<int32, FInventoryItem> ItemsMap, int32 EquippedItem)
     {
         EquipmentSlots = ItemsMap;

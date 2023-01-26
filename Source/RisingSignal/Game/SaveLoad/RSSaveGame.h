@@ -76,6 +76,7 @@ class RISINGSIGNAL_API URSSaveGame : public USaveGame
     GENERATED_BODY()
 
 public:
+    UPROPERTY()
     FName SavedLevelName = NAME_None;
 
     UPROPERTY()

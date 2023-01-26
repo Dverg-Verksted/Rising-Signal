@@ -189,13 +189,14 @@ public:
     virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
         AActor* DamageCauser) override;
 
-private:
-    bool canRun = true;
-
     /**
      * @brief Open inventory in game HUD
      */
+    UFUNCTION(BlueprintCallable, Category = "Inventory")
     void OpenCloseInventory();
+
+private:
+    bool canRun = true;
 
     /**
      * @brief Open Journal in game HUD
