@@ -248,9 +248,11 @@ bool URSInventoryComponent::MoveItemEquipment(const FInventoryItem& FirstInvento
                     return true;
                 }
                 EquipmentComponent->SwapItem(FirstInventorySlot, SecondInventorySlot);
+
                 return true;
             }
             EquipmentComponent->EquipItemInSlot(FirstInventorySlot, SecondInventorySlot.SlotIndex);
+
             EquipmentComponent->RemoveItem(FirstInventorySlot, FirstInventorySlot.Count, false);
             return true;
         }

@@ -17,7 +17,8 @@ enum class EMSMenuState : uint8
     MainMenu,
     Settings,
     Credits,
-    Loading
+    Loading,
+    NewGame
 };
 
 /* Delegate for change the menu state */

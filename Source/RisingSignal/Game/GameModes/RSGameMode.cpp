@@ -32,14 +32,17 @@ void ARSGameMode::StartPlay()
 
 }
 
-void ARSGameMode::CheckpointReached(AActor* ReachedActor)
+void ARSGameMode::CheckpointReached()
 {
-    ARSBaseCharacter* Player = Cast<ARSBaseCharacter>(ReachedActor);
+    ARSBaseCharacter* Player = GetWorld()->GetFirstPlayerController()->GetPawn<ARSBaseCharacter>();
+
     if (Player && SG)
     {
         // Immediately auto save on death
         SG->WriteSaveGame();
     }
+    else
+        LOG_RS(ELogRSVerb::Error, "Error while saving");
 }
 
 void ARSGameMode::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
@@ -67,17 +70,19 @@ void ARSGameMode::LoadCheckpoint()
 
 }
 
-void ARSGameMode::LoadLevel(FName LevelName, bool FromBegin)
+void ARSGameMode::LoadLevel(FName LevelName, bool FromBegin, bool SaveOnLoad)
 {
     if (FromBegin)
-        UGameplayStatics::OpenLevel(this, LevelName, true, L"LoadCheckpoint=False");
+    {
+        if (SaveOnLoad)
+            UGameplayStatics::OpenLevel(this, LevelName, true, L"LoadCheckpoint=False?Save=True");
+        else
+            UGameplayStatics::OpenLevel(this, LevelName, true, L"LoadCheckpoint=False?Save=False");
+    }
     else
-        UGameplayStatics::OpenLevel(this, LevelName, true, L"LoadCheckpoint=True");
+        UGameplayStatics::OpenLevel(this, LevelName, true, L"LoadCheckpoint=True?Save=False");
 }
 
-void ARSGameMode::RestartLevel()
-{
-}
 
 void ARSGameMode::BeginPlay()
 {
@@ -96,7 +101,7 @@ void ARSGameMode::BeginPlay()
     {
         SG->SetSaveGame(Cast<URSSaveGame>(UGameplayStatics::CreateSaveGameObject(URSSaveGame::StaticClass())));
 
-        UE_LOG(LogTemp, Warning, TEXT("Created New SaveGame Data. 1111111"));
+        UE_LOG(LogTemp, Warning, TEXT("Created New SaveGame Data."));
     }
     else
     {
@@ -110,7 +115,8 @@ void ARSGameMode::BeginPlay()
 
     if (UGameplayStatics::ParseOption(OptionsString, "LoadCheckpoint") == "True")
     {
-        UE_LOG(LogTemp, Warning, TEXT("Checkpoint"));
+        GEngine->AddOnScreenDebugMessage(0, 2, FColor::Red, "Checkpoint Loading");
+
         LoadCheckpoint();
     }
 
@@ -118,8 +124,10 @@ void ARSGameMode::BeginPlay()
 
 void ARSGameMode::GameStarted()
 {
-    // if (bGameWasLoaded)
-    // {
-    //     SG->OnSaveGameLoaded.Broadcast(SG->GetSaveGame());
-    // }
+    UE_LOG(LogTemp, Warning, TEXT("%s::%s() called"), *GetName(), *FString(__FUNCTION__));
+
+    if (UGameplayStatics::ParseOption(OptionsString, "Save") == "True")
+    {
+        CheckpointReached();
+    }
 }

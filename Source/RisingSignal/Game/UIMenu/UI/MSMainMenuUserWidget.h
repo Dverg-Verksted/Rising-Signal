@@ -18,7 +18,7 @@ class UButton;
 UCLASS()
 class RISINGSIGNAL_API UMSMainMenuUserWidget : public UMSMenuUserWidgetBase
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 protected:
     // @protected Native handling for SObjectWidget
@@ -27,27 +27,34 @@ protected:
 private:
     // @private Button to switch to a new game
     UPROPERTY(Transient, meta = (BindWidget))
+    UButton* MSContinueButton;
+    // @private Animation Button to switch to a new game
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
+    UWidgetAnimation* MSContinueButtonAnim;
+
+    // @private Button to switch to a new game
+    UPROPERTY(Transient, EditDefaultsOnly, meta = (BindWidget))
     UButton* MSNewGameButton;
     // @private Animation Button to switch to a new game
     UPROPERTY(Transient, meta = (BindWidgetAnim))
     UWidgetAnimation* MSNewGameButtonAnim;
-    
+
     // @private Button to switch to a settings
-    UPROPERTY(Transient, meta = (BindWidget))
+    UPROPERTY(Transient, EditDefaultsOnly, meta = (BindWidget))
     UButton* MSSettingsButton;
     // @private Animation Button to switch to a settings
     UPROPERTY(Transient, meta = (BindWidgetAnim))
     UWidgetAnimation* MSSettingsButtonAnim;
 
     // @private Button to switch to a credits game
-    UPROPERTY(Transient, meta = (BindWidget))
+    UPROPERTY(Transient, EditDefaultsOnly, meta = (BindWidget))
     UButton* MSCreditsButton;
     // @private Animation Button to switch to a credits game
     UPROPERTY(Transient, meta = (BindWidgetAnim))
     UWidgetAnimation* MSCreditsButtonAnim;
 
     // @private Button to close game
-    UPROPERTY(Transient, meta = (BindWidget))
+    UPROPERTY(Transient, EditDefaultsOnly, meta = (BindWidget))
     UButton* MSExitButton;
 
     /**
@@ -55,6 +62,14 @@ private:
      **/
     UFUNCTION()
     void NewGame();
+
+
+    /**
+ * @private Setup a new game
+ **/
+    UFUNCTION()
+    void ContinueGame();
+
 
     /**
      * @private Setup a Settings state
