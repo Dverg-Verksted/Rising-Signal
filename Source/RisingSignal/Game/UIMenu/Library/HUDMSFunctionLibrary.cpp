@@ -20,15 +20,15 @@ void UMSFunctionLibrary::Print_Log(ELogVerb TypeVerb, FString Str, int Line, con
 {
     if (TypeVerb == ELogVerb::Display)
     {        
-        UE_LOG(LogJamMenuSystem, Display, TEXT("[%s][%d] Reason:[%s]"), ANSI_TO_TCHAR(Function), Line, *Str);
+        UE_LOG(LogMenuSystem, Display, TEXT("[%s][%d] Reason:[%s]"), ANSI_TO_TCHAR(Function), Line, *Str);
     }
     else if (TypeVerb == ELogVerb::Warning)
     {
-        UE_LOG(LogJamMenuSystem, Warning, TEXT("[%s][%d] Reason:[%s]"), ANSI_TO_TCHAR(Function), Line, *Str);
+        UE_LOG(LogMenuSystem, Warning, TEXT("[%s][%d] Reason:[%s]"), ANSI_TO_TCHAR(Function), Line, *Str);
     }
     else if (TypeVerb == ELogVerb::Error)
     {
-        UE_LOG(LogJamMenuSystem, Error, TEXT("[%s][%d] Reason:[%s]"), ANSI_TO_TCHAR(Function), Line, *Str);
+        UE_LOG(LogMenuSystem, Error, TEXT("[%s][%d] Reason:[%s]"), ANSI_TO_TCHAR(Function), Line, *Str);
     }
 
 #if UE_EDITOR
@@ -38,19 +38,19 @@ void UMSFunctionLibrary::Print_Log(ELogVerb TypeVerb, FString Str, int Line, con
         if (TypeVerb == ELogVerb::Display && StateShowLog == EMSStateShowLog::All)
         {
             GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Blue,
-                (FString("LogJamMenuSystem: Display: [") + ANSI_TO_TCHAR(Function) + "][" + FString::FromInt(Line) +
+                (FString("LogMenuSystem: Display: [") + ANSI_TO_TCHAR(Function) + "][" + FString::FromInt(Line) +
                     FString(L"] Reason: [") + Str + FString("]")));
         }
         else if (TypeVerb == ELogVerb::Warning && StateShowLog >= EMSStateShowLog::Warning)
         {
             GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow,
-                    (FString("LogJamMenuSystem: Warning: [") + ANSI_TO_TCHAR(Function) + "][" + FString::FromInt(Line) +
+                    (FString("LogMenuSystem: Warning: [") + ANSI_TO_TCHAR(Function) + "][" + FString::FromInt(Line) +
                         FString(L"] Reason: [") + Str + FString("]")));
         }
         else if (TypeVerb == ELogVerb::Error && StateShowLog >= EMSStateShowLog::Error)
         {
             GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red,
-                    (FString("LogJamMenuSystem: Error: [") + ANSI_TO_TCHAR(Function) + "][" + FString::FromInt(Line) +
+                    (FString("LogMenuSystem: Error: [") + ANSI_TO_TCHAR(Function) + "][" + FString::FromInt(Line) +
                         FString(L"] Reason: [") + Str + FString("]")));
         }
     }

@@ -10,6 +10,7 @@
 #include "GameFramework/Character.h"
 #include "Library/RSFunctionLibrary.h"
 #include "Player/RSGamePLayer.h"
+#include "Player/NewTestPlayer/RSBaseCharacter.h"
 
 ARSInteractStaticWorkbench::ARSInteractStaticWorkbench()
 {
@@ -59,9 +60,9 @@ void ARSInteractStaticWorkbench::Interact(ACharacter* InteractingCharacter)
 {
     Super::Interact(InteractingCharacter);
 
-    UE_LOG(LogTemp, Error, TEXT("%s::%s() called"), *GetName(), *FString(__FUNCTION__));
-    
-    if (ARSGamePLayer* Player = Cast<ARSGamePLayer>(InteractingCharacter))
+    LOG_RS(ELogRSVerb::Warning, InteractingCharacter->GetName());
+
+    if (ARSBaseCharacter* Player = Cast<ARSBaseCharacter>(InteractingCharacter))
     {
         Player->OpenCloseInventory();
     }
