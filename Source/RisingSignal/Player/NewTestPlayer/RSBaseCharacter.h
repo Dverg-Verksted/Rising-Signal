@@ -84,7 +84,7 @@ public:
     virtual void Falling() override;
     virtual void Landed(const FHitResult& Hit) override;
     virtual void NotifyJumpApex() override;
-    
+
     virtual void Jump() override;
 
     FORCEINLINE URSCharacterMovementComponent* GetBaseCharacterMovementComponent() const { return RSCharacterMovementComponent; }
@@ -126,9 +126,9 @@ public:
 
     void ClimbLadder(float Value);
     void SwingRope(float Value);
-    
+
     void MoveWallForward(float Value);
-    
+
     void MoveWallRight(float Value);
 
     void RegisterInteractiveActor(AInteractiveActor* InteractiveActor);
@@ -148,15 +148,15 @@ public:
     const ALadder* GetAvailableLadder() const;
     ARope* GetAvailableRope() const;
     AClimbingWall* GetAvailableWall() const;
-    
-    UFUNCTION(BlueprintCallable, BlueprintPure)
-    FORCEINLINE float GetIKLeftFootOffset() const {return IKLeftFootOffset;}
 
     UFUNCTION(BlueprintCallable, BlueprintPure)
-    FORCEINLINE float GetIKRightFootOffset() const {return IKRightFootOffset;}
+    FORCEINLINE float GetIKLeftFootOffset() const { return IKLeftFootOffset; }
 
     UFUNCTION(BlueprintCallable, BlueprintPure)
-    FORCEINLINE float GetIKPelvisOffset() const {return IKPelvisOffset;}
+    FORCEINLINE float GetIKRightFootOffset() const { return IKRightFootOffset; }
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    FORCEINLINE float GetIKPelvisOffset() const { return IKPelvisOffset; }
 
     FORCEINLINE float GetHangingSpeed() const { return HangingSpeed; }
 
@@ -167,11 +167,14 @@ protected:
     TArray<AInteractiveActor*> AvailableInteractiveActors;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= "Landed settings", DisplayName="Минимальная высота для кувырка",
-    meta=(ToolTip="Выше этой высоты персонаж будет делать кувырок при приземлении. Должна быть меньше максимальной высоты для кувырка", ClampMin = 0.0f, UIMin = 0.0f))
+        meta=(ToolTip="Выше этой высоты персонаж будет делать кувырок при приземлении. Должна быть меньше максимальной высоты для кувырка",
+            ClampMin = 0.0f, UIMin = 0.0f))
     float MinHeightForRoll = 1.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= "Landed settings", DisplayName="Максимальная высота для кувырка",
-    meta=(ToolTip="Выше этой высоты персонаж не сможет сделать кувырок при приземлении. Должна быть не меньше минимальной высоты для кувырка", ClampMin = 0.0f, UIMin = 0.0f))
+        meta=(ToolTip=
+            "Выше этой высоты персонаж не сможет сделать кувырок при приземлении. Должна быть не меньше минимальной высоты для кувырка",
+            ClampMin = 0.0f, UIMin = 0.0f))
     float MaxHeightForRoll = 3.0f;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Falls")
@@ -321,13 +324,14 @@ public:
     virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
         AActor* DamageCauser) override;
 
+    /**
+    * @brief Open inventory in game HUD
+    */
+    void OpenCloseInventory();
+
 private:
     bool canRun = true;
 
-    /**
-     * @brief Open inventory in game HUD
-     */
-    void OpenCloseInventory();
 
     /**
      * @brief Open Journal in game HUD
@@ -351,7 +355,7 @@ private:
     const FMantlingSettings& GetMantlingSettings(float LedgeHeight) const;
 
     void GetControlRightVector(FVector& Right);
-    
+
     bool CanMove();
     bool CanMantle();
     bool CanRoll();
