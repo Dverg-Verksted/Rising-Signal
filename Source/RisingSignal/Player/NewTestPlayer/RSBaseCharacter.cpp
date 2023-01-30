@@ -273,7 +273,10 @@ void ARSBaseCharacter::SwingRope(float Value)
         GetControlRightVector(RightVector);
         RightVector *= Value;
         HangingSpeed = Value * 600.0f;
-        CurrentRope->AddSwingForce(RightVector, false);
+        if(IsValid(CurrentRope))
+        {
+            CurrentRope->AddSwingForce(RightVector, false);
+        }
     }
 }
 
