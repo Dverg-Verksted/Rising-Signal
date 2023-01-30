@@ -19,7 +19,7 @@ enum class ELogVerb: uint8
     Error
 };
 
-DEFINE_LOG_CATEGORY_STATIC(LogJamMenuSystem, All, All);
+DEFINE_LOG_CATEGORY_STATIC(LogMenuSystem, All, All);
 
 #define CHECK(exp, str) UMSFunctionLibrary::Print_Exp(exp, str, __LINE__, __FUNCTION__)
 #define LOGJAM(verb, str) UMSFunctionLibrary::Print_Log(verb, str, __LINE__, __FUNCTION__)

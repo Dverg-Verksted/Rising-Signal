@@ -357,6 +357,10 @@
 		{
 			"Name": "MediaIOFramework",
 			"Enabled": true
+		},
+		{
+			"Name": "JamMenuSystem",
+			"Enabled": false
 		}
 	],
 	"TargetPlatforms": [
