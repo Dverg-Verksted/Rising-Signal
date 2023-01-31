@@ -13,4 +13,10 @@ UCLASS()
 class RISINGSIGNAL_API URSGameInstance : public UGameInstance
 {
     GENERATED_BODY()
+
+public:
+    // Singleton
+    UFUNCTION(BlueprintCallable, Category = "URSGameInstance|Singleton")
+    static URSGameInstance* Get(UWorld* World) { return (World) ? Cast<URSGameInstance>(World->GetGameInstance()) : nullptr; }
+    
 };

@@ -1,20 +1,23 @@
-/**
-  * Maintain: Mark Veligod
-  * GitHub: https://github.com/markveligod
-  * Itch: https://markveligod.itch.io/
- **/
+// It is owned by the company Dverg Verksted.
 
-#include "Game/UIMenu/UI/MSMenuUserWidgetBase.h"
+
+#include "Game/HUD/Player/Base/HUDWidgetBase.h"
+
+#include "Game/GameModes/RSGameMode.h"
 #include "Game/UIMenu/Base/MSGameInstance/MSGameInstance.h"
 #include "Game/UIMenu/Base/MSGameMode/MSGameMode.h"
 #include "Game/UIMenu/Library/HUDMSFunctionLibrary.h"
+#include "GameInstance/RSGameInstance.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Player/RSGamePlayerController.h"
 
-void UMSMenuUserWidgetBase::Print_Menu(ELogMS TypeVerb, FString Str, int Line, const char* Function) const
+void UHUDWidgetBase::Print_Menu(ELogMS TypeVerb, FString Str, int Line, const char* Function) const
 {
     UMSFunctionLibrary::Print_Log(TypeVerb, FString::Printf(TEXT("Name widget: %s | "), *GetName()) + Str, Line, Function);
 }
 
-void UMSMenuUserWidgetBase::ShowAnim(UWidgetAnimation* Anim)
+void UHUDWidgetBase::ShowAnim(UWidgetAnimation* Anim)
 {
     SetupStateButton(EMSStateObject::Inactive);
     LOGMENU(ELogMS::Display, FString::Printf(TEXT("Show animation: %s"), *Anim->GetName()));
@@ -35,7 +38,7 @@ void UMSMenuUserWidgetBase::ShowAnim(UWidgetAnimation* Anim)
     }
 }
 
-void UMSMenuUserWidgetBase::ShowAnimTimer(UWidgetAnimation* Anim, float RateTime)
+void UHUDWidgetBase::ShowAnimTimer(UWidgetAnimation* Anim, float RateTime)
 {
     if (GetWorld()->GetTimerManager().TimerExists(this->TimerHandleShowAnim))
     {
@@ -50,20 +53,20 @@ void UMSMenuUserWidgetBase::ShowAnimTimer(UWidgetAnimation* Anim, float RateTime
     }
     
     FTimerDelegate TimerDelegate;
-    TimerDelegate.BindUObject(this, &UMSMenuUserWidgetBase::ShowAnim, Anim);
+    TimerDelegate.BindUObject(this, &UHUDWidgetBase::ShowAnim, Anim);
     GetWorld()->GetTimerManager().SetTimer(this->TimerHandleShowAnim, TimerDelegate, RateTime, false);
 
     LOGMENU(ELogMS::Display, FString::Printf(TEXT("Show Animation: %s via: %f"), *Anim->GetName(), Anim->GetEndTime()));
 }
 
-void UMSMenuUserWidgetBase::SetupStateButton(EMSStateObject NewState)
+void UHUDWidgetBase::SetupStateButton(EMSStateObject NewState)
 {
     if (this->StateWidget == EMSStateObject::Inactive) return;
     LOGMENU(ELogMS::Display, FString::Printf(TEXT("New State button: %s"), *UEnum::GetValueAsString(NewState)));
     this->StateButton = NewState;
 }
 
-void UMSMenuUserWidgetBase::SetupStateButtonTimer(EMSStateObject NewState, float RateTime)
+void UHUDWidgetBase::SetupStateButtonTimer(EMSStateObject NewState, float RateTime)
 {
     if (GetWorld()->GetTimerManager().TimerExists(this->TimerHandleButton))
     {
@@ -78,27 +81,29 @@ void UMSMenuUserWidgetBase::SetupStateButtonTimer(EMSStateObject NewState, float
     }
 
     FTimerDelegate TimerDelegate;
-    TimerDelegate.BindUObject(this, &UMSMenuUserWidgetBase::SetupStateButton, NewState);
+    TimerDelegate.BindUObject(this, &UHUDWidgetBase::SetupStateButton, NewState);
     GetWorld()->GetTimerManager().SetTimer(this->TimerHandleShowAnim, TimerDelegate, RateTime, false);
 }
 
-void UMSMenuUserWidgetBase::SetupStateWidget(const EMSStateObject NewState)
+void UHUDWidgetBase::SetupStateWidget(const EMSStateObject NewState)
 {
     LOGMENU(ELogMS::Display, FString::Printf(TEXT("New State widget: %s"), *UEnum::GetValueAsString(NewState)));
     this->StateWidget = NewState;
     SetupStateButton(NewState);
 }
 
-void UMSMenuUserWidgetBase::NativeOnInitialized()
+void UHUDWidgetBase::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
 
     LOGMENU(ELogMS::Display, "Native On Initialized");
-    
-    this->GameMode = AMSGameMode::Get(GetWorld());
-    if (!CHECKMS(this->GameMode != nullptr, "Game mode is nullptr")) return;
 
     this->GameInst = UMSGameInstance::Get(GetWorld());
     if (!CHECKMS(this->GameInst != nullptr, "Game instance is nullptr")) return;
+
+    PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+    GamePlayerController = Cast<ARSGamePlayerController>(PlayerController);
+
+    GameMode = Cast<ARSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
     
 }

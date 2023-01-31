@@ -14,6 +14,7 @@
 #include "Game/Inventory/RSInventoryComponent.h"
 #include "Game/WeaponSystem/WeaponComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Player/RSGamePlayerController.h"
@@ -368,6 +369,7 @@ void ARSBaseCharacter::BeginPlay()
 
     AbilitySystem->OnStateChangedSignature.AddDynamic(this, &ARSBaseCharacter::CheckSomeState);
     AbilitySystem->OnDeath.AddDynamic(this, &ARSBaseCharacter::RegisterDeath);
+    
 }
 
 void ARSBaseCharacter::Tick(float DeltaTime)

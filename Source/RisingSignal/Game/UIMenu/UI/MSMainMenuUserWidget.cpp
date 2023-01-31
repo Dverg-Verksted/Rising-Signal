@@ -50,6 +50,6 @@ void UMSMainMenuUserWidget::SwitchToCredits()
 void UMSMainMenuUserWidget::CloseGame()
 {
     if (GetStateButton() == EMSStateObject::Inactive) return;
-    LOGMENU(ELogVerb::Display, "Goodbye!");
+    LOGMS(ELogMS::Display, "Goodbye!");
     UKismetSystemLibrary::QuitGame(this, GetOwningPlayer(), EQuitPreference::Quit, true);
 }

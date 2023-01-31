@@ -23,20 +23,20 @@ void UMSGameInstance::Init()
     Super::Init();
     NameContinueLevel = GetSavedLevelName();
     this->MusicMenuClass->Properties.Volume = this->DefaultMusicVolumeValue / VALUE_PERCENT;
-    LOGJAM(ELogVerb::Display, FString::Printf(TEXT("Setup default music volume: %f"),
+    LOGMS(ELogMS::Display, FString::Printf(TEXT("Setup default music volume: %f"),
         this->MusicMenuClass->Properties.Volume));
     this->SoundMenuClass->Properties.Volume = this->DefaultSoundVolumeValue / VALUE_PERCENT;
-    LOGJAM(ELogVerb::Display, FString::Printf(TEXT("Setup default sound volume: %f"),
+    LOGMS(ELogMS::Display, FString::Printf(TEXT("Setup default sound volume: %f"),
         this->SoundMenuClass->Properties.Volume));
     UKismetSystemLibrary::GetConvenientWindowedResolutions(this->ArrayWindowedScreenSize);
-    LOGJAM(ELogVerb::Display, "---| Available screen resolutions |---");
+    LOGMS(ELogMS::Display, "---| Available screen resolutions |---");
     for (const auto Point : this->ArrayWindowedScreenSize)
     {
-        LOGJAM(ELogVerb::Display, FString::Printf(TEXT("Screen: %s"), *Point.ToString()));
+        LOGMS(ELogMS::Display, FString::Printf(TEXT("Screen: %s"), *Point.ToString()));
     }
     if (this->ArrayWindowedScreenSize.Num() > 0)
     {
-        LOGJAM(ELogVerb::Display, FString::Printf(TEXT("Selected default screen size: %s"),
+        LOGMS(ELogMS::Display, FString::Printf(TEXT("Selected default screen size: %s"),
             *UMSFunctionLibrary::GetStringSizeScreen(this->ArrayWindowedScreenSize[0])));
         UGameUserSettings* GameUserSettings = UGameUserSettings::GetGameUserSettings();
         if (GameUserSettings)
@@ -49,7 +49,7 @@ void UMSGameInstance::Init()
     this->LangGame = UKismetSystemLibrary::GetDefaultLanguage();
     if (!LangGame.IsEmpty())
     {
-        LOGJAM(ELogVerb::Display, FString::Printf(TEXT("Lang game: %s"), *this->LangGame));
+        LOGMS(ELogMS::Display, FString::Printf(TEXT("Lang game: %s"), *this->LangGame));
         this->SetupLangGame((this->LangGame != "ru" && this->LangGame != "ru-RU") ? "en" : "ru");
     }
 }
