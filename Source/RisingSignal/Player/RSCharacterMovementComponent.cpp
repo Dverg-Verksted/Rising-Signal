@@ -399,6 +399,10 @@ void URSCharacterMovementComponent::PhysLadder(float DeltaTime, int32 Iterations
 void URSCharacterMovementComponent::PhysHanging(float DeltaTime, int32 Iterations)
 {
     const ARope* CurrentRope = BaseCharacterOwner->GetAvailableRope();
+    if(!IsValid(CurrentRope))
+    {
+        return;
+    }
 
     const FVector NewLocation = FMath::Lerp(GetOwner()->GetActorLocation(), CurrentRope->GetCableEndMeshComponent()->GetComponentLocation(), 0.2f);
     const FVector Delta = NewLocation - GetActorLocation();

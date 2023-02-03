@@ -12,7 +12,7 @@
 #include "HUDMSFunctionLibrary.generated.h"
 
 UENUM(Blueprintable)
-enum class ELogVerb: uint8
+enum class ELogMS: uint8
 {
     Display,
     Warning,
@@ -21,12 +21,12 @@ enum class ELogVerb: uint8
 
 DEFINE_LOG_CATEGORY_STATIC(LogMenuSystem, All, All);
 
-#define CHECK(exp, str) UMSFunctionLibrary::Print_Exp(exp, str, __LINE__, __FUNCTION__)
-#define LOGJAM(verb, str) UMSFunctionLibrary::Print_Log(verb, str, __LINE__, __FUNCTION__)
+#define CHECKMS(exp, str) UMSFunctionLibrary::Print_Exp(exp, str, __LINE__, __FUNCTION__)
+#define LOGMS(verb, str) UMSFunctionLibrary::Print_Log(verb, str, __LINE__, __FUNCTION__)
 #define VALUE_PERCENT 100.0f
 
 //
-EMSStateShowLog StateShowLog = EMSStateShowLog::Error;
+EMSStateShowLog StateShowLogMS = EMSStateShowLog::Error;
 
 /**
  * @class Functional library for project support
@@ -42,7 +42,7 @@ public:
     static bool Print_Exp(bool Var, FString Str, int Line, const char* Function);
     
     // @public Print a log on screen(UE_EDITOR only) and in ULOG
-    static void Print_Log(ELogVerb TypeVerb, FString Str, int Line, const char* Function);
+    static void Print_Log(ELogMS TypeVerb, FString Str, int Line, const char* Function);
 
     // @public Get string from bool
     UFUNCTION(BlueprintPure, Category = "MSFunctionLibrary")

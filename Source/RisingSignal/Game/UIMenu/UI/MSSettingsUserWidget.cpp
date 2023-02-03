@@ -34,7 +34,7 @@ void UMSSettingsUserWidget::NativeOnInitialized()
     const UGameUserSettings* GameUserSettings = UGameUserSettings::GetGameUserSettings();
     if (!GameUserSettings)
     {
-        LOGMENU(ELogVerb::Error, FString("Game user settings is nullptr"));
+        LOGMENU(ELogMS::Error, FString("Game user settings is nullptr"));
         return;
     }
 
@@ -59,7 +59,7 @@ void UMSSettingsUserWidget::ChangeToMainMenu()
 void UMSSettingsUserWidget::ChangeMusicVolume(bool bIsChecked)
 {
     const float NewVolumeValue = bIsChecked ? GetGameInst()->GetDefaultMusicVolumeValue() / VALUE_PERCENT : 0.0f;
-    LOGMENU(ELogVerb::Display, FString::Printf(TEXT("Name checkbox: %s | State: %s | Current Music volume: %f | New Music volume: %f"),
+    LOGMENU(ELogMS::Display, FString::Printf(TEXT("Name checkbox: %s | State: %s | Current Music volume: %f | New Music volume: %f"),
         *this->MusicCheckBox->GetName(), *UMSFunctionLibrary::GetStringFromBool(bIsChecked),
         GetGameInst()->GetMusicMenuClass()->Properties.Volume, NewVolumeValue));
     
@@ -69,7 +69,7 @@ void UMSSettingsUserWidget::ChangeMusicVolume(bool bIsChecked)
 void UMSSettingsUserWidget::ChangeSoundVolume(bool bIsChecked)
 {
     const float NewVolumeValue = bIsChecked ? GetGameInst()->GetDefaultSoundVolumeValue() / VALUE_PERCENT : 0.0f;
-    LOGMENU(ELogVerb::Display, FString::Printf(TEXT("Name checkbox: %s | State: %s | Current Sound volume: %f | New Sound volume: %f"),
+    LOGMENU(ELogMS::Display, FString::Printf(TEXT("Name checkbox: %s | State: %s | Current Sound volume: %f | New Sound volume: %f"),
         *this->MusicCheckBox->GetName(), *UMSFunctionLibrary::GetStringFromBool(bIsChecked),
         GetGameInst()->GetSoundMenuClass()->Properties.Volume, NewVolumeValue));
     
@@ -78,19 +78,19 @@ void UMSSettingsUserWidget::ChangeSoundVolume(bool bIsChecked)
 
 void UMSSettingsUserWidget::ChangeSelectedScreenSize(FString SelectedItem, ESelectInfo::Type SelectionType)
 {
-    LOGMENU(ELogVerb::Display, FString::Printf(TEXT("Selected item: %s | Selection type: %s"), *SelectedItem, *UEnum::GetValueAsString(SelectionType)));
+    LOGMENU(ELogMS::Display, FString::Printf(TEXT("Selected item: %s | Selection type: %s"), *SelectedItem, *UEnum::GetValueAsString(SelectionType)));
     if (SelectionType == ESelectInfo::OnMouseClick)
     {
         UGameUserSettings* GameUserSettings = UGameUserSettings::GetGameUserSettings();
         if (!GameUserSettings)
         {
-            LOGMENU(ELogVerb::Error, FString("Game user settings is nullptr"));
+            LOGMENU(ELogMS::Error, FString("Game user settings is nullptr"));
             return;
         }
         const FIntPoint Point = UMSFunctionLibrary::GetSizeScreenFromString(SelectedItem);
         if (Point.X == 0 || Point.Y == 0)
         {
-            LOGMENU(ELogVerb::Error, FString::Printf(TEXT("Incorrect value screen size: X - %i | Y - %i"), Point.X, Point.Y));
+            LOGMENU(ELogMS::Error, FString::Printf(TEXT("Incorrect value screen size: X - %i | Y - %i"), Point.X, Point.Y));
             return;
         }
         GameUserSettings->SetScreenResolution(Point);
@@ -100,7 +100,7 @@ void UMSSettingsUserWidget::ChangeSelectedScreenSize(FString SelectedItem, ESele
 
 void UMSSettingsUserWidget::ChangeLangGame(FString SelectedItem, ESelectInfo::Type SelectionType)
 {
-    LOGMENU(ELogVerb::Display, FString::Printf(TEXT("Selected item: %s | Selection type: %s"), *SelectedItem, *UEnum::GetValueAsString(SelectionType)));
+    LOGMENU(ELogMS::Display, FString::Printf(TEXT("Selected item: %s | Selection type: %s"), *SelectedItem, *UEnum::GetValueAsString(SelectionType)));
     if (SelectionType == ESelectInfo::OnMouseClick)
     {
         GetGameInst()->SetupLangGame((SelectedItem == "English") ? "en" : "ru");

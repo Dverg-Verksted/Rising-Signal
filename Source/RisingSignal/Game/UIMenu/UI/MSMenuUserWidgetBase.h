@@ -28,7 +28,7 @@ class RISINGSIGNAL_API UMSMenuUserWidgetBase : public UUserWidget
 public:
 
     // Log print from menu
-    void Print_Menu(ELogVerb TypeVerb, FString Str, int Line, const char* Function) const;
+    void Print_Menu(ELogMS TypeVerb, FString Str, int Line, const char* Function) const;
     
 #pragma region Action
 

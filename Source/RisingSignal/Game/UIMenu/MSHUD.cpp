@@ -14,12 +14,12 @@ void AMSHUD::BeginPlay()
     Super::BeginPlay();
 
     this->GameMode = AMSGameMode::Get(GetWorld());
-    if (!CHECK(this->GameMode != nullptr, "Game mode is nullptr")) return;
+    if (!CHECKMS(this->GameMode != nullptr, "Game mode is nullptr")) return;
 
-    if (!CHECK(this->WelcomeHudWidgetClass.GetDefaultObject() != nullptr, "WelcomeHudWidgetClass is nullptr")) return;
-    if (!CHECK(this->MenuHudWidgetClass.GetDefaultObject() != nullptr, "MenuHudWidgetClass is nullptr")) return;
-    if (!CHECK(this->SettingsHudWidgetClass.GetDefaultObject() != nullptr, "OptionsHudWidgetClass is nullptr")) return;
-    if (!CHECK(this->CreditsHudWidgetClass.GetDefaultObject() != nullptr, "CreditsHudWidgetClass is nullptr")) return;
+    if (!CHECKMS(this->WelcomeHudWidgetClass.GetDefaultObject() != nullptr, "WelcomeHudWidgetClass is nullptr")) return;
+    if (!CHECKMS(this->MenuHudWidgetClass.GetDefaultObject() != nullptr, "MenuHudWidgetClass is nullptr")) return;
+    if (!CHECKMS(this->SettingsHudWidgetClass.GetDefaultObject() != nullptr, "OptionsHudWidgetClass is nullptr")) return;
+    if (!CHECKMS(this->CreditsHudWidgetClass.GetDefaultObject() != nullptr, "CreditsHudWidgetClass is nullptr")) return;
 
     this->MenuWidgets.Add(EMSMenuState::WelcomeToGame,
         CreateWidget<UMSMenuUserWidgetBase>(GetWorld(), this->WelcomeHudWidgetClass));
@@ -46,9 +46,9 @@ void AMSHUD::BeginPlay()
 
 void AMSHUD::OnMenuStateChanged(EMSMenuState NewState)
 {
-    LOGJAM(ELogVerb::Display, FString::Printf(TEXT("New State in HUD: %s"), *UEnum::GetValueAsString(NewState)));
+    LOGMS(ELogMS::Display, FString::Printf(TEXT("New State in HUD: %s"), *UEnum::GetValueAsString(NewState)));
 
-    if (!CHECK(this->MenuWidgets.Contains(NewState), FString::Printf(TEXT("State: %s don't contains in TMap widgets"),
+    if (!CHECKMS(this->MenuWidgets.Contains(NewState), FString::Printf(TEXT("State: %s don't contains in TMap widgets"),
         *UEnum::GetValueAsString(NewState)))) return;
     
     if (this->MenuWidget)
@@ -69,10 +69,10 @@ void AMSHUD::OnMenuStateChanged(EMSMenuState NewState)
 
 void AMSHUD::SetupNewWidget(UMSMenuUserWidgetBase* Widget)
 {
-    if (!CHECK(Widget != nullptr, "Widget is nullptr")) return;
+    if (!CHECKMS(Widget != nullptr, "Widget is nullptr")) return;
     if (this->MenuWidget == Widget)
     {
-        LOGJAM(ELogVerb::Warning, FString::Printf(TEXT("Menu widget equal pointer on new widget: %s"), *Widget->GetName()));
+        LOGMS(ELogMS::Warning, FString::Printf(TEXT("Menu widget equal pointer on new widget: %s"), *Widget->GetName()));
         return;
     }
     
